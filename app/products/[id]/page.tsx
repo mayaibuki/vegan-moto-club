@@ -50,9 +50,6 @@ export default async function ProductDetailPage({
                   fill
                   className="object-cover"
                   priority
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none"
-                  }}
                 />
               </div>
               {product.photos.length > 1 && (
@@ -67,9 +64,6 @@ export default async function ProductDetailPage({
                         alt={`${product.name} ${idx + 2}`}
                         fill
                         className="object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none"
-                        }}
                       />
                     </div>
                   ))}

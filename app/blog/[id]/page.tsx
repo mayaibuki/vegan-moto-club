@@ -47,9 +47,6 @@ export default async function BlogPostPage({
             fill
             className="object-cover"
             priority
-            onError={(e) => {
-              e.currentTarget.style.display = "none"
-            }}
           />
         </div>
       )}

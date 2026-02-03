@@ -26,9 +26,6 @@ export function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               fill
               className="object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none"
-              }}
             />
           </div>
         )}
