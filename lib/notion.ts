@@ -64,8 +64,8 @@ export async function getProducts(): Promise<Product[]> {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_PRODUCTS_DB_ID!,
       filter: {
-        property: "Name",
-        rich_text: {
+        property: "Name of product",
+        title: {
           is_not_empty: true,
         },
       },
@@ -76,7 +76,7 @@ export async function getProducts(): Promise<Product[]> {
 
       return {
         id: page.id,
-        name: extractText(properties.Name?.rich_text || []),
+        name: properties["Name of product"]?.title?.[0]?.plain_text || "",
         brand: extractText(properties.Brand?.rich_text || []),
         category: properties.Category?.select?.name || "",
         levelOfProtection: properties["Level of Protection"]?.select?.name || "",
@@ -113,7 +113,7 @@ export async function getProduct(id: string): Promise<Product | null> {
 
     return {
       id: page.id,
-      name: extractText(properties.Name?.rich_text || []),
+      name: properties["Name of product"]?.title?.[0]?.plain_text || "",
       brand: extractText(properties.Brand?.rich_text || []),
       category: properties.Category?.select?.name || "",
       levelOfProtection: properties["Level of Protection"]?.select?.name || "",
@@ -148,7 +148,7 @@ export async function getEvents(): Promise<Event[]> {
       database_id: process.env.NOTION_EVENTS_DB_ID!,
       filter: {
         property: "Name of event",
-        rich_text: {
+        title: {
           is_not_empty: true,
         },
       },
@@ -166,7 +166,7 @@ export async function getEvents(): Promise<Event[]> {
 
       return {
         id: page.id,
-        name: extractText(properties["Name of event"]?.rich_text || []),
+        name: properties["Name of event"]?.title?.[0]?.plain_text || "",
         startDate: dateRange?.start || "",
         endDate: dateRange?.end || dateRange?.start || "",
         description: extractText(properties.Description?.rich_text || []),
@@ -187,17 +187,11 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_BLOG_DB_ID!,
       filter: {
-        property: "Title",
-        rich_text: {
+        property: "Name",
+        title: {
           is_not_empty: true,
         },
       },
-      sorts: [
-        {
-          property: "Publish Date",
-          direction: "descending",
-        },
-      ],
     });
 
     return response.results.map((page: any) => {
@@ -205,11 +199,11 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
       return {
         id: page.id,
-        title: extractText(properties.Title?.rich_text || []),
-        content: extractText(properties["Content/Body"]?.rich_text || []),
-        publishDate: properties["Publish Date"]?.date?.start || "",
+        title: properties.Name?.title?.[0]?.plain_text || "",
+        content: extractText(properties.Description?.rich_text || []),
+        publishDate: "",
         featuredImage: getImageUrl(
-          properties["Featured Image"]?.files?.[0]
+          properties["Thumbnail Image"]?.files?.[0]
         ) || "",
       };
     });
@@ -227,11 +221,11 @@ export async function getBlogPost(id: string): Promise<BlogPost | null> {
 
     return {
       id: page.id,
-      title: extractText(properties.Title?.rich_text || []),
-      content: extractText(properties["Content/Body"]?.rich_text || []),
-      publishDate: properties["Publish Date"]?.date?.start || "",
+      title: properties.Name?.title?.[0]?.plain_text || "",
+      content: extractText(properties.Description?.rich_text || []),
+      publishDate: "",
       featuredImage: getImageUrl(
-        properties["Featured Image"]?.files?.[0]
+        properties["Thumbnail Image"]?.files?.[0]
       ) || "",
     };
   } catch (error) {
