@@ -192,6 +192,12 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
           is_not_empty: true,
         },
       },
+      sorts: [
+        {
+          property: "Date",
+          direction: "descending",
+        },
+      ],
     });
 
     return response.results.map((page: any) => {
@@ -201,7 +207,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         id: page.id,
         title: properties.Name?.title?.[0]?.plain_text || "",
         content: extractText(properties.Description?.rich_text || []),
-        publishDate: "",
+        publishDate: properties.Date?.date?.start || "",
         featuredImage: getImageUrl(
           properties["Thumbnail Image"]?.files?.[0]
         ) || "",
@@ -223,7 +229,7 @@ export async function getBlogPost(id: string): Promise<BlogPost | null> {
       id: page.id,
       title: properties.Name?.title?.[0]?.plain_text || "",
       content: extractText(properties.Description?.rich_text || []),
-      publishDate: "",
+      publishDate: properties.Date?.date?.start || "",
       featuredImage: getImageUrl(
         properties["Thumbnail Image"]?.files?.[0]
       ) || "",
