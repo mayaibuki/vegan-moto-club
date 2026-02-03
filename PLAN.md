@@ -825,35 +825,154 @@ Branch 'main' set up to track remote branch 'main' from 'origin'.
 
 ---
 
-## 🎉 PROJECT COMPLETE
+## Phase 8: Notion Database Connection Fixes ✅ COMPLETED
 
-### What's Live:
-- ✅ Homepage with hero, staff picks, upcoming events
-- ✅ Products page with filters (Brand, Category, Gender, Riding Style)
-- ✅ Events page with upcoming community events
-- ✅ Blog page with Notion-powered content
-- ✅ About page
-- ✅ Dark/light mode toggle
-- ✅ Mobile responsive design
-- ✅ Product suggestion form (Notion embed)
+### Session: February 3, 2026
 
-### How to Update Your Site:
+#### Issue 1: Exposed Secrets in GitHub (Public Repository)
+**Problem:** Notion API token and database IDs were exposed in documentation files.
+**Solution:**
+- Replaced secrets with placeholders in `PLAN.md`, `QUICKSTART.md`, `DEPLOYMENT.md`
+- User regenerated Notion API token (old token invalidated)
+- Commit: `540bd0f`
 
-**Content Changes (No code needed):**
-1. Edit in Notion (products, events, blog posts)
-2. Changes appear on website within seconds
+#### Issue 2: Wrong Environment Variable Values in Vercel
+**Problem:** User had set all 4 environment variables to the same API token value.
+**Solution:** Clarified the correct values:
+- `NEXT_PUBLIC_NOTION_API_KEY` = Notion API token (starts with `ntn_` or `secret_`)
+- `NOTION_PRODUCTS_DB_ID` = `e6d109a83834445b8ca042e430c511f8`
+- `NOTION_EVENTS_DB_ID` = `5e38c618f2ac4823a3ca0cafe9635693` (was using page ID, not database ID)
+- `NOTION_BLOG_DB_ID` = `22d439de397b80039676fd22f633a2cf`
 
-**Code/Design Changes:**
-1. Edit files locally
-2. Test with `npm run dev`
-3. Push to GitHub: `git add . && git commit -m "message" && git push`
-4. Vercel auto-deploys within 2-5 minutes
+#### Issue 3: Property Name Mismatches in `lib/notion.ts`
+**Problem:** Code property names didn't match actual Notion database schema.
+**Solution:** Updated `lib/notion.ts`:
 
-### Next Steps (Optional):
-- [ ] Connect custom domain (veganmotoclub.com)
-- [ ] Add Instagram gallery (when API access available)
-- [ ] Set up analytics (Vercel Analytics or Google Analytics)
+| Database | Code Expected | Notion Has | Fixed To |
+|----------|--------------|------------|----------|
+| Products | `Name` | `Name of product` | `Name of product` |
+| Events | `Name` | `Name of event` | `Name of event` |
+| Blog | `Title` | `Name` | `Name` |
+| Blog | `Content/Body` | `Description` | `Description` |
+| Blog | `Featured Image` | `Thumbnail Image` | `Thumbnail Image` |
+
+- Added `Date` field support for blog sorting
+- Commit: `aca5565`, `556f73e`
+
+#### Issue 4: Next.js 14 Server/Client Component Error
+**Problem:** Build failed with error: `Event handlers cannot be passed to Client Component props`
+**Root Cause:** `onError` handlers on `<Image>` components can't be used in Server Components.
+**Solution:** Removed `onError` handlers from:
+- `components/ProductCard.tsx`
+- `app/blog/page.tsx`
+- `app/products/[id]/page.tsx`
+- `app/blog/[id]/page.tsx`
+- Commit: `d7ec540`
+
+### Verification:
+Build logs confirmed Notion connection is working - product names like "Mag-1", "Divide", "Bomber", "Horizon", "TFX4 WP", "RS3 EVO" appeared during prerendering.
 
 ---
 
-**Status:** ✅ Website fully deployed and live!
+## Current Status: 🟡 AWAITING DEPLOYMENT VERIFICATION
+
+### Commits Made Today:
+1. `540bd0f` - Remove secrets from documentation files
+2. `aca5565` - Fix Notion property names to match database schema
+3. `556f73e` - Add Date field support for blog posts
+4. `d7ec540` - Remove onError handlers from Image components for Next.js 14 compatibility
+
+### Environment Variables in Vercel (Verified Correct):
+```
+NEXT_PUBLIC_NOTION_API_KEY = [Your Notion API Token]
+NOTION_PRODUCTS_DB_ID = e6d109a83834445b8ca042e430c511f8
+NOTION_EVENTS_DB_ID = 5e38c618f2ac4823a3ca0cafe9635693
+NOTION_BLOG_DB_ID = 22d439de397b80039676fd22f633a2cf
+```
+
+### What's Working:
+- ✅ Notion API connection established
+- ✅ Property names match database schema
+- ✅ Build should now succeed (onError handlers removed)
+- ✅ Code pushed to GitHub
+
+### Awaiting Verification:
+- [ ] Vercel deployment completes successfully
+- [ ] Products load on /products page
+- [ ] Events load on /events page
+- [ ] Blog posts load on /blog page
+
+---
+
+## Remaining Tasks
+
+### Task 1: Verify Notion Data Loads ⏳ IN PROGRESS
+After deployment completes:
+1. Visit https://vegan-moto-club.vercel.app/products
+2. Verify products are displayed
+3. Visit /events and /blog to verify those load too
+
+### Task 2: Update Theme to shadcn/ui Maia ⏳ PENDING
+**Target Theme Settings:**
+- Base: Radix
+- Style: Maia
+- Base Color: Stone
+- Theme: Lime
+- Icon Library: Tabler
+- Font: DM Sans
+- Menu Accent: Subtle
+- Radius: Small
+
+**Reference URL:** https://ui.shadcn.com/create?base=radix&style=maia&baseColor=stone&theme=lime&iconLibrary=tabler&font=dm-sans&menuAccent=subtle&menuColor=default&radius=small&item=preview
+
+**Files to Modify:**
+- `tailwind.config.ts`
+- `app/globals.css`
+- Component styling as needed
+
+### Task 3: Additional Design Improvements ⏳ PENDING
+To be detailed after theme update.
+
+### Task 4: Connect GoDaddy Domain ⏳ PENDING
+**Steps:**
+1. In Vercel: Settings → Domains → Add `veganmotoclub.com`
+2. In GoDaddy: Update DNS records as Vercel specifies
+3. Wait for DNS propagation (up to 48 hours)
+
+---
+
+## How to Continue Development
+
+### To Resume Work:
+1. Read this PLAN.md file for context
+2. Check Vercel dashboard for deployment status
+3. Continue with remaining tasks above
+
+### Useful Commands:
+```bash
+# Navigate to project
+cd /Users/mayaibuki/Documents/Claude/vegan-moto-club
+
+# Check git status
+git status
+
+# View recent commits
+git log --oneline -10
+
+# Push changes to GitHub (triggers Vercel deploy)
+git add . && git commit -m "Your message" && git push
+
+# Run locally for testing (requires Node.js/npm)
+npm run dev
+```
+
+### Important Files:
+- `/lib/notion.ts` - Notion API integration
+- `/app/globals.css` - Global styles and theme colors
+- `/tailwind.config.ts` - Tailwind configuration
+- `/.env.local` - Local environment variables (don't commit!)
+
+---
+
+**Last Updated:** February 3, 2026
+**Status:** Awaiting deployment verification, then theme update
