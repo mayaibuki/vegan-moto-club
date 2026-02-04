@@ -58,20 +58,33 @@ function getImageUrl(file: any): string | null {
   return null;
 }
 
-// Fetch all products
+// Fetch all products (with pagination to get all results)
 export async function getProducts(): Promise<Product[]> {
   try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_PRODUCTS_DB_ID!,
-      filter: {
-        property: "Name of product",
-        title: {
-          is_not_empty: true,
-        },
-      },
-    });
+    const allResults: any[] = [];
+    let hasMore = true;
+    let startCursor: string | undefined = undefined;
 
-    return response.results.map((page: any) => {
+    // Paginate through all results (Notion API returns max 100 per request)
+    while (hasMore) {
+      const response = await notion.databases.query({
+        database_id: process.env.NOTION_PRODUCTS_DB_ID!,
+        filter: {
+          property: "Name of product",
+          title: {
+            is_not_empty: true,
+          },
+        },
+        start_cursor: startCursor,
+        page_size: 100,
+      });
+
+      allResults.push(...response.results);
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
+
+    return allResults.map((page: any) => {
       const properties = page.properties;
 
       return {
@@ -141,26 +154,39 @@ export async function getProduct(id: string): Promise<Product | null> {
   }
 }
 
-// Fetch all events
+// Fetch all events (with pagination to get all results)
 export async function getEvents(): Promise<Event[]> {
   try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_EVENTS_DB_ID!,
-      filter: {
-        property: "Name of event",
-        title: {
-          is_not_empty: true,
-        },
-      },
-      sorts: [
-        {
-          property: "Date",
-          direction: "ascending",
-        },
-      ],
-    });
+    const allResults: any[] = [];
+    let hasMore = true;
+    let startCursor: string | undefined = undefined;
 
-    return response.results.map((page: any) => {
+    // Paginate through all results (Notion API returns max 100 per request)
+    while (hasMore) {
+      const response = await notion.databases.query({
+        database_id: process.env.NOTION_EVENTS_DB_ID!,
+        filter: {
+          property: "Name of event",
+          title: {
+            is_not_empty: true,
+          },
+        },
+        sorts: [
+          {
+            property: "Date",
+            direction: "ascending",
+          },
+        ],
+        start_cursor: startCursor,
+        page_size: 100,
+      });
+
+      allResults.push(...response.results);
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
+
+    return allResults.map((page: any) => {
       const properties = page.properties;
       const dateRange = properties.Date?.date;
 
