@@ -27,21 +27,21 @@ export function Navbar() {
   }
 
   return (
-    <nav className="border-b border-border bg-background sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <nav className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Logo size="md" href="/" />
 
-        <div className="flex items-center gap-6">
-          <Link href="/products" className="hover:text-primary transition-colors">
+        <div className="flex items-center gap-8">
+          <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
             Products
           </Link>
-          <Link href="/events" className="hover:text-primary transition-colors">
+          <Link href="/events" className="text-sm font-medium hover:text-primary transition-colors">
             Events
           </Link>
-          <Link href="/blog" className="hover:text-primary transition-colors">
+          <Link href="/blog" className="text-sm font-medium hover:text-primary transition-colors">
             Blog
           </Link>
-          <Link href="/about" className="hover:text-primary transition-colors">
+          <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
             About
           </Link>
 
@@ -51,8 +51,9 @@ export function Navbar() {
               size="icon"
               onClick={toggleTheme}
               aria-label="Toggle theme"
+              className="rounded-full"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
           )}
         </div>

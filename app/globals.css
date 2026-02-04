@@ -35,7 +35,12 @@
     --border: 12 6.3% 93.8%;              /* stone-200 */
     --input: 12 6.3% 93.8%;               /* stone-200 */
     --ring: 77.9 54.4% 47.4%;             /* lime-500 */
-    --radius: 0.375rem;                   /* Small radius */
+    --radius: 0.75rem;                    /* Maia: soft rounded corners */
+
+    /* Maia spacing scale */
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1.25rem;
+    --spacing-lg: 2rem;
 
     /* Chart colors */
     --chart-1: 77.9 54.4% 47.4%;          /* lime-500 */
