@@ -10,20 +10,10 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: [
-          'Petrona',
+          'DM Sans',
           'system-ui',
           '-apple-system',
           'sans-serif',
-        ],
-        heading: [
-          'Zalando Sans Expanded',
-          'system-ui',
-          '-apple-system',
-          'sans-serif',
-        ],
-        display: [
-          'Havana Script',
-          'cursive',
         ],
       },
       colors: {
