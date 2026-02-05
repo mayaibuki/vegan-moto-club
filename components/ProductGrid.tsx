@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { Search, X, Check, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, X, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { ProductCard } from "./ProductCard"
@@ -21,34 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select"
+import { Checkbox } from "./ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Label } from "./ui/label"
 
 interface ProductGridProps {
   products: Product[]
-}
-
-interface FilterButtonProps {
-  label: string
-  isActive: boolean
-  onClick: () => void
-}
-
-function FilterButton({ label, isActive, onClick }: FilterButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={`
-        w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all
-        flex items-center justify-between gap-2
-        ${isActive
-          ? "bg-primary text-primary-foreground"
-          : "hover:bg-muted text-foreground"
-        }
-      `}
-    >
-      <span className="truncate">{label}</span>
-      {isActive && <Check className="h-4 w-4 shrink-0" />}
-    </button>
-  )
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
@@ -143,45 +121,49 @@ export function ProductGrid({ products }: ProductGridProps) {
             {/* Category Filter */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-3 block">Category</label>
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                <FilterButton
-                  label="All Categories"
-                  isActive={selectedCategory === null}
-                  onClick={() => setSelectedCategory(null)}
-                />
-                {categories.map((category) => (
-                  <FilterButton
-                    key={category}
-                    label={category}
-                    isActive={selectedCategory === category}
-                    onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-                  />
+              <RadioGroup
+                value={selectedCategory || "all"}
+                onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
+                className="space-y-2"
+              >
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="all" id="category-all" />
+                  <Label htmlFor="category-all" className="text-sm font-medium cursor-pointer">
+                    All Categories
+                  </Label>
+                </div>
+                {["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"].map((category) => (
+                  <div key={category} className="flex items-center space-x-3">
+                    <RadioGroupItem value={category} id={`category-${category}`} />
+                    <Label htmlFor={`category-${category}`} className="text-sm font-medium cursor-pointer">
+                      {category}
+                    </Label>
+                  </div>
                 ))}
-              </div>
+              </RadioGroup>
             </div>
 
             {/* Gender Filter */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-3 block">Gender</label>
-              <div className="space-y-1">
-                <FilterButton
-                  label="All Genders"
-                  isActive={selectedGenders.length === 0}
-                  onClick={() => setSelectedGenders([])}
-                />
+              <div className="space-y-2">
                 {["Women", "Men", "Unisex"].map((gender) => (
-                  <FilterButton
-                    key={gender}
-                    label={gender}
-                    isActive={selectedGenders.includes(gender)}
-                    onClick={() => {
-                      setSelectedGenders(prev =>
-                        prev.includes(gender)
-                          ? prev.filter(g => g !== gender)
-                          : [...prev, gender]
-                      )
-                    }}
-                  />
+                  <div key={gender} className="flex items-center space-x-3">
+                    <Checkbox
+                      id={`gender-${gender}`}
+                      checked={selectedGenders.includes(gender)}
+                      onCheckedChange={(checked) => {
+                        setSelectedGenders(prev =>
+                          checked
+                            ? [...prev, gender]
+                            : prev.filter(g => g !== gender)
+                        )
+                      }}
+                    />
+                    <Label htmlFor={`gender-${gender}`} className="text-sm font-medium cursor-pointer">
+                      {gender}
+                    </Label>
+                  </div>
                 ))}
               </div>
             </div>
@@ -189,25 +171,24 @@ export function ProductGrid({ products }: ProductGridProps) {
             {/* Riding Style Filter */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-3 block">Riding Style</label>
-              <div className="space-y-1">
-                <FilterButton
-                  label="All Styles"
-                  isActive={selectedRidingStyles.length === 0}
-                  onClick={() => setSelectedRidingStyles([])}
-                />
+              <div className="space-y-2">
                 {["Commute / Street", "Adventure / Touring", "Sport / Canyons", "Racing / Trackdays", "Off-roading"].map((style) => (
-                  <FilterButton
-                    key={style}
-                    label={style}
-                    isActive={selectedRidingStyles.includes(style)}
-                    onClick={() => {
-                      setSelectedRidingStyles(prev =>
-                        prev.includes(style)
-                          ? prev.filter(s => s !== style)
-                          : [...prev, style]
-                      )
-                    }}
-                  />
+                  <div key={style} className="flex items-center space-x-3">
+                    <Checkbox
+                      id={`style-${style}`}
+                      checked={selectedRidingStyles.includes(style)}
+                      onCheckedChange={(checked) => {
+                        setSelectedRidingStyles(prev =>
+                          checked
+                            ? [...prev, style]
+                            : prev.filter(s => s !== style)
+                        )
+                      }}
+                    />
+                    <Label htmlFor={`style-${style}`} className="text-sm font-medium cursor-pointer">
+                      {style}
+                    </Label>
+                  </div>
                 ))}
               </div>
             </div>
@@ -215,21 +196,26 @@ export function ProductGrid({ products }: ProductGridProps) {
             {/* Brand Filter */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-3 block">Brand</label>
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                <FilterButton
-                  label={`All ${brands.length} Brands`}
-                  isActive={selectedBrand === null}
-                  onClick={() => setSelectedBrand(null)}
-                />
+              <RadioGroup
+                value={selectedBrand || "all"}
+                onValueChange={(value) => setSelectedBrand(value === "all" ? null : value)}
+                className="space-y-2 max-h-48 overflow-y-auto"
+              >
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="all" id="brand-all" />
+                  <Label htmlFor="brand-all" className="text-sm font-medium cursor-pointer">
+                    All {brands.length} Brands
+                  </Label>
+                </div>
                 {brands.map((brand) => (
-                  <FilterButton
-                    key={brand}
-                    label={brand}
-                    isActive={selectedBrand === brand}
-                    onClick={() => setSelectedBrand(selectedBrand === brand ? null : brand)}
-                  />
+                  <div key={brand} className="flex items-center space-x-3">
+                    <RadioGroupItem value={brand} id={`brand-${brand}`} />
+                    <Label htmlFor={`brand-${brand}`} className="text-sm font-medium cursor-pointer">
+                      {brand}
+                    </Label>
+                  </div>
                 ))}
-              </div>
+              </RadioGroup>
             </div>
 
             {/* Clear Filters */}
