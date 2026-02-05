@@ -122,7 +122,7 @@ export default async function ProductDetailPage({
                 <Badge variant="outline">{product.waterproofLevel}</Badge>
               )}
               {product.veganVerified && (
-                <Badge variant="outline" className="bg-green-50 text-green-900 dark:bg-green-900 dark:text-green-50">
+                <Badge variant="accent">
                   ✓ {product.veganVerified}
                 </Badge>
               )}

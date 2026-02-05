@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number): string {
-  return `$${price.toFixed(2)}`
+  return `$${Math.round(price)}`
 }
 
 export function formatDate(dateString: string): string {
@@ -24,8 +24,8 @@ export function filterProducts(
   filters: {
     brand?: string
     category?: string
-    gender?: string
-    ridingStyle?: string
+    genders?: string[]
+    ridingStyles?: string[]
     search?: string
   }
 ): any[] {
@@ -45,14 +45,17 @@ export function filterProducts(
     if (filters.category && product.category !== filters.category) {
       return false
     }
-    if (filters.gender && product.gender !== filters.gender) {
-      return false
+    if (filters.genders && filters.genders.length > 0) {
+      // Check if product's gender matches any of the selected genders
+      if (!filters.genders.some(g => product.gender.includes(g))) {
+        return false
+      }
     }
-    if (
-      filters.ridingStyle &&
-      !product.ridingStyle.includes(filters.ridingStyle)
-    ) {
-      return false
+    if (filters.ridingStyles && filters.ridingStyles.length > 0) {
+      // Check if product's ridingStyle matches any of the selected styles
+      if (!filters.ridingStyles.some(s => product.ridingStyle.includes(s))) {
+        return false
+      }
     }
     return true
   })

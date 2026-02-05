@@ -90,13 +90,13 @@ export async function getProducts(): Promise<Product[]> {
       return {
         id: page.id,
         name: properties["Name of product"]?.title?.[0]?.plain_text || "",
-        brand: extractText(properties.Brand?.rich_text || []),
-        category: properties.Category?.select?.name || "",
+        brand: properties.Brand?.select?.name || "",
+        category: (properties.Category?.multi_select || []).map((s: any) => s.name).join(", ") || "",
         levelOfProtection: properties["Level of Protection"]?.select?.name || "",
-        gender: properties.Gender?.select?.name || "",
+        gender: (properties.Gender?.multi_select || []).map((s: any) => s.name).join(", ") || "",
         price: properties.Price?.number || 0,
         description: extractText(properties.Description?.rich_text || []),
-        url: extractText(properties.URL?.rich_text || []),
+        url: properties.URL?.url || "",
         photos: (properties.Photos?.files || [])
           .map((file: any) => getImageUrl(file))
           .filter(Boolean) as string[],
@@ -127,13 +127,13 @@ export async function getProduct(id: string): Promise<Product | null> {
     return {
       id: page.id,
       name: properties["Name of product"]?.title?.[0]?.plain_text || "",
-      brand: extractText(properties.Brand?.rich_text || []),
-      category: properties.Category?.select?.name || "",
+      brand: properties.Brand?.select?.name || "",
+      category: (properties.Category?.multi_select || []).map((s: any) => s.name).join(", ") || "",
       levelOfProtection: properties["Level of Protection"]?.select?.name || "",
-      gender: properties.Gender?.select?.name || "",
+      gender: (properties.Gender?.multi_select || []).map((s: any) => s.name).join(", ") || "",
       price: properties.Price?.number || 0,
       description: extractText(properties.Description?.rich_text || []),
-      url: extractText(properties.URL?.rich_text || []),
+      url: properties.URL?.url || "",
       photos: (properties.Photos?.files || [])
         .map((file: any) => getImageUrl(file))
         .filter(Boolean) as string[],

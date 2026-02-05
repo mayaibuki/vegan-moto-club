@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
+import { Card, CardContent } from "./ui/card"
 import { Badge } from "./ui/badge"
 import { Product } from "@/lib/notion"
 import { formatPrice } from "@/lib/utils"
@@ -18,55 +18,69 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.id}`}>
-      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group">
-        {product.photos.length > 0 && (
-          <div className="relative h-52 w-full bg-muted overflow-hidden">
+      <Card className="h-full hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group">
+        {/* Image Section */}
+        <div className="relative aspect-square w-full bg-white overflow-hidden border-b border-border/30 flex items-center justify-center">
+          {product.photos.length > 0 ? (
             <Image
               src={product.photos[0]}
               alt={product.name}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
             />
-          </div>
-        )}
-
-        <CardHeader className="pb-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1">
-              <CardTitle className="text-lg leading-tight line-clamp-2">{product.name}</CardTitle>
-              <CardDescription className="text-sm mt-1">{product.brand}</CardDescription>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+              No Image
             </div>
-            {product.staffFavorite && <Badge variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0">⭐ Staff Pick</Badge>}
-          </div>
-        </CardHeader>
+          )}
+          {/* Staff Pick Badge - Positioned on image */}
+          {product.staffFavorite && (
+            <div className="absolute top-3 left-3">
+              <Badge variant="default">⭐ Staff Pick</Badge>
+            </div>
+          )}
+        </div>
 
-        <CardContent className="space-y-4">
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-bold">{formatPrice(product.price)}</span>
-          </div>
+        <CardContent className="p-5 space-y-3">
+          {/* Brand - Small and muted above product name */}
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            {product.brand}
+          </p>
 
-          <div className="flex flex-wrap gap-2">
+          {/* Product Name */}
+          <h3 className="font-semibold text-base leading-tight line-clamp-2">
+            {product.name}
+          </h3>
+
+          {/* Price - More prominent */}
+          <p className="text-xl font-bold text-foreground">
+            {formatPrice(product.price)}
+          </p>
+
+          {/* Badges - Grouped and cleaner */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
             {product.levelOfProtection && (
-              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+              <Badge variant="secondary">
                 {product.levelOfProtection}
               </Badge>
             )}
             {product.season.map((s) => (
-              <Badge key={s} variant="outline" className="bg-accent/20 border-accent/30 text-foreground">
+              <Badge key={s} variant="accent">
                 {seasonEmojis[s] || ""} {s}
               </Badge>
             ))}
             {product.gender && (
-              <Badge variant="outline" className="bg-muted border-border text-foreground">
+              <Badge variant="outline">
                 {product.gender}
               </Badge>
             )}
           </div>
 
+          {/* Category - Subtle text at bottom */}
           {product.category && (
-            <div className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground pt-1">
               {product.category}
-            </div>
+            </p>
           )}
         </CardContent>
       </Card>

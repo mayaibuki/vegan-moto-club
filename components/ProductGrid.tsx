@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { Search, X, Check, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { ProductCard } from "./ProductCard"
@@ -13,18 +14,52 @@ import {
   getUniqueRidingStyles,
 } from "@/lib/utils"
 import { Badge } from "./ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
 
 interface ProductGridProps {
   products: Product[]
+}
+
+interface FilterButtonProps {
+  label: string
+  isActive: boolean
+  onClick: () => void
+}
+
+function FilterButton({ label, isActive, onClick }: FilterButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all
+        flex items-center justify-between gap-2
+        ${isActive
+          ? "bg-primary text-primary-foreground"
+          : "hover:bg-muted text-foreground"
+        }
+      `}
+    >
+      <span className="truncate">{label}</span>
+      {isActive && <Check className="h-4 w-4 shrink-0" />}
+    </button>
+  )
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
   const [search, setSearch] = useState("")
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedGender, setSelectedGender] = useState<string | null>(null)
-  const [selectedRidingStyle, setSelectedRidingStyle] = useState<string | null>(null)
+  const [selectedGenders, setSelectedGenders] = useState<string[]>([])
+  const [selectedRidingStyles, setSelectedRidingStyles] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(25)
 
   const brands = useMemo(() => getUniqueBrands(products), [products])
   const categories = useMemo(() => getUniqueCategories(products), [products])
@@ -36,209 +71,324 @@ export function ProductGrid({ products }: ProductGridProps) {
       filterProducts(products, {
         brand: selectedBrand || undefined,
         category: selectedCategory || undefined,
-        gender: selectedGender || undefined,
-        ridingStyle: selectedRidingStyle || undefined,
+        genders: selectedGenders.length > 0 ? selectedGenders : undefined,
+        ridingStyles: selectedRidingStyles.length > 0 ? selectedRidingStyles : undefined,
         search: search || undefined,
-      }),
-    [products, search, selectedBrand, selectedCategory, selectedGender, selectedRidingStyle]
+      }).sort((a, b) => a.price - b.price),
+    [products, search, selectedBrand, selectedCategory, selectedGenders, selectedRidingStyles]
   )
 
-  const activeFilters = [
+  const activeFilterCount = [
     selectedBrand,
     selectedCategory,
-    selectedGender,
-    selectedRidingStyle,
-    search ? `Search: ${search}` : null,
-  ].filter(Boolean)
+    selectedGenders.length > 0,
+    selectedRidingStyles.length > 0,
+  ].filter(Boolean).length
+
+  const hasAnyFilters = activeFilterCount > 0 || search
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProducts.length / rowsPerPage)
+  const startIndex = (currentPage - 1) * rowsPerPage
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + rowsPerPage)
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filteredProducts.length])
+
+  const clearAllFilters = () => {
+    setSelectedBrand(null)
+    setSelectedCategory(null)
+    setSelectedGenders([])
+    setSelectedRidingStyles([])
+    setSearch("")
+  }
 
   return (
     <div className="w-full">
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Filters */}
         <aside
           className={`lg:w-64 flex-shrink-0 ${
             showFilters ? "block" : "hidden lg:block"
           }`}
         >
-          <div className="space-y-6 sticky top-24">
+          <div className="space-y-6 sticky top-24 bg-background lg:bg-transparent p-4 lg:p-0 rounded-xl lg:rounded-none border lg:border-0 border-border">
             {/* Search */}
             <div>
-              <h3 className="font-heading font-semibold mb-3">Search</h3>
-              <Input
-                placeholder="Search products..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-
-            {/* Brand Filter */}
-            <div>
-              <h3 className="font-heading font-semibold mb-3">Brand</h3>
-              <div className="space-y-2">
-                <Button
-                  variant={selectedBrand === null ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setSelectedBrand(null)}
-                  size="sm"
-                >
-                  All Brands
-                </Button>
-                {brands.map((brand) => (
-                  <Button
-                    key={brand}
-                    variant={selectedBrand === brand ? "default" : "outline"}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedBrand(brand)}
-                    size="sm"
+              <label className="text-sm font-semibold text-foreground mb-3 block">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search products..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
-                    {brand}
-                  </Button>
-                ))}
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
 
+            {/* Divider */}
+            <div className="border-t border-border" />
+
             {/* Category Filter */}
             <div>
-              <h3 className="font-heading font-semibold mb-3">Category</h3>
-              <div className="space-y-2">
-                <Button
-                  variant={selectedCategory === null ? "default" : "outline"}
-                  className="w-full justify-start"
+              <label className="text-sm font-semibold text-foreground mb-3 block">Category</label>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                <FilterButton
+                  label="All Categories"
+                  isActive={selectedCategory === null}
                   onClick={() => setSelectedCategory(null)}
-                  size="sm"
-                >
-                  All Categories
-                </Button>
+                />
                 {categories.map((category) => (
-                  <Button
+                  <FilterButton
                     key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedCategory(category)}
-                    size="sm"
-                  >
-                    {category}
-                  </Button>
+                    label={category}
+                    isActive={selectedCategory === category}
+                    onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
+                  />
                 ))}
               </div>
             </div>
 
             {/* Gender Filter */}
             <div>
-              <h3 className="font-heading font-semibold mb-3">Gender</h3>
-              <div className="space-y-2">
-                <Button
-                  variant={selectedGender === null ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setSelectedGender(null)}
-                  size="sm"
-                >
-                  All Genders
-                </Button>
-                {genders.map((gender) => (
-                  <Button
+              <label className="text-sm font-semibold text-foreground mb-3 block">Gender</label>
+              <div className="space-y-1">
+                <FilterButton
+                  label="All Genders"
+                  isActive={selectedGenders.length === 0}
+                  onClick={() => setSelectedGenders([])}
+                />
+                {["Women", "Men", "Unisex"].map((gender) => (
+                  <FilterButton
                     key={gender}
-                    variant={selectedGender === gender ? "default" : "outline"}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedGender(gender)}
-                    size="sm"
-                  >
-                    {gender}
-                  </Button>
+                    label={gender}
+                    isActive={selectedGenders.includes(gender)}
+                    onClick={() => {
+                      setSelectedGenders(prev =>
+                        prev.includes(gender)
+                          ? prev.filter(g => g !== gender)
+                          : [...prev, gender]
+                      )
+                    }}
+                  />
                 ))}
               </div>
             </div>
 
             {/* Riding Style Filter */}
             <div>
-              <h3 className="font-heading font-semibold mb-3">Riding Style</h3>
-              <div className="space-y-2">
-                <Button
-                  variant={selectedRidingStyle === null ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setSelectedRidingStyle(null)}
-                  size="sm"
-                >
-                  All Styles
-                </Button>
-                {ridingStyles.map((style) => (
-                  <Button
+              <label className="text-sm font-semibold text-foreground mb-3 block">Riding Style</label>
+              <div className="space-y-1">
+                <FilterButton
+                  label="All Styles"
+                  isActive={selectedRidingStyles.length === 0}
+                  onClick={() => setSelectedRidingStyles([])}
+                />
+                {["Commute / Street", "Adventure / Touring", "Sport / Canyons", "Racing / Trackdays", "Off-roading"].map((style) => (
+                  <FilterButton
                     key={style}
-                    variant={selectedRidingStyle === style ? "default" : "outline"}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedRidingStyle(style)}
-                    size="sm"
-                  >
-                    {style}
-                  </Button>
+                    label={style}
+                    isActive={selectedRidingStyles.includes(style)}
+                    onClick={() => {
+                      setSelectedRidingStyles(prev =>
+                        prev.includes(style)
+                          ? prev.filter(s => s !== style)
+                          : [...prev, style]
+                      )
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Brand Filter */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-3 block">Brand</label>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                <FilterButton
+                  label={`All ${brands.length} Brands`}
+                  isActive={selectedBrand === null}
+                  onClick={() => setSelectedBrand(null)}
+                />
+                {brands.map((brand) => (
+                  <FilterButton
+                    key={brand}
+                    label={brand}
+                    isActive={selectedBrand === brand}
+                    onClick={() => setSelectedBrand(selectedBrand === brand ? null : brand)}
+                  />
                 ))}
               </div>
             </div>
 
             {/* Clear Filters */}
-            {activeFilters.length > 0 && (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  setSelectedBrand(null)
-                  setSelectedCategory(null)
-                  setSelectedGender(null)
-                  setSelectedRidingStyle(null)
-                  setSearch("")
-                }}
-              >
-                Clear All Filters
-              </Button>
+            {hasAnyFilters && (
+              <>
+                <div className="border-t border-border" />
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={clearAllFilters}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Clear All Filters
+                </Button>
+              </>
             )}
           </div>
         </aside>
 
         {/* Main Content */}
         <div className="flex-1">
-          {/* Toggle Filters Button (Mobile) */}
-          <div className="mb-4 lg:hidden">
+          {/* Mobile Filter Toggle & Results Count */}
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-semibold text-foreground">
+                {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + rowsPerPage, filteredProducts.length)}
+              </span> of {filteredProducts.length} products
+            </p>
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
-              className="w-full"
+              className="lg:hidden"
             >
-              {showFilters ? "Hide Filters" : "Show Filters"}
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Filters
+              {activeFilterCount > 0 && (
+                <Badge variant="default" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {activeFilterCount}
+                </Badge>
+              )}
             </Button>
           </div>
 
           {/* Active Filters Display */}
-          {activeFilters.length > 0 && (
-            <div className="mb-6 p-4 bg-muted rounded-lg">
-              <h3 className="text-sm font-semibold mb-2">Active Filters:</h3>
-              <div className="flex flex-wrap gap-2">
-                {activeFilters.map((filter, idx) => (
-                  <Badge key={idx} variant="secondary">
-                    {filter}
-                  </Badge>
-                ))}
-              </div>
+          {hasAnyFilters && (
+            <div className="mb-6 flex flex-wrap items-center gap-2">
+              <span className="text-sm text-muted-foreground">Active:</span>
+              {selectedBrand && (
+                <Badge variant="secondary" className="gap-1">
+                  {selectedBrand}
+                  <button onClick={() => setSelectedBrand(null)} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {selectedCategory && (
+                <Badge variant="secondary" className="gap-1">
+                  {selectedCategory}
+                  <button onClick={() => setSelectedCategory(null)} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {selectedGenders.map((gender) => (
+                <Badge key={gender} variant="secondary" className="gap-1">
+                  {gender}
+                  <button onClick={() => setSelectedGenders(prev => prev.filter(g => g !== gender))} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+              {selectedRidingStyles.map((style) => (
+                <Badge key={style} variant="secondary" className="gap-1">
+                  {style}
+                  <button onClick={() => setSelectedRidingStyles(prev => prev.filter(s => s !== style))} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+              {search && (
+                <Badge variant="secondary" className="gap-1">
+                  "{search}"
+                  <button onClick={() => setSearch("")} className="ml-1 hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Clear all
+              </button>
             </div>
           )}
 
           {/* Products Grid */}
-          <div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Showing {filteredProducts.length} of {products.length} products
-            </p>
-
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No products found matching your filters.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-16 bg-muted/30 rounded-2xl">
+              <p className="text-lg text-muted-foreground mb-4">No products found matching your filters.</p>
+              <Button variant="outline" onClick={clearAllFilters}>
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-            )}
-          </div>
+
+              {/* Pagination */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Rows per page</span>
+                  <Select
+                    value={rowsPerPage.toString()}
+                    onValueChange={(v) => {
+                      setRowsPerPage(Number(v))
+                      setCurrentPage(1)
+                    }}
+                  >
+                    <SelectTrigger className="w-[80px] h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => p - 1)}
+                    disabled={currentPage === 1}
+                    className="gap-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => p + 1)}
+                    disabled={currentPage >= totalPages}
+                    className="gap-1"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -22,18 +22,13 @@ export function Logo({ size = "md", href = "/" }: LogoProps) {
   const logoElement = (
     <div className={`flex items-center gap-2 ${size !== "sm" ? "flex-col" : ""}`}>
       <Image
-        src="/images/logo.svg"
+        src="/images/logo.png"
         alt="Vegan Moto Club"
         width={sizes[size].width}
         height={sizes[size].height}
         className={sizeClass[size]}
         priority
       />
-      {size === "lg" && (
-        <span className="font-display text-center text-lg font-bold text-primary">
-          VEGAN MOTO CLUB
-        </span>
-      )}
     </div>
   )
 

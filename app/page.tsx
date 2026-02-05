@@ -11,7 +11,10 @@ export default async function Home() {
   const products = await getProducts()
   const events = await getEvents()
 
-  const staffPicks = products.filter((p) => p.staffFavorite).slice(0, 6)
+  const staffPicks = products
+    .filter((p) => p.staffFavorite)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 6)
   const upcomingEvents = events.slice(0, 5)
 
   return (
@@ -21,16 +24,11 @@ export default async function Home() {
         <div className="flex justify-center mb-8">
           <Logo size="lg" />
         </div>
-        <div className="space-y-3">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Vegan Moto Club
-          </h1>
-          <p className="text-xl text-muted-foreground font-medium">
-            100% Cruelty-Free Motorcycle Gear Database
-          </p>
-        </div>
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+          Vegan Moto Club
+        </h1>
         <p className="text-lg text-foreground max-w-2xl mx-auto leading-relaxed">
-          Discover ethical and cruelty-free motorcycle gear. We curate the best vegan alternatives for every riding style, protection level, and budget.
+          We curate the best vegan motorcycle gear alternatives for every riding style, weather, gender, and budget.
         </p>
         <div className="flex flex-col sm:flex-row gap-5 justify-center pt-4">
           <Button size="lg" asChild>
@@ -127,10 +125,10 @@ export default async function Home() {
       )}
 
       {/* Product Suggestion Form Section */}
-      <section className="bg-muted/50 rounded-3xl p-10 md:p-14">
+      <section className="rounded-3xl p-10 md:p-14">
         <h2 className="text-3xl font-bold tracking-tight mb-3">Suggest a Product</h2>
         <p className="text-muted-foreground text-lg mb-8">
-          Know a great vegan motorcycle gear brand? Tell us about it!
+          Know a great vegan motorcycle product? Tell us about it!
         </p>
         <div className="rounded-2xl overflow-hidden border border-border/50">
           <iframe

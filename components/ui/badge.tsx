@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "outline"
+  variant?: "default" | "secondary" | "outline" | "accent"
 }
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
@@ -16,6 +16,8 @@ function Badge({ className, variant = "default", ...props }: BadgeProps) {
         variant === "secondary" &&
           "border border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         variant === "outline" && "border border-input text-foreground",
+        variant === "accent" &&
+          "border border-transparent bg-accent/20 text-accent-foreground hover:bg-accent/30",
         className
       )}
       {...props}
