@@ -1,12 +1,13 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type { Product } from "./notion"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 export function formatPrice(price: number): string {
-  return `$${Math.round(price)}`
+  return price % 1 === 0 ? `$${price}` : `$${price.toFixed(2)}`
 }
 
 export function formatDate(dateString: string): string {
@@ -20,7 +21,7 @@ export function formatDate(dateString: string): string {
 }
 
 export function filterProducts(
-  products: any[],
+  products: Product[],
   filters: {
     brand?: string
     category?: string
@@ -28,7 +29,7 @@ export function filterProducts(
     ridingStyles?: string[]
     search?: string
   }
-): any[] {
+): Product[] {
   return products.filter((product) => {
     if (filters.search) {
       const searchLower = filters.search.toLowerCase()
@@ -61,25 +62,7 @@ export function filterProducts(
   })
 }
 
-export function getUniqueBrands(products: any[]): string[] {
+export function getUniqueBrands(products: Product[]): string[] {
   const brands = new Set(products.map((p) => p.brand).filter(Boolean))
   return Array.from(brands).sort()
-}
-
-export function getUniqueCategories(products: any[]): string[] {
-  const categories = new Set(products.map((p) => p.category).filter(Boolean))
-  return Array.from(categories).sort()
-}
-
-export function getUniqueGenders(products: any[]): string[] {
-  const genders = new Set(products.map((p) => p.gender).filter(Boolean))
-  return Array.from(genders).sort()
-}
-
-export function getUniqueRidingStyles(products: any[]): string[] {
-  const styles = new Set<string>()
-  products.forEach((p) => {
-    p.ridingStyle.forEach((s: string) => styles.add(s))
-  })
-  return Array.from(styles).sort()
 }

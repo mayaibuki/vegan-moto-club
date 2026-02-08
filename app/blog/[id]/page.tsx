@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { getBlogPost, getBlogPosts } from "@/lib/notion"
 import { notFound } from "next/navigation"
 import Image from "next/image"
@@ -5,11 +6,53 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/utils"
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
+
 export async function generateStaticParams() {
   const posts = await getBlogPosts()
   return posts.map((post) => ({
     id: post.id,
   }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string }
+}): Promise<Metadata> {
+  const post = await getBlogPost(params.id)
+
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    }
+  }
+
+  const description = post.content
+    ? post.content.slice(0, 160)
+    : `Read ${post.title} on Vegan Moto Club blog.`
+
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      title: `${post.title} | Vegan Moto Club`,
+      description,
+      url: `/blog/${post.id}`,
+      type: "article",
+      publishedTime: post.publishDate,
+      images: post.featuredImage ? [{ url: post.featuredImage }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: post.featuredImage ? [post.featuredImage] : [],
+    },
+    alternates: {
+      canonical: `/blog/${post.id}`,
+    },
+  }
 }
 
 export default async function BlogPostPage({
@@ -23,9 +66,39 @@ export default async function BlogPostPage({
     notFound()
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.content ? post.content.slice(0, 160) : "",
+    image: post.featuredImage || undefined,
+    datePublished: post.publishDate,
+    author: {
+      "@type": "Organization",
+      name: "Vegan Moto Club",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Vegan Moto Club",
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/blog/${post.id}`,
+    },
+  }
+
   return (
-    <article className="max-w-3xl mx-auto space-y-8">
-      {/* Back Button */}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <article className="max-w-3xl mx-auto space-y-8">
+        {/* Back Button */}
       <Button variant="ghost" asChild className="mb-4">
         <Link href="/blog">← Back to Blog</Link>
       </Button>
@@ -45,6 +118,7 @@ export default async function BlogPostPage({
             src={post.featuredImage}
             alt={post.title}
             fill
+            sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover"
             priority
           />
@@ -64,6 +138,7 @@ export default async function BlogPostPage({
           <Link href="/blog">← Back to All Posts</Link>
         </Button>
       </div>
-    </article>
+      </article>
+    </>
   )
 }

@@ -1,8 +1,12 @@
 import { Client } from "@notionhq/client";
+import { unstable_cache } from "next/cache";
 
 const notion = new Client({
-  auth: process.env.NEXT_PUBLIC_NOTION_API_KEY,
+  auth: process.env.NOTION_API_KEY,
 });
+
+// Revalidation time in seconds (1 hour for production, shorter for development)
+const REVALIDATE_TIME = process.env.NODE_ENV === "production" ? 3600 : 60;
 
 export interface Product {
   id: string;
@@ -42,26 +46,60 @@ export interface BlogPost {
   featuredImage: string;
 }
 
+// Notion API response types
+interface NotionRichText {
+  plain_text: string
+}
+
+interface NotionSelectOption {
+  name: string
+}
+
+interface NotionFile {
+  type: "external" | "file"
+  external?: { url: string }
+  file?: { url: string }
+}
+
+interface NotionPageProperties {
+  [key: string]: {
+    title?: NotionRichText[]
+    rich_text?: NotionRichText[]
+    select?: { name: string }
+    multi_select?: NotionSelectOption[]
+    number?: number
+    url?: string
+    checkbox?: boolean
+    date?: { start: string; end?: string }
+    files?: NotionFile[]
+  }
+}
+
+interface NotionPage {
+  id: string
+  properties: NotionPageProperties
+}
+
 // Helper function to extract text from rich text blocks
-function extractText(richText: any[]): string {
+function extractText(richText: NotionRichText[]): string {
   return richText.map((block) => block.plain_text).join("");
 }
 
 // Helper function to get image URL from files
-function getImageUrl(file: any): string | null {
+function getImageUrl(file: NotionFile): string | null {
   if (!file) return null;
   if (file.type === "external") {
-    return file.external.url;
+    return file.external?.url ?? null;
   } else if (file.type === "file") {
-    return file.file.url;
+    return file.file?.url ?? null;
   }
   return null;
 }
 
-// Fetch all products (with pagination to get all results)
-export async function getProducts(): Promise<Product[]> {
+// Internal function to fetch products from Notion
+async function fetchProductsFromNotion(): Promise<Product[]> {
   try {
-    const allResults: any[] = [];
+    const allResults: NotionPage[] = [];
     let hasMore = true;
     let startCursor: string | undefined = undefined;
 
@@ -79,85 +117,102 @@ export async function getProducts(): Promise<Product[]> {
         page_size: 100,
       });
 
-      allResults.push(...response.results);
+      allResults.push(...(response.results as NotionPage[]));
       hasMore = response.has_more;
       startCursor = response.next_cursor ?? undefined;
     }
 
-    return allResults.map((page: any) => {
+    return allResults.map((page: NotionPage) => {
       const properties = page.properties;
 
       return {
         id: page.id,
         name: properties["Name of product"]?.title?.[0]?.plain_text || "",
         brand: properties.Brand?.select?.name || "",
-        category: (properties.Category?.multi_select || []).map((s: any) => s.name).join(", ") || "",
+        category: (properties.Category?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
         levelOfProtection: properties["Level of Protection"]?.select?.name || "",
-        gender: (properties.Gender?.multi_select || []).map((s: any) => s.name).join(", ") || "",
+        gender: (properties.Gender?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
         price: properties.Price?.number || 0,
         description: extractText(properties.Description?.rich_text || []),
         url: properties.URL?.url || "",
         photos: (properties.Photos?.files || [])
-          .map((file: any) => getImageUrl(file))
+          .map((file: NotionFile) => getImageUrl(file))
           .filter(Boolean) as string[],
         ridingStyle: (properties["Riding style"]?.multi_select || []).map(
-          (s: any) => s.name
+          (s: NotionSelectOption) => s.name
         ),
-        season: (properties.Season?.multi_select || []).map((s: any) => s.name),
+        season: (properties.Season?.multi_select || []).map((s: NotionSelectOption) => s.name),
         waterproofLevel: properties["Level of Waterproof"]?.select?.name || "",
         materials: (properties.Materials?.multi_select || []).map(
-          (m: any) => m.name
+          (m: NotionSelectOption) => m.name
         ),
         veganVerified: properties["Vegan Verified"]?.select?.name || "",
         staffFavorite: properties["Staff favorite"]?.checkbox || false,
       };
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("[Notion] Failed to fetch products:", error);
     return [];
   }
 }
 
-// Get a single product by ID
-export async function getProduct(id: string): Promise<Product | null> {
+// Cached version of getProducts with revalidation
+export const getProducts = unstable_cache(
+  fetchProductsFromNotion,
+  ["products"],
+  { revalidate: REVALIDATE_TIME, tags: ["products"] }
+);
+
+// Internal function to fetch single product from Notion
+async function fetchProductFromNotion(id: string): Promise<Product | null> {
   try {
     const page = await notion.pages.retrieve({ page_id: id });
-    const properties = (page as any).properties;
+    const properties = (page as NotionPage).properties;
 
     return {
       id: page.id,
       name: properties["Name of product"]?.title?.[0]?.plain_text || "",
       brand: properties.Brand?.select?.name || "",
-      category: (properties.Category?.multi_select || []).map((s: any) => s.name).join(", ") || "",
+      category: (properties.Category?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
       levelOfProtection: properties["Level of Protection"]?.select?.name || "",
-      gender: (properties.Gender?.multi_select || []).map((s: any) => s.name).join(", ") || "",
+      gender: (properties.Gender?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
       price: properties.Price?.number || 0,
       description: extractText(properties.Description?.rich_text || []),
       url: properties.URL?.url || "",
       photos: (properties.Photos?.files || [])
-        .map((file: any) => getImageUrl(file))
+        .map((file: NotionFile) => getImageUrl(file))
         .filter(Boolean) as string[],
       ridingStyle: (properties["Riding style"]?.multi_select || []).map(
-        (s: any) => s.name
+        (s: NotionSelectOption) => s.name
       ),
-      season: (properties.Season?.multi_select || []).map((s: any) => s.name),
+      season: (properties.Season?.multi_select || []).map((s: NotionSelectOption) => s.name),
       waterproofLevel: properties["Level of Waterproof"]?.select?.name || "",
       materials: (properties.Materials?.multi_select || []).map(
-        (m: any) => m.name
+        (m: NotionSelectOption) => m.name
       ),
       veganVerified: properties["Vegan Verified"]?.select?.name || "",
       staffFavorite: properties["Staff favorite"]?.checkbox || false,
     };
   } catch (error) {
-    console.error("Error fetching product:", error);
+    console.error("[Notion] Failed to fetch product:", error);
     return null;
   }
 }
 
-// Fetch all events (with pagination to get all results)
-export async function getEvents(): Promise<Event[]> {
+// Get a single product by ID with caching
+export async function getProduct(id: string): Promise<Product | null> {
+  const getCachedProduct = unstable_cache(
+    () => fetchProductFromNotion(id),
+    [`product-${id}`],
+    { revalidate: REVALIDATE_TIME, tags: ["products", `product-${id}`] }
+  );
+  return getCachedProduct();
+}
+
+// Internal function to fetch events from Notion
+async function fetchEventsFromNotion(): Promise<Event[]> {
   try {
-    const allResults: any[] = [];
+    const allResults: NotionPage[] = [];
     let hasMore = true;
     let startCursor: string | undefined = undefined;
 
@@ -181,12 +236,12 @@ export async function getEvents(): Promise<Event[]> {
         page_size: 100,
       });
 
-      allResults.push(...response.results);
+      allResults.push(...(response.results as NotionPage[]));
       hasMore = response.has_more;
       startCursor = response.next_cursor ?? undefined;
     }
 
-    return allResults.map((page: any) => {
+    return allResults.map((page: NotionPage) => {
       const properties = page.properties;
       const dateRange = properties.Date?.date;
 
@@ -202,31 +257,50 @@ export async function getEvents(): Promise<Event[]> {
       };
     });
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error("[Notion] Failed to fetch events:", error);
     return [];
   }
 }
 
-// Fetch all blog posts
-export async function getBlogPosts(): Promise<BlogPost[]> {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_BLOG_DB_ID!,
-      filter: {
-        property: "Name",
-        title: {
-          is_not_empty: true,
-        },
-      },
-      sorts: [
-        {
-          property: "Date",
-          direction: "descending",
-        },
-      ],
-    });
+// Cached version of getEvents with revalidation
+export const getEvents = unstable_cache(
+  fetchEventsFromNotion,
+  ["events"],
+  { revalidate: REVALIDATE_TIME, tags: ["events"] }
+);
 
-    return response.results.map((page: any) => {
+// Internal function to fetch blog posts from Notion
+async function fetchBlogPostsFromNotion(): Promise<BlogPost[]> {
+  try {
+    const allResults: NotionPage[] = [];
+    let hasMore = true;
+    let startCursor: string | undefined = undefined;
+
+    while (hasMore) {
+      const response = await notion.databases.query({
+        database_id: process.env.NOTION_BLOG_DB_ID!,
+        filter: {
+          property: "Name",
+          title: {
+            is_not_empty: true,
+          },
+        },
+        sorts: [
+          {
+            property: "Date",
+            direction: "descending",
+          },
+        ],
+        start_cursor: startCursor,
+        page_size: 100,
+      });
+
+      allResults.push(...(response.results as NotionPage[]));
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
+
+    return allResults.map((page: NotionPage) => {
       const properties = page.properties;
 
       return {
@@ -235,21 +309,28 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         content: extractText(properties.Description?.rich_text || []),
         publishDate: properties.Date?.date?.start || "",
         featuredImage: getImageUrl(
-          properties["Thumbnail Image"]?.files?.[0]
+          properties["Thumbnail Image"]?.files?.[0] as NotionFile
         ) || "",
       };
     });
   } catch (error) {
-    console.error("Error fetching blog posts:", error);
+    console.error("[Notion] Failed to fetch blog posts:", error);
     return [];
   }
 }
 
-// Get a single blog post by ID
-export async function getBlogPost(id: string): Promise<BlogPost | null> {
+// Cached version of getBlogPosts with revalidation
+export const getBlogPosts = unstable_cache(
+  fetchBlogPostsFromNotion,
+  ["blog-posts"],
+  { revalidate: REVALIDATE_TIME, tags: ["blog"] }
+);
+
+// Internal function to fetch single blog post from Notion
+async function fetchBlogPostFromNotion(id: string): Promise<BlogPost | null> {
   try {
     const page = await notion.pages.retrieve({ page_id: id });
-    const properties = (page as any).properties;
+    const properties = (page as NotionPage).properties;
 
     return {
       id: page.id,
@@ -257,11 +338,21 @@ export async function getBlogPost(id: string): Promise<BlogPost | null> {
       content: extractText(properties.Description?.rich_text || []),
       publishDate: properties.Date?.date?.start || "",
       featuredImage: getImageUrl(
-        properties["Thumbnail Image"]?.files?.[0]
+        properties["Thumbnail Image"]?.files?.[0] as NotionFile
       ) || "",
     };
   } catch (error) {
-    console.error("Error fetching blog post:", error);
+    console.error("[Notion] Failed to fetch blog post:", error);
     return null;
   }
+}
+
+// Get a single blog post by ID with caching
+export async function getBlogPost(id: string): Promise<BlogPost | null> {
+  const getCachedBlogPost = unstable_cache(
+    () => fetchBlogPostFromNotion(id),
+    [`blog-post-${id}`],
+    { revalidate: REVALIDATE_TIME, tags: ["blog", `blog-post-${id}`] }
+  );
+  return getCachedBlogPost();
 }

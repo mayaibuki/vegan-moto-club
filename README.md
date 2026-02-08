@@ -132,7 +132,6 @@ git push -u origin main
 ### Change Colors
 Edit `app/globals.css` CSS variables:
 ```css
---primary: 354 100% 45%;      /* Red */
 --secondary: 30 8% 65%;       /* Warm grey */
 --accent: 81 100% 65%;        /* Lime green */
 ```

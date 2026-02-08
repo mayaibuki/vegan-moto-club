@@ -7,6 +7,25 @@ import { Logo } from "@/components/Logo"
 import Link from "next/link"
 import { formatDate } from "@/lib/utils"
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Vegan Moto Club",
+  url: siteUrl,
+  description:
+    "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${siteUrl}/products?search={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+}
+
 export default async function Home() {
   const products = await getProducts()
   const events = await getEvents()
@@ -18,8 +37,13 @@ export default async function Home() {
   const upcomingEvents = events.slice(0, 5)
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section */}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="space-y-16">
+        {/* Hero Section */}
       <section className="py-16 md:py-24 text-center space-y-8 bg-gradient-to-br from-secondary/20 via-accent/10 to-background rounded-3xl p-10 md:p-16">
         <div className="flex justify-center mb-8">
           <Logo size="lg" />
@@ -41,10 +65,10 @@ export default async function Home() {
       </section>
 
       {/* Featured Products Section */}
-      <section>
+      <section aria-labelledby="staff-picks-heading">
         <div className="flex items-center justify-between mb-10">
           <div className="space-y-1">
-            <h2 className="text-3xl font-bold tracking-tight">Staff Picks</h2>
+            <h2 id="staff-picks-heading" className="text-3xl font-bold tracking-tight">Staff Picks</h2>
             <p className="text-muted-foreground text-lg">Our favorite vegan motorcycle gear</p>
           </div>
           <Button variant="outline" asChild>
@@ -71,10 +95,10 @@ export default async function Home() {
 
       {/* Upcoming Events Section */}
       {upcomingEvents.length > 0 && (
-        <section>
+        <section aria-labelledby="upcoming-events-heading">
           <div className="flex items-center justify-between mb-10">
             <div className="space-y-1">
-              <h2 className="text-3xl font-bold tracking-tight">Upcoming Events</h2>
+              <h2 id="upcoming-events-heading" className="text-3xl font-bold tracking-tight">Upcoming Events</h2>
               <p className="text-muted-foreground text-lg">Join the community</p>
             </div>
             <Button variant="outline" asChild>
@@ -96,7 +120,7 @@ export default async function Home() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium">📍 Location</p>
+                    <p className="text-sm font-medium"><span aria-hidden="true">📍</span> Location</p>
                     <p className="text-muted-foreground">{event.location}</p>
                   </div>
                   {event.description && (
@@ -111,8 +135,13 @@ export default async function Home() {
                     <Badge variant="outline">{event.price}</Badge>
                     {event.url && (
                       <Button size="sm" asChild>
-                        <a href={event.url} target="_blank" rel="noopener noreferrer">
-                          Learn More
+                        <a
+                          href={event.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Learn more about ${event.name} (opens in new tab)`}
+                        >
+                          Learn More<span className="sr-only"> (opens in new tab)</span>
                         </a>
                       </Button>
                     )}
@@ -125,8 +154,8 @@ export default async function Home() {
       )}
 
       {/* Product Suggestion Form Section */}
-      <section className="rounded-3xl p-10 md:p-14">
-        <h2 className="text-3xl font-bold tracking-tight mb-3">Suggest a Product</h2>
+      <section className="rounded-3xl p-10 md:p-14" aria-labelledby="suggest-product-heading">
+        <h2 id="suggest-product-heading" className="text-3xl font-bold tracking-tight mb-3">Suggest a Product</h2>
         <p className="text-muted-foreground text-lg mb-8">
           Know a great vegan motorcycle product? Tell us about it!
         </p>
@@ -137,9 +166,11 @@ export default async function Home() {
             height="600"
             frameBorder="0"
             allowFullScreen
+            title="Product suggestion form - Submit vegan motorcycle gear recommendations"
           />
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }

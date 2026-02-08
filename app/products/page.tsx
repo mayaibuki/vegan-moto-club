@@ -1,5 +1,21 @@
+import type { Metadata } from "next"
 import { getProducts } from "@/lib/notion"
 import { ProductGrid } from "@/components/ProductGrid"
+
+export const metadata: Metadata = {
+  title: "Vegan Motorcycle Gear",
+  description:
+    "Browse our curated database of ethical and cruelty-free motorcycle gear. Find vegan jackets, gloves, boots, and protective wear for every riding style.",
+  openGraph: {
+    title: "Vegan Motorcycle Gear | Vegan Moto Club",
+    description:
+      "Browse our curated database of ethical and cruelty-free motorcycle gear. Find vegan jackets, gloves, boots, and protective wear for every riding style.",
+    url: "/products",
+  },
+  alternates: {
+    canonical: "/products",
+  },
+}
 
 export default async function ProductsPage() {
   const products = await getProducts()

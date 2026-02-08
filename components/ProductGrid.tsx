@@ -9,9 +9,6 @@ import { Product } from "@/lib/notion"
 import {
   filterProducts,
   getUniqueBrands,
-  getUniqueCategories,
-  getUniqueGenders,
-  getUniqueRidingStyles,
 } from "@/lib/utils"
 import { Badge } from "./ui/badge"
 import {
@@ -40,9 +37,6 @@ export function ProductGrid({ products }: ProductGridProps) {
   const [rowsPerPage, setRowsPerPage] = useState(25)
 
   const brands = useMemo(() => getUniqueBrands(products), [products])
-  const categories = useMemo(() => getUniqueCategories(products), [products])
-  const genders = useMemo(() => getUniqueGenders(products), [products])
-  const ridingStyles = useMemo(() => getUniqueRidingStyles(products), [products])
 
   const filteredProducts = useMemo(
     () =>
@@ -88,28 +82,36 @@ export function ProductGrid({ products }: ProductGridProps) {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Filters */}
         <aside
+          aria-label="Product filters"
+          id="product-filters"
           className={`lg:w-64 flex-shrink-0 ${
             showFilters ? "block" : "hidden lg:block"
           }`}
         >
           <div className="space-y-6 sticky top-24 bg-background lg:bg-transparent p-4 lg:p-0 rounded-xl lg:rounded-none border lg:border-0 border-border">
             {/* Search */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-3 block">Search</label>
+            <div role="search">
+              <label htmlFor="product-search" className="text-sm font-semibold text-foreground mb-3 block">Search</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
+                  id="product-search"
+                  type="search"
                   placeholder="Search products..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-9"
+                  aria-describedby="search-description"
                 />
+                <span id="search-description" className="sr-only">Search by product name, brand, or description</span>
                 {search && (
                   <button
                     onClick={() => setSearch("")}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                    type="button"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -119,8 +121,8 @@ export function ProductGrid({ products }: ProductGridProps) {
             <div className="border-t border-border" />
 
             {/* Category Filter */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-3 block">Category</label>
+            <fieldset>
+              <legend className="text-sm font-semibold text-foreground mb-3 block">Category</legend>
               <RadioGroup
                 value={selectedCategory || "all"}
                 onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
@@ -141,11 +143,11 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </div>
                 ))}
               </RadioGroup>
-            </div>
+            </fieldset>
 
             {/* Gender Filter */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-3 block">Gender</label>
+            <fieldset>
+              <legend className="text-sm font-semibold text-foreground mb-3 block">Gender</legend>
               <div className="space-y-2">
                 {["Women", "Men", "Unisex"].map((gender) => (
                   <div key={gender} className="flex items-center space-x-3">
@@ -166,11 +168,11 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </div>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
             {/* Riding Style Filter */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-3 block">Riding Style</label>
+            <fieldset>
+              <legend className="text-sm font-semibold text-foreground mb-3 block">Riding Style</legend>
               <div className="space-y-2">
                 {["Commute / Street", "Adventure / Touring", "Sport / Canyons", "Racing / Trackdays", "Off-roading"].map((style) => (
                   <div key={style} className="flex items-center space-x-3">
@@ -191,11 +193,11 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </div>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
             {/* Brand Filter */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-3 block">Brand</label>
+            <fieldset>
+              <legend className="text-sm font-semibold text-foreground mb-3 block">Brand</legend>
               <RadioGroup
                 value={selectedBrand || "all"}
                 onValueChange={(value) => setSelectedBrand(value === "all" ? null : value)}
@@ -216,18 +218,19 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </div>
                 ))}
               </RadioGroup>
-            </div>
+            </fieldset>
 
             {/* Clear Filters */}
             {hasAnyFilters && (
               <>
-                <div className="border-t border-border" />
+                <div className="border-t border-border" aria-hidden="true" />
                 <Button
                   variant="outline"
                   className="w-full"
                   onClick={clearAllFilters}
+                  aria-label={`Clear all ${activeFilterCount} active filters`}
                 >
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 mr-2" aria-hidden="true" />
                   Clear All Filters
                 </Button>
               </>
@@ -236,10 +239,10 @@ export function ProductGrid({ products }: ProductGridProps) {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1">
+        <section className="flex-1" aria-label="Product results">
           {/* Mobile Filter Toggle & Results Count */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
               Showing <span className="font-semibold text-foreground">
                 {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + rowsPerPage, filteredProducts.length)}
               </span> of {filteredProducts.length} products
@@ -248,11 +251,14 @@ export function ProductGrid({ products }: ProductGridProps) {
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className="lg:hidden"
+              aria-expanded={showFilters}
+              aria-controls="product-filters"
+              aria-label={`${showFilters ? "Hide" : "Show"} filters${activeFilterCount > 0 ? `, ${activeFilterCount} active` : ""}`}
             >
-              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              <SlidersHorizontal className="h-4 w-4 mr-2" aria-hidden="true" />
               Filters
               {activeFilterCount > 0 && (
-                <Badge variant="default" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                <Badge variant="default" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs" aria-hidden="true">
                   {activeFilterCount}
                 </Badge>
               )}
@@ -261,51 +267,77 @@ export function ProductGrid({ products }: ProductGridProps) {
 
           {/* Active Filters Display */}
           {hasAnyFilters && (
-            <div className="mb-6 flex flex-wrap items-center gap-2">
-              <span className="text-sm text-muted-foreground">Active:</span>
+            <div className="mb-6 flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
+              <span className="text-sm text-muted-foreground" id="active-filters-label">Active:</span>
               {selectedBrand && (
                 <Badge variant="secondary" className="gap-1">
                   {selectedBrand}
-                  <button onClick={() => setSelectedBrand(null)} className="ml-1 hover:text-foreground">
-                    <X className="h-3 w-3" />
+                  <button
+                    onClick={() => setSelectedBrand(null)}
+                    className="ml-1 hover:text-foreground"
+                    aria-label={`Remove ${selectedBrand} brand filter`}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" aria-hidden="true" />
                   </button>
                 </Badge>
               )}
               {selectedCategory && (
                 <Badge variant="secondary" className="gap-1">
                   {selectedCategory}
-                  <button onClick={() => setSelectedCategory(null)} className="ml-1 hover:text-foreground">
-                    <X className="h-3 w-3" />
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className="ml-1 hover:text-foreground"
+                    aria-label={`Remove ${selectedCategory} category filter`}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" aria-hidden="true" />
                   </button>
                 </Badge>
               )}
               {selectedGenders.map((gender) => (
                 <Badge key={gender} variant="secondary" className="gap-1">
                   {gender}
-                  <button onClick={() => setSelectedGenders(prev => prev.filter(g => g !== gender))} className="ml-1 hover:text-foreground">
-                    <X className="h-3 w-3" />
+                  <button
+                    onClick={() => setSelectedGenders(prev => prev.filter(g => g !== gender))}
+                    className="ml-1 hover:text-foreground"
+                    aria-label={`Remove ${gender} gender filter`}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" aria-hidden="true" />
                   </button>
                 </Badge>
               ))}
               {selectedRidingStyles.map((style) => (
                 <Badge key={style} variant="secondary" className="gap-1">
                   {style}
-                  <button onClick={() => setSelectedRidingStyles(prev => prev.filter(s => s !== style))} className="ml-1 hover:text-foreground">
-                    <X className="h-3 w-3" />
+                  <button
+                    onClick={() => setSelectedRidingStyles(prev => prev.filter(s => s !== style))}
+                    className="ml-1 hover:text-foreground"
+                    aria-label={`Remove ${style} riding style filter`}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" aria-hidden="true" />
                   </button>
                 </Badge>
               ))}
               {search && (
                 <Badge variant="secondary" className="gap-1">
-                  "{search}"
-                  <button onClick={() => setSearch("")} className="ml-1 hover:text-foreground">
-                    <X className="h-3 w-3" />
+                  &quot;{search}&quot;
+                  <button
+                    onClick={() => setSearch("")}
+                    className="ml-1 hover:text-foreground"
+                    aria-label={`Remove search for "${search}"`}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" aria-hidden="true" />
                   </button>
                 </Badge>
               )}
               <button
                 onClick={clearAllFilters}
                 className="text-sm text-muted-foreground hover:text-foreground underline"
+                type="button"
               >
                 Clear all
               </button>
@@ -329,9 +361,9 @@ export function ProductGrid({ products }: ProductGridProps) {
               </div>
 
               {/* Pagination */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
+              <nav aria-label="Product pagination" className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Rows per page</span>
+                  <label htmlFor="rows-per-page" className="text-sm text-muted-foreground">Rows per page</label>
                   <Select
                     value={rowsPerPage.toString()}
                     onValueChange={(v) => {
@@ -339,7 +371,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       setCurrentPage(1)
                     }}
                   >
-                    <SelectTrigger className="w-[80px] h-9">
+                    <SelectTrigger id="rows-per-page" className="w-[80px] h-9" aria-label={`${rowsPerPage} rows per page`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -350,15 +382,17 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </Select>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" role="group" aria-label="Pagination controls">
+                  <span className="sr-only">Page {currentPage} of {totalPages}</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setCurrentPage(p => p - 1)}
                     disabled={currentPage === 1}
                     className="gap-1"
+                    aria-label="Go to previous page"
                   >
-                    <ChevronLeft className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                     Previous
                   </Button>
                   <Button
@@ -367,15 +401,16 @@ export function ProductGrid({ products }: ProductGridProps) {
                     onClick={() => setCurrentPage(p => p + 1)}
                     disabled={currentPage >= totalPages}
                     className="gap-1"
+                    aria-label="Go to next page"
                   >
                     Next
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </div>
-              </div>
+              </nav>
             </>
           )}
-        </div>
+        </section>
       </div>
     </div>
   )

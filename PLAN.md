@@ -993,5 +993,50 @@ npm run dev
 
 ---
 
-**Last Updated:** February 5, 2026
-**Status:** Filter components updated, ready for domain connection
+## Phase 9: Site Audit — Performance, Accessibility, SEO, Code Quality ✅ COMPLETED
+
+### Session: February 8, 2026
+
+Full-site audit with baseline/after screenshots at 3 breakpoints x 2 themes across 5 pages (30 screenshots each pass). All changes verified with `npm run build` (229 pages, 0 errors). No visual regressions.
+
+#### Performance Fixes
+| File | Change |
+|------|--------|
+| `components/ProductCard.tsx` | Wrapped in `React.memo`, extracted static `seasonEmojis` outside component |
+| `components/Navbar.tsx` | Added `useCallback` to `toggleTheme` |
+| `lib/notion.ts` | Added pagination to `fetchBlogPostsFromNotion` (was limited to 100 posts) |
+
+#### Accessibility Fixes
+| File | Change |
+|------|--------|
+| `app/events/page.tsx` | Added `aria-label` with "(opens in new tab)" on external links; wrapped emojis in `<span aria-hidden="true">` |
+| `app/products/[id]/page.tsx` | Changed 6 misused `<h2>` metadata labels to `<p>`; changed `<div role="img">` to `<figure>` |
+| `app/blog/page.tsx` | Added `aria-label` on blog post links |
+| `components/Navbar.tsx` | Added mobile menu focus management (focus first link on open, return to toggle on close) |
+
+#### SEO Fixes
+| File | Change |
+|------|--------|
+| `app/products/[id]/page.tsx` | Fixed JSON-LD currency: `EUR` → `USD` |
+| `app/sitemap.ts` | Static pages use fixed timestamp instead of `new Date()` |
+| `app/events/page.tsx` | Added `Event` + `ItemList` JSON-LD structured data |
+| `app/blog/page.tsx` | Added `ItemList` JSON-LD structured data |
+| `components/Footer.tsx` | Discord → `https://discord.gg/GN4jkBRnut`, Instagram → `https://www.instagram.com/veganmotoclub`, copyright → 2026 |
+| `app/layout.tsx` | Updated Organization schema `sameAs` with social profiles |
+
+#### Code Quality Fixes
+| File | Change |
+|------|--------|
+| `lib/notion.ts` | Replaced ~20 `any` types with `NotionPage`, `NotionRichText`, `NotionSelectOption`, `NotionFile`, `NotionPageProperties` interfaces; added `console.error` logging to all 5 catch blocks |
+| `lib/utils.ts` | Added `Product` type imports; fixed `formatPrice` to handle decimals |
+
+#### New Files Created
+- `CLAUDE.md` — Project documentation and audit changelog
+- `.claude/commands/audit-site.md` — Reusable `/audit-site` skill for future audits
+- `audit-screenshots/baseline/` — 30 pre-audit screenshots
+- `audit-screenshots/after/` — 30 post-audit screenshots
+
+---
+
+**Last Updated:** February 8, 2026
+**Status:** Site audit completed, ready for domain connection

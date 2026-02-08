@@ -1,4 +1,20 @@
+import type { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/card"
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "Learn about Vegan Moto Club's mission to provide compassionate riders with comprehensive information about cruelty-free motorcycle gear.",
+  openGraph: {
+    title: "About | Vegan Moto Club",
+    description:
+      "Learn about Vegan Moto Club's mission to provide compassionate riders with comprehensive information about cruelty-free motorcycle gear.",
+    url: "/about",
+  },
+  alternates: {
+    canonical: "/about",
+  },
+}
 
 export default function AboutPage() {
   return (
