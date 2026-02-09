@@ -46,7 +46,7 @@ export function ProductGrid({ products }: ProductGridProps) {
         genders: selectedGenders.length > 0 ? selectedGenders : undefined,
         ridingStyles: selectedRidingStyles.length > 0 ? selectedRidingStyles : undefined,
         search: search || undefined,
-      }).sort((a, b) => a.price - b.price),
+      }).sort((a, b) => new Date(b.lastEditedTime).getTime() - new Date(a.lastEditedTime).getTime()),
     [products, search, selectedBrand, selectedCategory, selectedGenders, selectedRidingStyles]
   )
 
@@ -354,7 +354,7 @@ export function ProductGrid({ products }: ProductGridProps) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

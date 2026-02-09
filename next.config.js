@@ -2,23 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // Enable image optimization with remote patterns for Notion-hosted images
+    // Allow all HTTPS image hosts since product images in Notion
+    // come from various external sources (retailer CDNs, brand sites, etc.)
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.notion.so',
-      },
-      {
-        protocol: 'https',
-        hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 's3.us-west-2.amazonaws.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.amazonaws.com',
+        hostname: '**',
       },
     ],
     // Optimize image formats

@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Logo } from "@/components/Logo"
+import Image from "next/image"
 import Link from "next/link"
-import { formatDate } from "@/lib/utils"
+import { formatDate, formatRelativeDate } from "@/lib/utils"
+import { Check } from "lucide-react"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 
@@ -33,8 +35,11 @@ export default async function Home() {
   const staffPicks = products
     .filter((p) => p.staffFavorite)
     .sort(() => Math.random() - 0.5)
-    .slice(0, 6)
+    .slice(0, 8)
   const upcomingEvents = events.slice(0, 5)
+  const lastUpdated = products.reduce((latest, p) =>
+    p.lastEditedTime > latest ? p.lastEditedTime : latest, products[0]?.lastEditedTime || ""
+  )
 
   return (
     <>
@@ -44,23 +49,60 @@ export default async function Home() {
       />
       <div className="space-y-16">
         {/* Hero Section */}
-      <section className="py-16 md:py-24 text-center space-y-8 bg-gradient-to-br from-secondary/20 via-accent/10 to-background rounded-3xl p-10 md:p-16">
-        <div className="flex justify-center mb-8">
-          <Logo size="lg" />
-        </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Vegan Moto Club
-        </h1>
-        <p className="text-lg text-foreground max-w-2xl mx-auto leading-relaxed">
-          We curate the best vegan motorcycle gear alternatives for every riding style, weather, gender, and budget.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-5 justify-center pt-4">
-          <Button size="lg" asChild>
-            <Link href="/products">Browse Products</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/about">Learn More</Link>
-          </Button>
+      <section className="py-16 md:py-24 bg-gradient-to-br from-secondary/20 via-accent/10 to-background rounded-3xl p-10 md:p-16">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
+          {/* Left Column — Text Content */}
+          <div className="flex-1 text-center lg:text-left space-y-8">
+            {/* Last Updated Badge */}
+            <div className="flex items-center gap-2 justify-center lg:justify-start">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-4 py-1.5 text-sm text-muted-foreground">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                Last updated: <span className="font-semibold text-foreground">{formatRelativeDate(lastUpdated)}</span>
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+              Ride motorcycles, not animals
+            </h1>
+
+            <ul className="space-y-3 text-lg text-muted-foreground mx-auto lg:mx-0 max-w-2xl">
+              <li className="flex items-center gap-3 justify-center lg:justify-start">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                Find vegan motorcycle gear
+              </li>
+              <li className="flex items-center gap-3 justify-center lg:justify-start">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                Discover bike events
+              </li>
+              <li className="flex items-center gap-3 justify-center lg:justify-start">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                Connect with other riders
+              </li>
+            </ul>
+
+            <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start pt-4">
+              <Button size="lg" asChild>
+                <Link href="/products">Browse Products</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="https://discord.gg/GN4jkBRnut">Join our Discord</Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Column — Hero Image (hidden on mobile, shown on lg+) */}
+          <div className="hidden lg:block flex-1 mt-12 lg:mt-0">
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
+              <Image
+                src="/images/hero.jpg"
+                alt="Vegan Moto Club riders on a Ducati motorcycle with a Protect Animals sign at an animal rights rally"
+                fill
+                className="object-cover"
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -85,9 +127,11 @@ export default async function Home() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {staffPicks.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {staffPicks.map((product, index) => (
+              <div key={product.id} className={index >= 6 ? "hidden lg:block" : undefined}>
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         )}

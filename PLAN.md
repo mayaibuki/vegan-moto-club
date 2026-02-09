@@ -1038,5 +1038,57 @@ Full-site audit with baseline/after screenshots at 3 breakpoints x 2 themes acro
 
 ---
 
+## Phase 10: Design Iteration — Hero Redesign, Grid Layout, Product Sorting ✅ COMPLETED
+
+### Session: February 8, 2026
+
+Comprehensive design iteration focused on the home page hero section, product grid responsiveness, and product sort order.
+
+#### Hero Section Redesign (`app/page.tsx`)
+| Change | Detail |
+|--------|--------|
+| **Layout** | Redesigned from single-column centered to two-column layout on `lg`+ (text left, hero image right). Mobile stays single-column centered. |
+| **Hero image** | Added `public/images/hero.jpg` — Vegan Moto Club riders at animal rights rally. Displayed in `aspect-[4/5]` rounded container, hidden on mobile. Uses `next/image` with `priority` for LCP. |
+| **Heading** | Changed to "Ride motorcycles, not animals" |
+| **Description** | Replaced paragraph with 3-item checklist using `Check` icons from `lucide-react`: "Find vegan motorcycle gear", "Discover bike events", "Connect with other riders" |
+| **Badge** | Added dynamic "Last updated" badge showing relative time (e.g., "Today", "3 days ago") based on most recent Notion product edit |
+| **CTA buttons** | "Browse Products" (primary) + "Join our Discord" (outline, links to Discord) |
+
+#### Product Grid Layout (`components/ProductGrid.tsx`, `app/page.tsx`)
+| Change | Detail |
+|--------|--------|
+| **Products page grid** | `grid-cols-2 md:grid-cols-3 lg:grid-cols-4` (was `grid-cols-1 md:grid-cols-2 xl:grid-cols-3`) |
+| **Home page Staff Picks grid** | `grid-cols-2 md:grid-cols-3 lg:grid-cols-4` (was `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`) |
+| **Responsive Staff Picks count** | Shows 6 products on mobile/tablet, 8 on desktop (`lg`+). Items 7–8 use `hidden lg:block`. |
+
+#### Product Sort Order (`lib/notion.ts`, `components/ProductGrid.tsx`)
+| Change | Detail |
+|--------|--------|
+| **Notion query** | Added `sorts: [{ timestamp: "last_edited_time", direction: "descending" }]` to products fetch |
+| **Product interface** | Added `lastEditedTime: string` field, mapped from `page.last_edited_time` |
+| **Client-side sort** | Changed from `price ascending` to `lastEditedTime descending` (most recently updated first) |
+
+#### Utilities & Config
+| File | Change |
+|------|--------|
+| `lib/utils.ts` | Added `formatRelativeDate()` — converts ISO dates to "Today", "Yesterday", "3 days ago", etc. |
+| `next.config.js` | Simplified `remotePatterns` to allow all HTTPS hosts (`hostname: '**'`) since Notion product images come from various external CDNs (Shopify, RevZilla, Dainese, etc.) |
+
+#### New Files
+- `public/images/hero.jpg` — Hero section image for desktop viewports
+
+---
+
+### Remaining Tasks / TODOs
+
+- [ ] **Re-upload external product images in Notion** — Some products have images hosted on `cdn.shopify.com`, `www.revzilla.com`, `dainese-cdn.thron.com`. These should be re-uploaded directly to Notion so they're hosted on the Notion/S3 CDN. After re-uploading, `next.config.js` can be tightened back to specific hosts.
+- [ ] **Connect GoDaddy domain** — Phase 4 Task 4 (see above). Add `veganmotoclub.com` in Vercel, update DNS in GoDaddy.
+- [ ] **ESLint configuration** — `npm run lint` prompts for setup. Should be configured for consistent code quality.
+- [ ] **OG image** — Create a custom Open Graph image for social media sharing.
+- [ ] **Color contrast audit** — Manual check needed for low-contrast text on accent backgrounds.
+- [ ] **Mobile hero image** — Currently hidden on mobile. Consider adding a smaller version or a different layout for tablet viewports.
+
+---
+
 **Last Updated:** February 8, 2026
-**Status:** Site audit completed, ready for domain connection
+**Status:** Design iteration completed, deployed to Vercel

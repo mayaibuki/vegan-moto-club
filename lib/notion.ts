@@ -25,6 +25,7 @@ export interface Product {
   materials: string[];
   veganVerified: string;
   staffFavorite: boolean;
+  lastEditedTime: string;
 }
 
 export interface Event {
@@ -77,6 +78,7 @@ interface NotionPageProperties {
 
 interface NotionPage {
   id: string
+  last_edited_time: string
   properties: NotionPageProperties
 }
 
@@ -113,6 +115,12 @@ async function fetchProductsFromNotion(): Promise<Product[]> {
             is_not_empty: true,
           },
         },
+        sorts: [
+          {
+            timestamp: "last_edited_time",
+            direction: "descending" as const,
+          },
+        ],
         start_cursor: startCursor,
         page_size: 100,
       });
@@ -127,6 +135,7 @@ async function fetchProductsFromNotion(): Promise<Product[]> {
 
       return {
         id: page.id,
+        lastEditedTime: page.last_edited_time,
         name: properties["Name of product"]?.title?.[0]?.plain_text || "",
         brand: properties.Brand?.select?.name || "",
         category: (properties.Category?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
