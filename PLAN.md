@@ -1079,6 +1079,31 @@ Comprehensive design iteration focused on the home page hero section, product gr
 
 ---
 
+### Phase 11: Native Suggestion Form + Spam Protection
+
+Replaced the Notion iframe product suggestion form with a fully native implementation using shadcn/ui components and a Next.js API route. Added the form to multiple pages and implemented bot spam protection.
+
+#### Native Suggestion Form
+
+| File | Change |
+|------|--------|
+| `components/SuggestProductForm.tsx` | New client component using Card, Input, Label, Button from shadcn/ui. Single URL input with idle/submitting/success/error states. Accepts optional `id` prop for unique DOM IDs when rendered on multiple pages. |
+| `app/api/suggest/route.ts` | New POST API route. Validates URL, rate-limits (5/IP/hour), creates Notion page with title `"User Suggestion - {hostname}"` and URL property in the products database. |
+| `app/page.tsx` | Replaced Notion iframe embed with `<SuggestProductForm />` component |
+| `app/about/page.tsx` | Added `<SuggestProductForm id="about" />` after the "Get Involved" card. Updated text to say "below" instead of "on the home page". |
+| `app/products/[id]/page.tsx` | Added `<SuggestProductForm id="product" />` after the description card on every product detail page |
+
+#### Bot Spam Protection
+
+| Layer | Mechanism | Detail |
+|-------|-----------|--------|
+| **Client — Honeypot** | Hidden `website` input field | Invisible to humans (`opacity-0`, `h-0`, `w-0`, `tabIndex={-1}`). Bots auto-fill it. If filled → fake success, no Notion submission. |
+| **Client — Timing** | `useRef(Date.now())` on mount | If form submitted in < 2 seconds after page load → fake success (bots submit instantly). |
+| **Server — Honeypot** | Check `website` field in request body | If non-empty → return `{ success: true }` without creating Notion page. Catches direct API callers. |
+| **Server — Rate limit** | In-memory IP-based map | Max 5 submissions per IP per hour. Returns 429 on excess. |
+
+---
+
 ### Remaining Tasks / TODOs
 
 - [ ] **Re-upload external product images in Notion** — Some products have images hosted on `cdn.shopify.com`, `www.revzilla.com`, `dainese-cdn.thron.com`. These should be re-uploaded directly to Notion so they're hosted on the Notion/S3 CDN. After re-uploading, `next.config.js` can be tightened back to specific hosts.
@@ -1091,4 +1116,4 @@ Comprehensive design iteration focused on the home page hero section, product gr
 ---
 
 **Last Updated:** February 8, 2026
-**Status:** Design iteration completed, deployed to Vercel
+**Status:** Native suggestion form deployed across all pages, with spam protection

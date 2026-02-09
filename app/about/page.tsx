@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Card, CardContent } from "@/components/ui/card"
+import { SuggestProductForm } from "@/components/SuggestProductForm"
 
 export const metadata: Metadata = {
   title: "About",
@@ -75,7 +76,7 @@ export default function AboutPage() {
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
               <strong className="text-foreground">Found a great vegan brand?</strong> Submit it through our
-              product suggestion form on the home page.
+              product suggestion form below.
             </p>
             <p>
               <strong className="text-foreground">Have questions?</strong> Reach out to us on Discord or through
@@ -88,6 +89,8 @@ export default function AboutPage() {
           </div>
         </CardContent>
       </Card>
+
+      <SuggestProductForm id="about" />
     </div>
   )
 }

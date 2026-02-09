@@ -8,6 +8,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { formatDate, formatRelativeDate } from "@/lib/utils"
 import { Check } from "lucide-react"
+import { SuggestProductForm } from "@/components/SuggestProductForm"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 
@@ -62,7 +63,7 @@ export default async function Home() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Ride motorcycles, not animals
+              Ride motorcycles, love animals
             </h1>
 
             <ul className="space-y-3 text-lg text-muted-foreground mx-auto lg:mx-0 max-w-2xl">
@@ -198,22 +199,7 @@ export default async function Home() {
       )}
 
       {/* Product Suggestion Form Section */}
-      <section className="rounded-3xl p-10 md:p-14" aria-labelledby="suggest-product-heading">
-        <h2 id="suggest-product-heading" className="text-3xl font-bold tracking-tight mb-3">Suggest a Product</h2>
-        <p className="text-muted-foreground text-lg mb-8">
-          Know a great vegan motorcycle product? Tell us about it!
-        </p>
-        <div className="rounded-2xl overflow-hidden border border-border/50">
-          <iframe
-            src="https://veganmotoclub.notion.site/ebd//19c439de397b80e99216c28ebd83a771"
-            width="100%"
-            height="600"
-            frameBorder="0"
-            allowFullScreen
-            title="Product suggestion form - Submit vegan motorcycle gear recommendations"
-          />
-        </div>
-      </section>
+      <SuggestProductForm />
       </div>
     </>
   )

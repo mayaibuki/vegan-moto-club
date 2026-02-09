@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
+import { SuggestProductForm } from "@/components/SuggestProductForm"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 
@@ -271,6 +272,8 @@ export default async function ProductDetailPage({
           </CardContent>
         </Card>
       )}
+
+      <SuggestProductForm id="product" />
     </div>
     </>
   )
