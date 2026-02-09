@@ -180,6 +180,7 @@ async function fetchProductFromNotion(id: string): Promise<Product | null> {
 
     return {
       id: page.id,
+      lastEditedTime: (page as NotionPage).last_edited_time,
       name: properties["Name of product"]?.title?.[0]?.plain_text || "",
       brand: properties.Brand?.select?.name || "",
       category: (properties.Category?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
