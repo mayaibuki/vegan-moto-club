@@ -195,18 +195,51 @@ export default async function ProductDetailPage({
             <p className="text-sm text-muted-foreground font-medium mb-2">Specs</p>
             <div className="flex flex-wrap gap-2" role="list" aria-label="Product specifications">
               {product.levelOfProtection && (
-                <Badge role="listitem">{product.levelOfProtection}</Badge>
+                <Badge
+                  role="listitem"
+                  variant={
+                    product.levelOfProtection === "Most protective" ||
+                    product.levelOfProtection === "Highly protective"
+                      ? "default"
+                      : product.levelOfProtection === "Moderately protective" ||
+                        product.levelOfProtection === "Slightly protective"
+                      ? "outline"
+                      : "destructive"
+                  }
+                >
+                  {product.levelOfProtection}
+                </Badge>
               )}
               {product.season.map((s) => (
-                <Badge key={s} variant="secondary" role="listitem">
+                <Badge key={s} variant="outline" role="listitem">
                   <span aria-hidden="true">{seasonEmojis[s] || ""}</span> {s}
                 </Badge>
               ))}
               {product.waterproofLevel && (
-                <Badge variant="outline" role="listitem">{product.waterproofLevel}</Badge>
+                <Badge
+                  role="listitem"
+                  variant={
+                    product.waterproofLevel === "Water resistant" ||
+                    product.waterproofLevel === "Not waterproof"
+                      ? "destructive"
+                      : "outline"
+                  }
+                >
+                  {product.waterproofLevel}
+                </Badge>
               )}
               {product.veganVerified && (
-                <Badge variant="accent" role="listitem">
+                <Badge
+                  role="listitem"
+                  variant={
+                    product.veganVerified === "Verified Vegan by Us" ||
+                    product.veganVerified === "Confirmed Vegan by maker"
+                      ? "default"
+                      : product.veganVerified === "Verified Vegan by AI"
+                      ? "outline"
+                      : "destructive"
+                  }
+                >
                   <span aria-hidden="true">✓</span> {product.veganVerified}
                 </Badge>
               )}
@@ -220,7 +253,7 @@ export default async function ProductDetailPage({
               <ul className="flex flex-wrap gap-2 list-none" aria-label="Suitable riding styles">
                 {product.ridingStyle.map((style) => (
                   <li key={style}>
-                    <Badge variant="secondary">
+                    <Badge variant="outline">
                       {style}
                     </Badge>
                   </li>
