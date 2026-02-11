@@ -67,12 +67,22 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             {/* Badges - Grouped and cleaner */}
             <div className="flex flex-wrap gap-1.5 pt-1" aria-label="Product attributes">
               {product.levelOfProtection && (
-                <Badge variant="secondary">
+                <Badge
+                  variant={
+                    product.levelOfProtection === "Most protective" ||
+                    product.levelOfProtection === "Highly protective"
+                      ? "default"
+                      : product.levelOfProtection === "Moderately protective" ||
+                        product.levelOfProtection === "Slightly protective"
+                      ? "outline"
+                      : "destructive"
+                  }
+                >
                   {product.levelOfProtection}
                 </Badge>
               )}
               {product.season.map((s) => (
-                <Badge key={s} variant="accent">
+                <Badge key={s} variant="outline">
                   <span aria-hidden="true">{seasonEmojis[s] || ""}</span> {s}
                 </Badge>
               ))}
