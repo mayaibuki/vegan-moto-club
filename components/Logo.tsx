@@ -8,15 +8,15 @@ interface LogoProps {
 
 export function Logo({ size = "md", href = "/" }: LogoProps) {
   const sizes = {
-    sm: { width: 30, height: 30 },
+    sm: { width: 32, height: 32 },
     md: { width: 40, height: 40 },
-    lg: { width: 60, height: 60 },
+    lg: { width: 64, height: 64 },
   }
 
   const sizeClass = {
-    sm: "h-[30px] w-auto",
-    md: "h-[40px] w-auto",
-    lg: "h-[60px] w-auto",
+    sm: "h-8 w-auto",
+    md: "h-10 w-auto",
+    lg: "h-16 w-auto",
   }
 
   const logoElement = (

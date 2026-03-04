@@ -371,7 +371,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       setCurrentPage(1)
                     }}
                   >
-                    <SelectTrigger id="rows-per-page" className="w-[80px] h-9" aria-label={`${rowsPerPage} rows per page`}>
+                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`${rowsPerPage} rows per page`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

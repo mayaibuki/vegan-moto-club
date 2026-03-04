@@ -173,13 +173,13 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
             </div>
 
             {status === "success" && (
-              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+              <p className="text-sm text-success font-medium">
                 Thanks! Your suggestion has been submitted.
               </p>
             )}
 
             {status === "error" && errorMessage && (
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+              <p className="text-sm text-destructive font-medium">
                 {errorMessage}
               </p>
             )}

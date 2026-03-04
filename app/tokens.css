@@ -1,0 +1,277 @@
+/* ============================================================
+   VEGAN MOTO CLUB — DESIGN TOKENS
+   3-Layer Token Architecture
+
+   Layer 1: Primitive tokens (raw values, upstream design system)
+   Layer 2: Semantic aliases (reference Layer 1 with fallbacks)
+   Layer 3: Components reference ONLY Layer 2 aliases
+
+   Components must NEVER use raw values — always var(--token).
+   ============================================================ */
+
+/* ============================================================
+   LAYER 1 — PRIMITIVE TOKENS
+   Raw design values. These define the palette, scale, and
+   system-level constants. Never referenced directly by
+   components — only by Layer 2 aliases.
+   ============================================================ */
+
+:root {
+  /* ---- Color Primitives (Stone palette) ---- */
+  --ds-stone-50:  0 0% 98%;
+  --ds-stone-100: 12 6.5% 97.5%;
+  --ds-stone-200: 12 6.3% 93.8%;
+  --ds-stone-300: 12 5.4% 84%;
+  --ds-stone-400: 12 4.9% 64%;
+  --ds-stone-500: 12 6.5% 51.5%;
+  --ds-stone-800: 12 6.3% 18.8%;
+  --ds-stone-900: 12 8.7% 11.8%;
+  --ds-stone-950: 12 8.3% 7.2%;
+  --ds-white:     0 0% 100%;
+
+  /* ---- Color Primitives (Lime palette) ---- */
+  --ds-lime-200: 79.9 84.6% 80.2%;
+  --ds-lime-300: 79.7 77.9% 69.7%;
+  --ds-lime-400: 79.1 64.5% 57.5%;
+  --ds-lime-500: 77.9 54.4% 47.4%;
+  --ds-lime-600: 77.2 61.3% 38.5%;
+
+  /* ---- Color Primitives (Status) ---- */
+  --ds-red-light:    0 84.2% 60.2%;
+  --ds-red-dark:     0 62.8% 30.6%;
+  --ds-green-600:    142 71% 45%;
+  --ds-green-400:    142 69% 58%;
+
+  /* ---- Spacing Primitives (4px base unit) ---- */
+  --ds-space-0:   0rem;        /*  0px */
+  --ds-space-0-5: 0.125rem;    /*  2px */
+  --ds-space-1:   0.25rem;     /*  4px */
+  --ds-space-1-5: 0.375rem;    /*  6px */
+  --ds-space-2:   0.5rem;      /*  8px */
+  --ds-space-2-5: 0.625rem;    /* 10px */
+  --ds-space-3:   0.75rem;     /* 12px */
+  --ds-space-4:   1rem;        /* 16px */
+  --ds-space-5:   1.25rem;     /* 20px */
+  --ds-space-6:   1.5rem;      /* 24px */
+  --ds-space-7:   1.75rem;     /* 28px */
+  --ds-space-8:   2rem;        /* 32px */
+  --ds-space-10:  2.5rem;      /* 40px */
+  --ds-space-12:  3rem;        /* 48px */
+  --ds-space-16:  4rem;        /* 64px */
+  --ds-space-20:  5rem;        /* 80px */
+  --ds-space-24:  6rem;        /* 96px */
+
+  /* ---- Typography Primitives ---- */
+  --ds-font-sans: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+
+  --ds-text-xs:   0.75rem;     /* 12px */
+  --ds-text-sm:   0.875rem;    /* 14px */
+  --ds-text-base: 1rem;        /* 16px */
+  --ds-text-lg:   1.125rem;    /* 18px */
+  --ds-text-xl:   1.25rem;     /* 20px */
+  --ds-text-2xl:  1.5rem;      /* 24px */
+  --ds-text-3xl:  1.875rem;    /* 30px */
+  --ds-text-4xl:  2.25rem;     /* 36px */
+  --ds-text-6xl:  3.75rem;     /* 60px */
+
+  --ds-leading-none:    1;
+  --ds-leading-tight:   1.25;
+  --ds-leading-snug:    1.375;
+  --ds-leading-normal:  1.5;
+  --ds-leading-relaxed: 1.625;
+
+  --ds-weight-normal:   400;
+  --ds-weight-medium:   500;
+  --ds-weight-semibold: 600;
+  --ds-weight-bold:     700;
+
+  --ds-tracking-tight:  -0.025em;
+  --ds-tracking-normal: 0em;
+  --ds-tracking-wide:   0.025em;
+
+  /* ---- Border Radius Primitives ---- */
+  --ds-radius-none: 0;
+  --ds-radius-sm:   0.25rem;   /*  4px */
+  --ds-radius-md:   0.375rem;  /*  6px */
+  --ds-radius-base: 0.5rem;    /*  8px */
+  --ds-radius-lg:   0.75rem;   /* 12px */
+  --ds-radius-xl:   1rem;      /* 16px */
+  --ds-radius-2xl:  1.5rem;    /* 24px */
+  --ds-radius-full: 9999px;
+
+  /* ---- Elevation / Shadow Primitives ---- */
+  --ds-shadow-none: 0 0 #0000;
+  --ds-shadow-sm:   0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ds-shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --ds-shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* ---- Z-Index Primitives ---- */
+  --ds-z-base:    0;
+  --ds-z-raised:  10;
+  --ds-z-sticky:  50;
+  --ds-z-overlay: 100;
+
+  /* ---- Motion / Transition Primitives ---- */
+  --ds-duration-fast:   150ms;
+  --ds-duration-normal: 200ms;
+  --ds-duration-slow:   300ms;
+  --ds-ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Opacity Primitives ---- */
+  --ds-opacity-disabled: 0.5;
+  --ds-opacity-muted:    0.7;
+  --ds-opacity-hover:    0.8;
+  --ds-opacity-soft:     0.9;
+}
+
+
+/* ============================================================
+   LAYER 2 — SEMANTIC ALIASES (Light Mode)
+   These are the ONLY tokens components should reference.
+   Each alias references a Layer 1 primitive with a fallback.
+   ============================================================ */
+
+:root {
+  /* ---- Semantic Colors ---- */
+  --color-bg:              var(--ds-white, 0 0% 100%);
+  --color-bg-subtle:       var(--ds-stone-100, 12 6.5% 97.5%);
+  --color-bg-muted:        var(--ds-stone-100, 12 6.5% 97.5%);
+  --color-bg-inverse:      var(--ds-stone-950, 12 8.3% 7.2%);
+
+  --color-text:            var(--ds-stone-900, 12 8.7% 11.8%);
+  --color-text-muted:      var(--ds-stone-500, 12 6.5% 51.5%);
+  --color-text-inverse:    var(--ds-stone-50, 0 0% 98%);
+  --color-text-on-primary: var(--ds-stone-950, 12 8.3% 7.2%);
+
+  --color-primary:         var(--ds-lime-500, 77.9 54.4% 47.4%);
+  --color-primary-hover:   var(--ds-lime-400, 79.1 64.5% 57.5%);
+  --color-accent:          var(--ds-lime-400, 79.1 64.5% 57.5%);
+
+  --color-border:          var(--ds-stone-200, 12 6.3% 93.8%);
+  --color-border-muted:    var(--ds-stone-200, 12 6.3% 93.8%);
+  --color-input:           var(--ds-stone-200, 12 6.3% 93.8%);
+  --color-ring:            var(--ds-lime-500, 77.9 54.4% 47.4%);
+
+  --color-card-bg:         var(--ds-white, 0 0% 100%);
+  --color-card-text:       var(--ds-stone-900, 12 8.7% 11.8%);
+
+  --color-destructive:     var(--ds-red-light, 0 84.2% 60.2%);
+  --color-destructive-text: 0 0% 98%;
+
+  --color-success:         var(--ds-green-600, 142 71% 45%);
+  --color-success-text:    var(--ds-green-600, 142 71% 45%);
+
+  /* ---- Semantic Spacing ---- */
+  --space-xs:    var(--ds-space-1, 0.25rem);       /*  4px — tight inner spacing */
+  --space-sm:    var(--ds-space-2, 0.5rem);         /*  8px — compact spacing */
+  --space-md:    var(--ds-space-4, 1rem);            /* 16px — default spacing */
+  --space-lg:    var(--ds-space-6, 1.5rem);          /* 24px — generous spacing */
+  --space-xl:    var(--ds-space-8, 2rem);             /* 32px — section spacing */
+  --space-2xl:   var(--ds-space-10, 2.5rem);          /* 40px — large section */
+  --space-3xl:   var(--ds-space-16, 4rem);             /* 64px — page sections */
+  --space-4xl:   var(--ds-space-24, 6rem);              /* 96px — hero sections */
+
+  /* ---- Semantic Typography ---- */
+  --font-family:       var(--ds-font-sans);
+  --font-size-caption: var(--ds-text-xs, 0.75rem);
+  --font-size-body-sm: var(--ds-text-sm, 0.875rem);
+  --font-size-body:    var(--ds-text-base, 1rem);
+  --font-size-body-lg: var(--ds-text-lg, 1.125rem);
+  --font-size-h4:      var(--ds-text-xl, 1.25rem);
+  --font-size-h3:      var(--ds-text-2xl, 1.5rem);
+  --font-size-h2:      var(--ds-text-3xl, 1.875rem);
+  --font-size-h1:      var(--ds-text-4xl, 2.25rem);
+  --font-size-display: var(--ds-text-6xl, 3.75rem);
+
+  --font-weight-normal:   var(--ds-weight-normal, 400);
+  --font-weight-medium:   var(--ds-weight-medium, 500);
+  --font-weight-semibold: var(--ds-weight-semibold, 600);
+  --font-weight-bold:     var(--ds-weight-bold, 700);
+
+  --line-height-tight:   var(--ds-leading-tight, 1.25);
+  --line-height-normal:  var(--ds-leading-normal, 1.5);
+  --line-height-relaxed: var(--ds-leading-relaxed, 1.625);
+
+  /* ---- Semantic Border Radius ---- */
+  --radius-sm:    var(--ds-radius-sm, 0.25rem);
+  --radius-md:    var(--ds-radius-md, 0.375rem);
+  --radius-base:  var(--ds-radius-base, 0.5rem);
+  --radius-lg:    var(--ds-radius-lg, 0.75rem);
+  --radius-xl:    var(--ds-radius-xl, 1rem);
+  --radius-2xl:   var(--ds-radius-2xl, 1.5rem);
+  --radius-pill:  var(--ds-radius-full, 9999px);
+
+  /* ---- Semantic Elevation ---- */
+  --shadow-none:      var(--ds-shadow-none);
+  --shadow-card:      var(--ds-shadow-sm);
+  --shadow-card-hover: var(--ds-shadow-md);
+  --shadow-dropdown:  var(--ds-shadow-md);
+  --shadow-elevated:  var(--ds-shadow-lg);
+
+  /* ---- Semantic Z-Index ---- */
+  --z-base:     var(--ds-z-base, 0);
+  --z-raised:   var(--ds-z-raised, 10);
+  --z-sticky:   var(--ds-z-sticky, 50);
+  --z-overlay:  var(--ds-z-overlay, 100);
+
+  /* ---- Semantic Motion ---- */
+  --duration-fast:   var(--ds-duration-fast, 150ms);
+  --duration-normal: var(--ds-duration-normal, 200ms);
+  --duration-slow:   var(--ds-duration-slow, 300ms);
+  --ease:            var(--ds-ease-default);
+
+  /* ---- Component-Specific Sizing ---- */
+  --size-icon-sm:   0.75rem;   /* 12px — inline icons */
+  --size-icon:      1rem;      /* 16px — small icons */
+  --size-icon-md:   1.25rem;   /* 20px — standard icons */
+  --size-icon-lg:   1.5rem;    /* 24px — large icons */
+
+  --size-logo-sm:   30px;
+  --size-logo-md:   40px;
+  --size-logo-lg:   60px;
+
+  --size-control-sm: 2.25rem;  /* 36px — small inputs/selects */
+  --size-control:    2.5rem;   /* 40px — default buttons (sm) */
+  --size-control-md: 2.75rem;  /* 44px — default inputs/buttons */
+  --size-control-lg: 3rem;     /* 48px — large buttons */
+
+  --max-width-content: 80rem;  /* 1280px — max-w-7xl */
+  --max-width-prose:   48rem;  /* 768px — max-w-3xl */
+  --max-width-form:    42rem;  /* 672px — max-w-2xl */
+}
+
+
+/* ============================================================
+   LAYER 2 — SEMANTIC ALIASES (Dark Mode)
+   Same tokens, different values in .dark context.
+   ============================================================ */
+
+.dark {
+  --color-bg:              var(--ds-stone-950, 12 8.3% 7.2%);
+  --color-bg-subtle:       var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-bg-muted:        var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-bg-inverse:      var(--ds-white, 0 0% 100%);
+
+  --color-text:            0 0% 98%;
+  --color-text-muted:      var(--ds-stone-400, 12 4.9% 64%);
+  --color-text-inverse:    var(--ds-stone-900, 12 8.7% 11.8%);
+  --color-text-on-primary: var(--ds-stone-950, 12 8.3% 7.2%);
+
+  --color-primary:         var(--ds-lime-400, 79.1 64.5% 57.5%);
+  --color-primary-hover:   var(--ds-lime-500, 77.9 54.4% 47.4%);
+  --color-accent:          var(--ds-lime-500, 77.9 54.4% 47.4%);
+
+  --color-border:          var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-border-muted:    var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-input:           var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-ring:            var(--ds-lime-400, 79.1 64.5% 57.5%);
+
+  --color-card-bg:         var(--ds-stone-900, 12 8.7% 11.8%);
+  --color-card-text:       0 0% 98%;
+
+  --color-destructive:     var(--ds-red-dark, 0 62.8% 30.6%);
+  --color-destructive-text: 0 0% 98%;
+
+  --color-success:         var(--ds-green-400, 142 69% 58%);
+  --color-success-text:    var(--ds-green-400, 142 69% 58%);
+}
