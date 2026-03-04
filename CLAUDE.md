@@ -140,5 +140,5 @@ node scripts/token-audit.js       # Scan for hardcoded values
 - [ ] Manual color contrast check (muted-foreground on backgrounds — near WCAG AA threshold)
 - [ ] Add `/public/favicon.ico` (currently 404)
 - [ ] Add actual `/public/og-image.png` for OpenGraph previews
-- [ ] Connect GoDaddy domain (`veganmotoclub.com`) to Vercel
+- [x] ~~Connect GoDaddy domain (`veganmotoclub.com`) to Vercel~~ **DONE** — DNS propagated, domain live
 - [ ] Configure ESLint (not yet set up — `npm run lint` prompts for config)
