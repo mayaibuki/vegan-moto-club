@@ -137,6 +137,7 @@ node scripts/token-audit.js       # Scan for hardcoded values
 
 ## Remaining TODOs
 
+- [ ] Add donations section with PayPal integration (allow supporters to donate to the project)
 - [ ] Manual color contrast check (muted-foreground on backgrounds — near WCAG AA threshold)
 - [ ] Add `/public/favicon.ico` (currently 404)
 - [ ] Add actual `/public/og-image.png` for OpenGraph previews
