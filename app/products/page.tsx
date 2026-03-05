@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import { getProducts } from "@/lib/notion"
 import { ProductGrid } from "@/components/ProductGrid"
 
@@ -29,7 +30,9 @@ export default async function ProductsPage() {
         </p>
       </div>
 
-      <ProductGrid products={products} />
+      <Suspense fallback={<div className="text-muted-foreground">Loading products...</div>}>
+        <ProductGrid products={products} />
+      </Suspense>
     </div>
   )
 }

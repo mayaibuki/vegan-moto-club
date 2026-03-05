@@ -39,6 +39,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
+  // Category filter pages (indexable filtered views)
+  const categories = ["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"]
+  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
+    url: `${siteUrl}/products?category=${encodeURIComponent(cat)}`,
+    lastModified: STATIC_LAST_MODIFIED,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }))
+
   // Dynamic product pages
   const products = await getProducts()
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
@@ -57,5 +66,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...productPages, ...blogPages]
+  return [...staticPages, ...categoryPages, ...productPages, ...blogPages]
 }

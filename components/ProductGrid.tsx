@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Search, X, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
@@ -27,14 +28,39 @@ interface ProductGridProps {
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
-  const [search, setSearch] = useState("")
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedGenders, setSelectedGenders] = useState<string[]>([])
-  const [selectedRidingStyles, setSelectedRidingStyles] = useState<string[]>([])
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Initialize state from URL search params
+  const [search, setSearch] = useState(searchParams.get("search") || "")
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(searchParams.get("brand"))
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get("category"))
+  const [selectedGenders, setSelectedGenders] = useState<string[]>(
+    searchParams.get("gender")?.split(",").filter(Boolean) || []
+  )
+  const [selectedRidingStyles, setSelectedRidingStyles] = useState<string[]>(
+    searchParams.get("style")?.split(",").filter(Boolean) || []
+  )
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(25)
+
+  // Sync filter state → URL params
+  const syncUrl = useCallback(() => {
+    const params = new URLSearchParams()
+    if (search) params.set("search", search)
+    if (selectedBrand) params.set("brand", selectedBrand)
+    if (selectedCategory) params.set("category", selectedCategory)
+    if (selectedGenders.length > 0) params.set("gender", selectedGenders.join(","))
+    if (selectedRidingStyles.length > 0) params.set("style", selectedRidingStyles.join(","))
+    const qs = params.toString()
+    router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false })
+  }, [search, selectedBrand, selectedCategory, selectedGenders, selectedRidingStyles, pathname, router])
+
+  useEffect(() => {
+    syncUrl()
+  }, [syncUrl])
 
   const brands = useMemo(() => getUniqueBrands(products), [products])
 

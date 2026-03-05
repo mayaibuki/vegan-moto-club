@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
+import { RelatedProducts } from "@/components/RelatedProducts"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 
@@ -69,7 +71,10 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string }
 }) {
-  const product = await getProductBySlug(params.slug)
+  const [product, allProducts] = await Promise.all([
+    getProductBySlug(params.slug),
+    getProducts(),
+  ])
 
   if (!product) {
     notFound()
@@ -150,10 +155,15 @@ export default async function ProductDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="space-y-8">
-      {/* Back Button */}
-      <Button variant="ghost" asChild className="mb-4">
-        <Link href="/products">← Back to Products</Link>
-      </Button>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Products", href: "/products" },
+          { label: product.category, href: `/products?category=${encodeURIComponent(product.category)}` },
+          { label: product.name },
+        ]}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Images */}
@@ -339,6 +349,9 @@ export default async function ProductDetailPage({
           </p>
         </div>
       )}
+
+      {/* Related Products */}
+      <RelatedProducts currentProduct={product} allProducts={allProducts} />
 
       <SuggestProductForm id="product" />
     </div>
