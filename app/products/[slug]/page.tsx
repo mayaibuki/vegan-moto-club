@@ -30,9 +30,17 @@ export async function generateMetadata({
     }
   }
 
+  // Build a keyword-rich description that includes materials, protection level, and season
+  const keyFeatures = [
+    product.levelOfProtection,
+    ...product.season,
+    product.waterproofLevel,
+    ...product.materials.slice(0, 2),
+  ].filter(Boolean).join(", ")
+
   const description = product.description
     ? product.description.slice(0, 160)
-    : `${product.name} by ${product.brand} - Vegan ${product.category} for motorcycle riders. Cruelty-free and ethical gear.`
+    : `${product.name} by ${product.brand} - Vegan ${product.category} for motorcycle riders.${keyFeatures ? ` ${keyFeatures}.` : ""} Cruelty-free and ethical gear.`.slice(0, 160)
 
   return {
     title: `${product.name} by ${product.brand}`,
@@ -73,6 +81,31 @@ export default async function ProductDetailPage({
     Winter: "❄️",
   }
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Products",
+        item: `${siteUrl}/products`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.name,
+        item: `${siteUrl}/products/${product.slug}`,
+      },
+    ],
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -108,6 +141,10 @@ export default async function ProductDetailPage({
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
