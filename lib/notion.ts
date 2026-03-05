@@ -1,5 +1,6 @@
 import { Client } from "@notionhq/client";
 import { unstable_cache } from "next/cache";
+import { generateSlug } from "./utils";
 
 const notion = new Client({
   auth: process.env.NOTION_API_KEY,
@@ -10,6 +11,7 @@ const REVALIDATE_TIME = process.env.NODE_ENV === "production" ? 3600 : 60;
 
 export interface Product {
   id: string;
+  slug: string;
   name: string;
   brand: string;
   category: string;
@@ -132,11 +134,13 @@ async function fetchProductsFromNotion(): Promise<Product[]> {
 
     return allResults.map((page: NotionPage) => {
       const properties = page.properties;
+      const name = properties["Name of product"]?.title?.[0]?.plain_text || "";
 
       return {
         id: page.id,
+        slug: generateSlug(name),
         lastEditedTime: page.last_edited_time,
-        name: properties["Name of product"]?.title?.[0]?.plain_text || "",
+        name,
         brand: properties.Brand?.select?.name || "",
         category: (properties.Category?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
         levelOfProtection: properties["Level of Protection"]?.select?.name || "",
@@ -177,11 +181,13 @@ async function fetchProductFromNotion(id: string): Promise<Product | null> {
   try {
     const page = await notion.pages.retrieve({ page_id: id });
     const properties = (page as NotionPage).properties;
+    const name = properties["Name of product"]?.title?.[0]?.plain_text || "";
 
     return {
       id: page.id,
+      slug: generateSlug(name),
       lastEditedTime: (page as NotionPage).last_edited_time,
-      name: properties["Name of product"]?.title?.[0]?.plain_text || "",
+      name,
       brand: properties.Brand?.select?.name || "",
       category: (properties.Category?.multi_select || []).map((s: NotionSelectOption) => s.name).join(", ") || "",
       levelOfProtection: properties["Level of Protection"]?.select?.name || "",
@@ -217,6 +223,12 @@ export async function getProduct(id: string): Promise<Product | null> {
     { revalidate: REVALIDATE_TIME, tags: ["products", `product-${id}`] }
   );
   return getCachedProduct();
+}
+
+// Get a single product by slug (looks up from all products)
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  const products = await getProducts();
+  return products.find((p) => p.slug === slug) || null;
 }
 
 // Internal function to fetch events from Notion

@@ -81,6 +81,16 @@ export function filterProducts(
   })
 }
 
+export function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
 export function getUniqueBrands(products: Product[]): string[] {
   const brands = new Set(products.map((p) => p.brand).filter(Boolean))
   return Array.from(brands).sort()

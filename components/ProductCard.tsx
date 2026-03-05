@@ -20,7 +20,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
   return (
     <article className="h-full">
       <Link
-        href={`/products/${product.id}`}
+        href={`/products/${product.slug}`}
         aria-label={`View ${product.name} by ${product.brand} - ${formatPrice(product.price)}`}
         className="block h-full"
       >

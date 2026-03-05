@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { getProduct, getProducts } from "@/lib/notion"
+import { getProductBySlug, getProducts } from "@/lib/notion"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -13,16 +13,16 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 export async function generateStaticParams() {
   const products = await getProducts()
   return products.map((product) => ({
-    id: product.id,
+    slug: product.slug,
   }))
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string }
+  params: { slug: string }
 }): Promise<Metadata> {
-  const product = await getProduct(params.id)
+  const product = await getProductBySlug(params.slug)
 
   if (!product) {
     return {
@@ -40,7 +40,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${product.name} by ${product.brand} | Vegan Moto Club`,
       description,
-      url: `/products/${product.id}`,
+      url: `/products/${product.slug}`,
       images: product.photos.length > 0 ? [{ url: product.photos[0] }] : [],
       type: "website",
     },
@@ -51,7 +51,7 @@ export async function generateMetadata({
       images: product.photos.length > 0 ? [product.photos[0]] : [],
     },
     alternates: {
-      canonical: `/products/${product.id}`,
+      canonical: `/products/${product.slug}`,
     },
   }
 }
@@ -59,9 +59,9 @@ export async function generateMetadata({
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: { slug: string }
 }) {
-  const product = await getProduct(params.id)
+  const product = await getProductBySlug(params.slug)
 
   if (!product) {
     notFound()
@@ -88,7 +88,7 @@ export default async function ProductDetailPage({
       price: product.price,
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
-      url: product.url || `${siteUrl}/products/${product.id}`,
+      url: product.url || `${siteUrl}/products/${product.slug}`,
     },
     category: product.category,
     additionalProperty: [
