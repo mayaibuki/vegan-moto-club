@@ -4,9 +4,10 @@ import Image from "next/image"
 interface LogoProps {
   size?: "sm" | "md" | "lg"
   href?: string
+  showName?: boolean
 }
 
-export function Logo({ size = "md", href = "/" }: LogoProps) {
+export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
   const sizes = {
     sm: { width: 32, height: 32 },
     md: { width: 40, height: 40 },
@@ -19,8 +20,14 @@ export function Logo({ size = "md", href = "/" }: LogoProps) {
     lg: "h-16 w-auto",
   }
 
+  const nameClass = {
+    sm: "text-sm font-semibold",
+    md: "text-base font-semibold",
+    lg: "text-xl font-bold",
+  }
+
   const logoElement = (
-    <div className={`flex items-center gap-2 ${size !== "sm" ? "flex-col" : ""}`}>
+    <div className="flex items-center gap-3">
       <Image
         src="/images/logo.png"
         alt="Vegan Moto Club"
@@ -29,6 +36,9 @@ export function Logo({ size = "md", href = "/" }: LogoProps) {
         className={sizeClass[size]}
         priority
       />
+      {showName && (
+        <span className={nameClass[size]}>Vegan Moto Club</span>
+      )}
     </div>
   )
 

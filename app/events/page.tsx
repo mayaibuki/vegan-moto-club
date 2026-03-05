@@ -1,9 +1,54 @@
 import type { Metadata } from "next"
 import { getEvents } from "@/lib/notion"
+import type { Event } from "@/lib/notion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/utils"
+import { SuggestEventForm } from "@/components/SuggestEventForm"
+
+function EventCard({ event, muted = false }: { event: Event; muted?: boolean }) {
+  return (
+    <Card className={muted ? "opacity-60" : undefined}>
+      <CardHeader>
+        <CardTitle className="text-xl">{event.name}</CardTitle>
+        <CardDescription className="text-base">
+          {formatDate(event.startDate)}
+          {event.endDate && event.endDate !== event.startDate
+            ? ` - ${formatDate(event.endDate)}`
+            : ""}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <p className="text-sm font-medium"><span aria-hidden="true">📍</span> Location</p>
+          <p className="text-muted-foreground">{event.location}</p>
+        </div>
+        {event.description && (
+          <div>
+            <p className="text-sm font-medium">Description</p>
+            <p className="text-muted-foreground line-clamp-2">{event.description}</p>
+          </div>
+        )}
+        <div className="flex items-center justify-between pt-3">
+          <Badge variant="outline">{event.price}</Badge>
+          {event.url && (
+            <Button size="sm" asChild>
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Learn more about ${event.name} (opens in new tab)`}
+              >
+                Learn More<span className="sr-only"> (opens in new tab)</span>
+              </a>
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 export const metadata: Metadata = {
   title: "Events",
@@ -21,14 +66,27 @@ export const metadata: Metadata = {
 }
 
 export default async function EventsPage() {
-  const events = await getEvents()
+  const rawEvents = await getEvents()
+
+  const oneWeekAgo = new Date()
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
+  const upcomingEvents = rawEvents
+    .filter((e) => new Date(e.startDate) >= oneWeekAgo)
+    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+
+  const pastEvents = rawEvents
+    .filter((e) => new Date(e.startDate) < oneWeekAgo)
+    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
+
+  const allEvents = [...upcomingEvents, ...pastEvents]
 
   const eventsJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: events.map((event, index) => ({
+    itemListElement: allEvents.map((event, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
@@ -58,75 +116,45 @@ export default async function EventsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }}
       />
       <div className="space-y-10">
-      <div className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-bold">Events</h1>
-        <p className="text-lg text-muted-foreground">
-          Join our community at upcoming events and meetups
-        </p>
-      </div>
-
-      {events.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-bold">Events</h1>
             <p className="text-lg text-muted-foreground">
-              No upcoming events at the moment. Check back soon!
+              Join our community at upcoming events and meetups
             </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-6">
-          {events.map((event) => (
-            <Card key={event.id} className="overflow-hidden">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-1">
-                    <CardTitle className="text-xl md:text-2xl">{event.name}</CardTitle>
-                    <CardDescription className="text-base">
-                      <span aria-hidden="true">📅</span> {formatDate(event.startDate)}
-                      {event.endDate && event.endDate !== event.startDate
-                        ? ` - ${formatDate(event.endDate)}`
-                        : ""}
-                    </CardDescription>
-                  </div>
-                  <Badge variant="secondary" className="whitespace-nowrap shrink-0">
-                    {event.price}
-                  </Badge>
-                </div>
-              </CardHeader>
+          </div>
 
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-1"><span aria-hidden="true">📍</span> Location</p>
-                  <p className="text-muted-foreground">{event.location}</p>
-                </div>
+          {/* Upcoming Events */}
+          <section aria-labelledby="upcoming-heading" className="space-y-6">
+            <h2 id="upcoming-heading" className="text-2xl font-semibold">Upcoming Events</h2>
+            {upcomingEvents.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">No upcoming events at the moment. Check back soon!</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            )}
+          </section>
 
-                {event.description && (
-                  <div>
-                    <p className="text-sm font-medium mb-1">Description</p>
-                    <p className="text-muted-foreground">{event.description}</p>
-                  </div>
-                )}
+          {/* Past Events */}
+          {pastEvents.length > 0 && (
+            <section aria-labelledby="past-heading" className="space-y-6">
+              <h2 id="past-heading" className="text-2xl font-semibold text-muted-foreground">Past Events</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {pastEvents.map((event) => (
+                  <EventCard key={event.id} event={event} muted />
+                ))}
+              </div>
+            </section>
+          )}
 
-                {event.url && (
-                  <div className="pt-2">
-                    <Button asChild>
-                      <a
-                        href={event.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Learn more and register for ${event.name} (opens in new tab)`}
-                      >
-                        Learn More & Register<span className="sr-only"> (opens in new tab)</span>
-                      </a>
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+          <SuggestEventForm />
         </div>
-      )}
-    </div>
     </>
   )
 }

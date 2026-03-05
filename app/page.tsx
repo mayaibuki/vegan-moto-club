@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Logo } from "@/components/Logo"
+import { InstagramGallery } from "@/components/InstagramGallery"
 import Image from "next/image"
 import Link from "next/link"
 import { formatDate, formatRelativeDate } from "@/lib/utils"
@@ -37,7 +38,13 @@ export default async function Home() {
     .filter((p) => p.staffFavorite)
     .sort(() => Math.random() - 0.5)
     .slice(0, 8)
-  const upcomingEvents = events.slice(0, 5)
+  const oneWeekAgo = new Date()
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
+  const upcomingEvents = events
+    .filter(event => new Date(event.startDate) >= oneWeekAgo)
+    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    .slice(0, 5)
   const lastUpdated = products.reduce((latest, p) =>
     p.lastEditedTime > latest ? p.lastEditedTime : latest, products[0]?.lastEditedTime || ""
   )
@@ -50,10 +57,10 @@ export default async function Home() {
       />
       <div className="space-y-16">
         {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-secondary/20 via-accent/10 to-background rounded-3xl p-10 md:p-16">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
+      <section className="overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-stretch">
           {/* Left Column — Text Content */}
-          <div className="flex-1 text-center lg:text-left space-y-8">
+          <div className="flex-1 p-10 md:p-16 text-center lg:text-left space-y-8">
             {/* Last Updated Badge */}
             <div className="flex items-center gap-2 justify-center lg:justify-start">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-4 py-1.5 text-sm text-muted-foreground">
@@ -91,18 +98,16 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Right Column — Hero Image (hidden on mobile, shown on lg+) */}
-          <div className="hidden lg:block flex-1 mt-12 lg:mt-0">
-            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
-              <Image
-                src="/images/hero.jpg"
-                alt="Vegan Moto Club riders on a Ducati motorcycle with a Protect Animals sign at an animal rights rally"
-                fill
-                className="object-cover"
-                priority
-                sizes="(min-width: 1024px) 50vw, 100vw"
-              />
-            </div>
+          {/* Right Column — Hero Image edge-to-edge (hidden on mobile) */}
+          <div className="hidden lg:block flex-1 relative min-h-96">
+            <Image
+              src="/images/hero.jpg"
+              alt="Vegan Moto Club riders on a Ducati motorcycle with a Protect Animals sign at an animal rights rally"
+              fill
+              className="object-cover"
+              priority
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
           </div>
         </div>
       </section>
@@ -197,6 +202,11 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* Gallery Section */}
+      <section>
+        <InstagramGallery />
+      </section>
 
       {/* Product Suggestion Form Section */}
       <SuggestProductForm />

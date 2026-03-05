@@ -101,8 +101,8 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
         <CardHeader>
           <CardTitle id={headingId}>Suggest a Product</CardTitle>
           <CardDescription className="text-base">
-            Know a great vegan motorcycle product? Share the link and we&apos;ll
-            check it out.
+            Know a great vegan motorcycle product? Share the link a we&apos;ll
+            post it here.
           </CardDescription>
         </CardHeader>
         <CardContent>

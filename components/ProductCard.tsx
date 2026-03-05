@@ -43,7 +43,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             {/* Staff Pick Badge - Positioned on image */}
             {product.staffFavorite && (
               <div className="absolute top-3 left-3">
-                <Badge variant="default"><span aria-hidden="true">⭐</span> Staff Pick</Badge>
+                <Badge variant="default">Staff Pick</Badge>
               </div>
             )}
           </div>
@@ -93,12 +93,6 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
               )}
             </div>
 
-            {/* Category - Subtle text at bottom */}
-            {product.category && (
-              <p className="text-xs text-muted-foreground pt-1">
-                {product.category}
-              </p>
-            )}
           </CardContent>
         </Card>
       </Link>

@@ -254,6 +254,7 @@ async function fetchEventsFromNotion(): Promise<Event[]> {
     return allResults.map((page: NotionPage) => {
       const properties = page.properties;
       const dateRange = properties.Date?.date;
+      const priceNumber = properties.Price?.number;
 
       return {
         id: page.id,
@@ -262,8 +263,8 @@ async function fetchEventsFromNotion(): Promise<Event[]> {
         endDate: dateRange?.end || dateRange?.start || "",
         description: extractText(properties.Description?.rich_text || []),
         location: extractText(properties.Location?.rich_text || []),
-        url: extractText(properties.URL?.rich_text || []),
-        price: extractText(properties.Price?.rich_text || []) || "Free",
+        url: properties.URL?.url || "",
+        price: priceNumber ? `$${priceNumber.toFixed(2)}` : "Free",
       };
     });
   } catch (error) {

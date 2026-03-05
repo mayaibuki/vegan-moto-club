@@ -4,7 +4,6 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
@@ -124,7 +123,7 @@ export default async function ProductDetailPage({
         <figure aria-label={`Product images for ${product.name}`}>
           {product.photos.length > 0 ? (
             <div className="space-y-4">
-              <div className="relative w-full h-96 bg-muted rounded-lg overflow-hidden">
+              <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden">
                 <Image
                   src={product.photos[0]}
                   alt={`${product.name} by ${product.brand} - ${product.category || "motorcycle gear"}`}
@@ -139,7 +138,7 @@ export default async function ProductDetailPage({
                   {product.photos.slice(1).map((photo, idx) => (
                     <div
                       key={idx}
-                      className="relative h-24 bg-muted rounded overflow-hidden"
+                      className="relative aspect-square bg-muted rounded overflow-hidden"
                     >
                       <Image
                         src={photo}
@@ -165,12 +164,12 @@ export default async function ProductDetailPage({
         <div className="space-y-6">
           {/* Title and Brand */}
           <div>
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <h1 className="text-3xl font-bold">{product.name}</h1>
-              {product.staffFavorite && <Badge><span aria-hidden="true">⭐</span> Staff Pick</Badge>}
-            </div>
+            <h1 className="text-3xl font-bold">{product.name}</h1>
             <p className="text-lg text-muted-foreground">{product.brand}</p>
           </div>
+
+          {/* Staff Pick Badge */}
+          {product.staffFavorite && <Badge><span aria-hidden="true">⭐</span> Staff Pick</Badge>}
 
           {/* Price */}
           <div>
@@ -296,14 +295,12 @@ export default async function ProductDetailPage({
 
       {/* Description */}
       {product.description && (
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-xl font-bold mb-4">Description</h2>
-            <p className="text-muted-foreground whitespace-pre-wrap">
-              {product.description}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-xl font-bold mb-4">Description</h2>
+          <p className="text-muted-foreground whitespace-pre-wrap">
+            {product.description}
+          </p>
+        </div>
       )}
 
       <SuggestProductForm id="product" />
