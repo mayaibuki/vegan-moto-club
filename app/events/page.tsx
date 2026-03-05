@@ -21,7 +21,7 @@ function EventCard({ event, muted = false }: { event: Event; muted?: boolean }) 
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="text-sm font-medium"><span aria-hidden="true">📍</span> Location</p>
+          <p className="text-sm font-medium">Location</p>
           <p className="text-muted-foreground">{event.location}</p>
         </div>
         {event.description && (
@@ -141,6 +141,8 @@ export default async function EventsPage() {
             )}
           </section>
 
+          <SuggestEventForm />
+
           {/* Past Events */}
           {pastEvents.length > 0 && (
             <section aria-labelledby="past-heading" className="space-y-6">
@@ -152,8 +154,6 @@ export default async function EventsPage() {
               </div>
             </section>
           )}
-
-          <SuggestEventForm />
         </div>
     </>
   )

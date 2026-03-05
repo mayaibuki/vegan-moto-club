@@ -170,7 +170,7 @@ export default async function Home() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium"><span aria-hidden="true">📍</span> Location</p>
+                    <p className="text-sm font-medium">Location</p>
                     <p className="text-muted-foreground">{event.location}</p>
                   </div>
                   {event.description && (
