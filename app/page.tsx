@@ -93,7 +93,9 @@ export default async function Home() {
                 <Link href="/products">Browse Products</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="https://discord.gg/GN4jkBRnut">Join our Discord</Link>
+                <a href="https://discord.gg/GN4jkBRnut" target="_blank" rel="noopener noreferrer" aria-label="Join us on Discord (opens in new tab)">
+                  Join our Discord<span className="sr-only"> (opens in new tab)</span>
+                </a>
               </Button>
             </div>
           </div>
