@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { DM_Sans } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { AgentationWrapper } from "@/components/AgentationWrapper"
@@ -131,6 +132,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <AgentationWrapper />
+        <Analytics />
       </body>
     </html>
   )
