@@ -2,16 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // Allow all HTTPS image hosts since product images in Notion
-    // come from various external sources (retailer CDNs, brand sites, etc.)
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**',
       },
     ],
-    // Optimize image formats
-    formats: ['image/avif', 'image/webp'],
+    formats: ['image/webp'],
+    minimumCacheTTL: 2678400,
+    deviceSizes: [640, 828, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 256],
   },
 }
 
