@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { ArrowRight, MapPin } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { Event } from "@/lib/notion"
@@ -13,7 +13,7 @@ interface EventCardProps {
 function DateBlock({ date }: { date: string }) {
   return (
     <div
-      className="flex size-12 flex-col items-center justify-center bg-foreground text-background"
+      className="flex size-12 flex-col items-center justify-center border border-foreground bg-background text-foreground"
       aria-hidden="true"
     >
       <span className="text-sm font-semibold leading-5">{formatEventMonth(date)}</span>
@@ -53,7 +53,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
               <DateBlock date={event.startDate} />
               {multiDay && (
                 <>
-                  <ArrowRight className="size-6 text-foreground" aria-hidden="true" />
+                  <ArrowRight className="size-6 text-foreground ring-1 ring-foreground rounded-sm" aria-hidden="true" />
                   <DateBlock date={event.endDate} />
                 </>
               )}
@@ -78,9 +78,8 @@ export function EventCard({ event, muted = false }: EventCardProps) {
 
         {/* Location */}
         {event.location && (
-          <p className="flex items-start gap-1.5 text-sm font-medium leading-5 text-muted-foreground">
-            <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            <span className="line-clamp-2">{event.location}</span>
+          <p className="text-sm font-medium leading-5 text-muted-foreground line-clamp-2">
+            {event.location}
           </p>
         )}
 

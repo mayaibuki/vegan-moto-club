@@ -45,7 +45,7 @@ export function Navbar() {
   return (
     <header className="border-b border-border/50 bg-muted/80 backdrop-blur-sm sticky top-0 z-50">
       <nav aria-label="Main navigation" className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Logo size="md" href="/" />
+        <Logo size="md" href="/" showName={false} />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
