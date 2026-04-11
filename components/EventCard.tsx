@@ -13,7 +13,7 @@ interface EventCardProps {
 function DateBlock({ date }: { date: string }) {
   return (
     <div
-      className="flex size-12 flex-col items-center justify-center border border-foreground bg-background text-foreground"
+      className="flex size-12 flex-col items-center justify-center bg-foreground text-background"
       aria-hidden="true"
     >
       <span className="text-sm font-semibold leading-5">{formatEventMonth(date)}</span>
@@ -53,7 +53,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
               <DateBlock date={event.startDate} />
               {multiDay && (
                 <>
-                  <ArrowRight className="size-6 text-foreground ring-1 ring-foreground rounded-sm" aria-hidden="true" />
+                  <ArrowRight className="size-6 text-foreground" aria-hidden="true" />
                   <DateBlock date={event.endDate} />
                 </>
               )}
