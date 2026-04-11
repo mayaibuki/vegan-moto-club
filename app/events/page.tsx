@@ -1,54 +1,8 @@
 import type { Metadata } from "next"
 import { getEvents } from "@/lib/notion"
-import type { Event } from "@/lib/notion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { formatDate } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
+import { EventCard } from "@/components/EventCard"
 import { SuggestEventForm } from "@/components/SuggestEventForm"
-
-function EventCard({ event, muted = false }: { event: Event; muted?: boolean }) {
-  return (
-    <Card className={muted ? "opacity-60" : undefined}>
-      <CardHeader>
-        <CardTitle className="text-xl">{event.name}</CardTitle>
-        <CardDescription className="text-base">
-          {formatDate(event.startDate)}
-          {event.endDate && event.endDate !== event.startDate
-            ? ` - ${formatDate(event.endDate)}`
-            : ""}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm font-medium">Location</p>
-          <p className="text-muted-foreground">{event.location}</p>
-        </div>
-        {event.description && (
-          <div>
-            <p className="text-sm font-medium">Description</p>
-            <p className="text-muted-foreground line-clamp-2">{event.description}</p>
-          </div>
-        )}
-        <div className="flex items-center justify-between pt-3">
-          <Badge variant="outline">{event.price}</Badge>
-          {event.url && (
-            <Button size="sm" asChild>
-              <a
-                href={event.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Learn more about ${event.name} (opens in new tab)`}
-              >
-                Learn More<span className="sr-only"> (opens in new tab)</span>
-              </a>
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 
 export const metadata: Metadata = {
   title: "Events",

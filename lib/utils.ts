@@ -20,6 +20,22 @@ export function formatDate(dateString: string): string {
   })
 }
 
+export function isSameEventDay(start: string, end: string): boolean {
+  if (!start) return true
+  if (!end || end === start) return true
+  return new Date(start).toDateString() === new Date(end).toDateString()
+}
+
+export function formatEventMonth(dateString: string): string {
+  if (!dateString) return ""
+  return new Date(dateString).toLocaleDateString("en-US", { month: "short" })
+}
+
+export function formatEventDay(dateString: string): string {
+  if (!dateString) return ""
+  return String(new Date(dateString).getDate())
+}
+
 export function formatRelativeDate(dateString: string): string {
   if (!dateString) return ""
   const date = new Date(dateString)

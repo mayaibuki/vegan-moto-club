@@ -39,6 +39,7 @@ export interface Event {
   location: string;
   url: string;
   price: string;
+  poster: string;
 }
 
 export interface BlogPost {
@@ -290,6 +291,14 @@ async function fetchEventsFromNotion(): Promise<Event[]> {
         location: extractText(properties.Location?.rich_text || []),
         url: properties.URL?.url || "",
         price: priceNumber ? `$${priceNumber.toFixed(2)}` : "Free",
+        poster: (() => {
+          const file = properties["Event poster"]?.files?.[0] as NotionFile | undefined;
+          if (!file) return "";
+          if (file.type === "file") {
+            return `/api/notion-image?pageId=${page.id}&prop=Event+poster&idx=0`;
+          }
+          return getImageUrl(file) || "";
+        })(),
       };
     });
   } catch (error) {

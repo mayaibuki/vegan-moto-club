@@ -75,5 +75,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 ## Cross-References
 
 - [ProductCard](./product-card.md) — Specialized card for products
+- [EventCard](./event-card.md) — Specialized card for events
 - [Badge](./badge.md) — Often used inside cards
 - [Button](./button.md) — CTA buttons in card footer
