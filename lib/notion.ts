@@ -89,13 +89,14 @@ function extractText(richText: NotionRichText[]): string {
   return richText.map((block) => block.plain_text).join("");
 }
 
-// Helper function to get image URL from files
+// Helper function to get image URL from files (external URLs only).
+// Notion-hosted files (type "file") must be handled at the call site using
+// the stable /api/notion-image?pageId=...&prop=...&idx=... proxy so Vercel's
+// image optimization cache key doesn't rotate with Notion's signed URLs.
 function getImageUrl(file: NotionFile): string | null {
   if (!file) return null;
   if (file.type === "external") {
     return file.external?.url ?? null;
-  } else if (file.type === "file") {
-    return file.file?.url ?? null;
   }
   return null;
 }
@@ -149,7 +150,14 @@ async function fetchProductsFromNotion(): Promise<Product[]> {
         description: extractText(properties.Description?.rich_text || []),
         url: properties.URL?.url || "",
         photos: (properties.Photos?.files || [])
-          .map((file: NotionFile) => getImageUrl(file))
+          .map((file: NotionFile, idx: number) => {
+            // Use a stable proxy URL for Notion-hosted files so Vercel's image
+            // optimizer cache key never changes when Notion rotates signed URLs.
+            if (file.type === "file") {
+              return `/api/notion-image?pageId=${page.id}&prop=Photos&idx=${idx}`;
+            }
+            return getImageUrl(file);
+          })
           .filter(Boolean) as string[],
         ridingStyle: (properties["Riding style"]?.multi_select || []).map(
           (s: NotionSelectOption) => s.name
@@ -196,7 +204,12 @@ async function fetchProductFromNotion(id: string): Promise<Product | null> {
       description: extractText(properties.Description?.rich_text || []),
       url: properties.URL?.url || "",
       photos: (properties.Photos?.files || [])
-        .map((file: NotionFile) => getImageUrl(file))
+        .map((file: NotionFile, idx: number) => {
+          if (file.type === "file") {
+            return `/api/notion-image?pageId=${page.id}&prop=Photos&idx=${idx}`;
+          }
+          return getImageUrl(file);
+        })
         .filter(Boolean) as string[],
       ridingStyle: (properties["Riding style"]?.multi_select || []).map(
         (s: NotionSelectOption) => s.name
@@ -331,9 +344,14 @@ async function fetchBlogPostsFromNotion(): Promise<BlogPost[]> {
         title: properties.Name?.title?.[0]?.plain_text || "",
         content: extractText(properties.Description?.rich_text || []),
         publishDate: properties.Date?.date?.start || "",
-        featuredImage: getImageUrl(
-          properties["Thumbnail Image"]?.files?.[0] as NotionFile
-        ) || "",
+        featuredImage: (() => {
+          const file = properties["Thumbnail Image"]?.files?.[0] as NotionFile | undefined;
+          if (!file) return "";
+          if (file.type === "file") {
+            return `/api/notion-image?pageId=${page.id}&prop=Thumbnail+Image&idx=0`;
+          }
+          return getImageUrl(file) || "";
+        })(),
       };
     });
   } catch (error) {
@@ -360,9 +378,14 @@ async function fetchBlogPostFromNotion(id: string): Promise<BlogPost | null> {
       title: properties.Name?.title?.[0]?.plain_text || "",
       content: extractText(properties.Description?.rich_text || []),
       publishDate: properties.Date?.date?.start || "",
-      featuredImage: getImageUrl(
-        properties["Thumbnail Image"]?.files?.[0] as NotionFile
-      ) || "",
+      featuredImage: (() => {
+        const file = properties["Thumbnail Image"]?.files?.[0] as NotionFile | undefined;
+        if (!file) return "";
+        if (file.type === "file") {
+          return `/api/notion-image?pageId=${page.id}&prop=Thumbnail+Image&idx=0`;
+        }
+        return getImageUrl(file) || "";
+      })(),
     };
   } catch (error) {
     console.error("[Notion] Failed to fetch blog post:", error);

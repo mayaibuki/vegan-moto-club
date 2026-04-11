@@ -35,6 +35,7 @@ export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
         height={sizes[size].height}
         className={sizeClass[size]}
         priority
+        unoptimized
       />
       {showName && (
         <span className={nameClass[size]}>Vegan Moto Club</span>

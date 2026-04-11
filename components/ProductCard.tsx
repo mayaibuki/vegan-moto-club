@@ -1,8 +1,8 @@
 import { memo } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Card, CardContent } from "./ui/card"
 import { Badge } from "./ui/badge"
+import { ProductCardImage } from "./ProductCardImage"
 import { Product } from "@/lib/notion"
 import { formatPrice } from "@/lib/utils"
 
@@ -28,12 +28,9 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
           {/* Image Section */}
           <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border/30 flex items-center justify-center">
             {product.photos.length > 0 ? (
-              <Image
+              <ProductCardImage
                 src={product.photos[0]}
                 alt={`${product.name} by ${product.brand} - ${product.category || "motorcycle gear"}`}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted-foreground" aria-hidden="true">
