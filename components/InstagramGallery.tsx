@@ -19,7 +19,7 @@ export function InstagramGallery() {
   }, [])
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-80">
       <behold-widget feed-id="IMLk3Wl3QEREHuhbK7uK" />
     </div>
   )

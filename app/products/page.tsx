@@ -1,7 +1,11 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
+import dynamic from "next/dynamic"
 import { getProducts } from "@/lib/notion"
-import { ProductGrid } from "@/components/ProductGrid"
+
+const ProductGrid = dynamic(() => import("@/components/ProductGrid").then(m => m.ProductGrid), { ssr: false })
+
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: "Vegan Motorcycle Gear",

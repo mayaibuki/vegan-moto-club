@@ -11,6 +11,8 @@ import { formatRelativeDate } from "@/lib/utils"
 import { Check } from "lucide-react"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 
+export const revalidate = 3600
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 
 const jsonLd = {
