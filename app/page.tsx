@@ -1,13 +1,13 @@
 import { getProducts, getEvents } from "@/lib/notion"
 import { ProductCard } from "@/components/ProductCard"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EventCard } from "@/components/EventCard"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Logo } from "@/components/Logo"
 import { InstagramGallery } from "@/components/InstagramGallery"
 import Image from "next/image"
 import Link from "next/link"
-import { formatDate, formatRelativeDate } from "@/lib/utils"
+import { formatRelativeDate } from "@/lib/utils"
 import { Check } from "lucide-react"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 
@@ -201,48 +201,9 @@ export default async function Home() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {upcomingEvents.map((event) => (
-              <Card key={event.id}>
-                <CardHeader>
-                  <CardTitle className="text-xl">{event.name}</CardTitle>
-                  <CardDescription className="text-base">
-                    {formatDate(event.startDate)}
-                    {event.endDate && event.endDate !== event.startDate
-                      ? ` - ${formatDate(event.endDate)}`
-                      : ""}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium">Location</p>
-                    <p className="text-muted-foreground">{event.location}</p>
-                  </div>
-                  {event.description && (
-                    <div>
-                      <p className="text-sm font-medium">Description</p>
-                      <p className="text-muted-foreground line-clamp-2">
-                        {event.description}
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between pt-3">
-                    <Badge variant="outline">{event.price}</Badge>
-                    {event.url && (
-                      <Button size="sm" asChild>
-                        <a
-                          href={event.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Learn more about ${event.name} (opens in new tab)`}
-                        >
-                          Learn More<span className="sr-only"> (opens in new tab)</span>
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <EventCard key={event.id} event={event} />
             ))}
           </div>
         </section>
