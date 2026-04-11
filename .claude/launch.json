@@ -3,8 +3,14 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": ["/Users/mayaibuki/Documents/Claude/vegan-moto-club/node_modules/next/dist/bin/next", "dev", "/Users/mayaibuki/Documents/Claude/vegan-moto-club"],
+      "port": 3000
+    },
+    {
+      "name": "start",
+      "runtimeExecutable": "/usr/local/bin/npm",
+      "runtimeArgs": ["run", "start"],
       "port": 3000
     }
   ]

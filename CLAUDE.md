@@ -70,7 +70,7 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 
 ## Remaining TODOs
 
-- [ ] Add donations section with PayPal integration
+- [ ] Add donations section — allow users to support the project via Venmo or a simple PayPal.me link (no complex checkout needed, just a donate button/link)
 - [ ] Manual color contrast check (muted-foreground on backgrounds — near WCAG AA threshold)
 - [ ] Add `/public/favicon.ico` (currently 404)
 - [ ] Add actual `/public/og-image.png` for OpenGraph previews

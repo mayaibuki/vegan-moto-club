@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { DM_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -80,6 +80,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteUrl,
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#84b13d" },
+    { media: "(prefers-color-scheme: dark)", color: "#a8d357" },
+  ],
 }
 
 export default function RootLayout({
