@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, FormEvent } from "react"
+import { useState, useRef, FormEvent } from "react"
 import {
   Card,
   CardHeader,
@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/Spinner"
 
 type FormStatus = "idle" | "submitting" | "success" | "error"
 
@@ -24,10 +25,6 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
   const [status, setStatus] = useState<FormStatus>("idle")
   const [errorMessage, setErrorMessage] = useState("")
   const mountTime = useRef(Date.now())
-
-  useEffect(() => {
-    mountTime.current = Date.now()
-  }, [])
 
   const headingId = id ? `suggest-product-heading-${id}` : "suggest-product-heading"
   const inputId = id ? `product-url-${id}` : "product-url"
@@ -101,7 +98,7 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
         <CardHeader>
           <CardTitle id={headingId}>Suggest a Product</CardTitle>
           <CardDescription className="text-base">
-            Know a great vegan motorcycle product? Share the link a we&apos;ll
+            Know a good vegan motorcycle product? Share the link and we will
             post it here.
           </CardDescription>
         </CardHeader>
@@ -143,26 +140,7 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
                 >
                   {status === "submitting" ? (
                     <span className="flex items-center gap-2">
-                      <svg
-                        className="h-4 w-4 animate-spin"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
+                      <Spinner />
                       Submitting...
                     </span>
                   ) : (

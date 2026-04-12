@@ -17,6 +17,7 @@ export function formatDate(dateString: string): string {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   })
 }
 
@@ -86,13 +87,11 @@ export function filterProducts(
       return false
     }
     if (filters.genders && filters.genders.length > 0) {
-      // Check if product's gender matches any of the selected genders
       if (!filters.genders.some(g => product.gender.includes(g))) {
         return false
       }
     }
     if (filters.ridingStyles && filters.ridingStyles.length > 0) {
-      // Check if product's ridingStyle matches any of the selected styles
       if (!filters.ridingStyles.some(s => product.ridingStyle.includes(s))) {
         return false
       }

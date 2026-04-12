@@ -5,8 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/utils"
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
+import { SITE_URL } from "@/lib/constants"
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts()
@@ -82,12 +81,12 @@ export default async function BlogPostPage({
       name: "Vegan Moto Club",
       logo: {
         "@type": "ImageObject",
-        url: `${siteUrl}/logo.png`,
+        url: `${SITE_URL}/logo.png`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${siteUrl}/blog/${post.id}`,
+      "@id": `${SITE_URL}/blog/${post.id}`,
     },
   }
 

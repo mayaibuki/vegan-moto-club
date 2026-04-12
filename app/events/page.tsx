@@ -3,6 +3,7 @@ import { getEvents } from "@/lib/notion"
 import { Card, CardContent } from "@/components/ui/card"
 import { EventCard } from "@/components/EventCard"
 import { SuggestEventForm } from "@/components/SuggestEventForm"
+import { SITE_URL } from "@/lib/constants"
 
 export const metadata: Metadata = {
   title: "Events",
@@ -35,8 +36,6 @@ export default async function EventsPage() {
     .filter((e) => new Date(e.startDate) < oneWeekAgo)
     .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
-
   const allEvents = [...upcomingEvents, ...pastEvents]
 
   const eventsJsonLd = {
@@ -59,7 +58,7 @@ export default async function EventsPage() {
         organizer: {
           "@type": "Organization",
           name: "Vegan Moto Club",
-          url: siteUrl,
+          url: SITE_URL,
         },
       },
     })),

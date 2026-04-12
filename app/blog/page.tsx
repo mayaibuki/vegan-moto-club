@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import Image from "next/image"
 import { formatDate } from "@/lib/utils"
+import { SITE_URL } from "@/lib/constants"
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -25,15 +26,13 @@ export const revalidate = 3600
 export default async function BlogPage() {
   const posts = await getBlogPosts()
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
-
   const blogListJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     itemListElement: posts.map((post, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: `${siteUrl}/blog/${post.id}`,
+      url: `${SITE_URL}/blog/${post.id}`,
       name: post.title,
     })),
   }

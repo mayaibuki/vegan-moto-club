@@ -93,7 +93,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [filteredProducts.length])
+  }, [search, selectedBrand, selectedCategory, selectedGenders, selectedRidingStyles])
 
   const clearAllFilters = () => {
     setSelectedBrand(null)
@@ -106,7 +106,6 @@ export function ProductGrid({ products }: ProductGridProps) {
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar Filters */}
         <aside
           aria-label="Product filters"
           id="product-filters"
@@ -115,7 +114,6 @@ export function ProductGrid({ products }: ProductGridProps) {
           }`}
         >
           <div className="space-y-6 sticky top-24 bg-background lg:bg-transparent p-4 lg:p-0 rounded-xl lg:rounded-none border lg:border-0 border-border">
-            {/* Search */}
             <div role="search">
               <label htmlFor="product-search" className="text-sm font-semibold text-foreground mb-3 block">Search</label>
               <div className="relative">
@@ -143,10 +141,8 @@ export function ProductGrid({ products }: ProductGridProps) {
               </div>
             </div>
 
-            {/* Divider */}
             <div className="border-t border-border" />
 
-            {/* Category Filter */}
             <fieldset>
               <legend className="text-sm font-semibold text-foreground mb-3 block">Category</legend>
               <RadioGroup
@@ -171,7 +167,6 @@ export function ProductGrid({ products }: ProductGridProps) {
               </RadioGroup>
             </fieldset>
 
-            {/* Gender Filter */}
             <fieldset>
               <legend className="text-sm font-semibold text-foreground mb-3 block">Gender</legend>
               <div className="space-y-2">
@@ -196,7 +191,6 @@ export function ProductGrid({ products }: ProductGridProps) {
               </div>
             </fieldset>
 
-            {/* Riding Style Filter */}
             <fieldset>
               <legend className="text-sm font-semibold text-foreground mb-3 block">Riding Style</legend>
               <div className="space-y-2">
@@ -221,7 +215,6 @@ export function ProductGrid({ products }: ProductGridProps) {
               </div>
             </fieldset>
 
-            {/* Brand Filter */}
             <fieldset>
               <legend className="text-sm font-semibold text-foreground mb-3 block">Brand</legend>
               <RadioGroup
@@ -246,7 +239,6 @@ export function ProductGrid({ products }: ProductGridProps) {
               </RadioGroup>
             </fieldset>
 
-            {/* Clear Filters */}
             {hasAnyFilters && (
               <>
                 <div className="border-t border-border" aria-hidden="true" />
@@ -264,9 +256,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           </div>
         </aside>
 
-        {/* Main Content */}
         <section className="flex-1" aria-label="Product results">
-          {/* Mobile Filter Toggle & Results Count */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
               Showing <span className="font-semibold text-foreground">
@@ -291,7 +281,6 @@ export function ProductGrid({ products }: ProductGridProps) {
             </Button>
           </div>
 
-          {/* Active Filters Display */}
           {hasAnyFilters && (
             <div className="mb-6 flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
               <span className="text-sm text-muted-foreground" id="active-filters-label">Active:</span>
@@ -370,7 +359,6 @@ export function ProductGrid({ products }: ProductGridProps) {
             </div>
           )}
 
-          {/* Products Grid */}
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16 bg-muted/30 rounded-2xl">
               <p className="text-lg text-muted-foreground mb-4">No products found matching your filters.</p>
@@ -386,7 +374,6 @@ export function ProductGrid({ products }: ProductGridProps) {
                 ))}
               </div>
 
-              {/* Pagination */}
               <nav aria-label="Product pagination" className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
                 <div className="flex items-center gap-2">
                   <label htmlFor="rows-per-page" className="text-sm text-muted-foreground">Rows per page</label>

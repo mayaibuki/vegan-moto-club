@@ -6,18 +6,16 @@ import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { AgentationWrapper } from "@/components/AgentationWrapper"
 import "./globals.css"
+import { SITE_URL } from "@/lib/constants"
 
-// Optimize font loading with next/font - eliminates render-blocking CSS
 const dmSans = DM_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-dm-sans",
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Vegan Moto Club - Cruelty-Free Motorcycle Gear",
     template: "%s | Vegan Moto Club",
@@ -45,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteUrl,
+    url: SITE_URL,
     siteName: "Vegan Moto Club",
     title: "Vegan Moto Club - Cruelty-Free Motorcycle Gear",
     description:
@@ -78,7 +76,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: siteUrl,
+    canonical: SITE_URL,
   },
 }
 
@@ -116,8 +114,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Vegan Moto Club",
-              url: siteUrl,
-              logo: `${siteUrl}/logo.png`,
+              url: SITE_URL,
+              logo: `${SITE_URL}/logo.png`,
               description:
                 "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
               sameAs: ["https://www.instagram.com/veganmotoclub", "https://discord.gg/GN4jkBRnut"],

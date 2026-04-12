@@ -5,12 +5,7 @@ import { Badge } from "./ui/badge"
 import { ProductCardImage } from "./ProductCardImage"
 import { Product } from "@/lib/notion"
 import { formatPrice } from "@/lib/utils"
-
-const seasonEmojis: Record<string, string> = {
-  Summer: "☀️",
-  "Mid season": "🌦",
-  Winter: "❄️",
-}
+import { seasonEmojis } from "@/lib/constants"
 
 interface ProductCardProps {
   product: Product
@@ -25,7 +20,6 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
         className="block h-full"
       >
         <Card className="h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden group">
-          {/* Image Section */}
           <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border/30 flex items-center justify-center">
             {product.photos.length > 0 ? (
               <ProductCardImage
@@ -37,7 +31,6 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
                 No Image
               </div>
             )}
-            {/* Staff Pick Badge - Positioned on image */}
             {product.staffFavorite && (
               <div className="absolute top-3 left-3">
                 <Badge variant="default">Staff Pick</Badge>
@@ -46,22 +39,18 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
           </div>
 
           <CardContent className="p-5 space-y-3">
-            {/* Brand - Small and muted above product name */}
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {product.brand}
             </p>
 
-            {/* Product Name */}
             <h3 className="font-semibold text-base leading-tight line-clamp-2">
               {product.name}
             </h3>
 
-            {/* Price - More prominent */}
             <p className="text-xl font-bold text-foreground tabular-nums">
               {formatPrice(product.price)}
             </p>
 
-            {/* Badges - Grouped and cleaner */}
             <div className="flex flex-wrap gap-1.5 pt-1" aria-label="Product attributes">
               {product.levelOfProtection && (
                 <Badge

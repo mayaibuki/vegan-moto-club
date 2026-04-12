@@ -1,7 +1,5 @@
-import { Client } from "@notionhq/client"
+import { notion } from "@/lib/notion"
 import { NextRequest, NextResponse } from "next/server"
-
-const notion = new Client({ auth: process.env.NOTION_API_KEY })
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl

@@ -9,8 +9,7 @@ import { formatPrice } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
+import { SITE_URL, seasonEmojis } from "@/lib/constants"
 
 export async function generateStaticParams() {
   const products = await getProducts()
@@ -80,12 +79,6 @@ export default async function ProductDetailPage({
     notFound()
   }
 
-  const seasonEmojis: Record<string, string> = {
-    Summer: "☀️",
-    "Mid season": "🌦",
-    Winter: "❄️",
-  }
-
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -94,19 +87,19 @@ export default async function ProductDetailPage({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: siteUrl,
+        item: SITE_URL,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Products",
-        item: `${siteUrl}/products`,
+        item: `${SITE_URL}/products`,
       },
       {
         "@type": "ListItem",
         position: 3,
         name: product.name,
-        item: `${siteUrl}/products/${product.slug}`,
+        item: `${SITE_URL}/products/${product.slug}`,
       },
     ],
   }
@@ -126,7 +119,7 @@ export default async function ProductDetailPage({
       price: product.price,
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
-      url: product.url || `${siteUrl}/products/${product.slug}`,
+      url: product.url || `${SITE_URL}/products/${product.slug}`,
     },
     category: product.category,
     additionalProperty: [
@@ -155,7 +148,6 @@ export default async function ProductDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="space-y-8">
-      {/* Breadcrumb Navigation */}
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -166,7 +158,6 @@ export default async function ProductDetailPage({
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Images */}
         <figure aria-label={`Product images for ${product.name}`}>
           {product.photos.length > 0 ? (
             <div className="space-y-4">
@@ -207,24 +198,19 @@ export default async function ProductDetailPage({
           )}
         </figure>
 
-        {/* Details */}
         <div className="space-y-6">
-          {/* Title and Brand */}
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
             <p className="text-lg text-muted-foreground">{product.brand}</p>
           </div>
 
-          {/* Staff Pick Badge */}
           {product.staffFavorite && <Badge><span aria-hidden="true">⭐</span> Staff Pick</Badge>}
 
-          {/* Price */}
           <div>
             <p className="text-sm text-muted-foreground font-medium mb-1">Price</p>
             <p className="text-3xl font-bold" aria-label={`Price: ${formatPrice(product.price)}`}>{formatPrice(product.price)}</p>
           </div>
 
-          {/* Category and Gender */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-muted-foreground font-medium mb-1">Category</p>
@@ -236,7 +222,6 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          {/* Badges */}
           <div>
             <p className="text-sm text-muted-foreground font-medium mb-2">Specs</p>
             <div className="flex flex-wrap gap-2" role="list" aria-label="Product specifications">
@@ -292,7 +277,6 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          {/* Riding Styles */}
           {product.ridingStyle.length > 0 && (
             <div>
               <p className="text-sm text-muted-foreground font-medium mb-2">Riding Styles</p>
@@ -308,7 +292,6 @@ export default async function ProductDetailPage({
             </div>
           )}
 
-          {/* Materials */}
           {product.materials.length > 0 && (
             <div>
               <p className="text-sm text-muted-foreground font-medium mb-2">Materials</p>
@@ -324,7 +307,6 @@ export default async function ProductDetailPage({
             </div>
           )}
 
-          {/* CTA Button */}
           {product.url && (
             <Button size="lg" asChild className="w-full">
               <a
@@ -340,7 +322,6 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      {/* Description */}
       {product.description && (
         <div className="max-w-2xl mx-auto">
           <h2 className="text-xl font-bold mb-4">Description</h2>
@@ -350,7 +331,6 @@ export default async function ProductDetailPage({
         </div>
       )}
 
-      {/* Related Products */}
       <RelatedProducts currentProduct={product} allProducts={allProducts} />
 
       <SuggestProductForm id="product" />

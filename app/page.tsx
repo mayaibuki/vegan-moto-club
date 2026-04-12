@@ -8,25 +8,24 @@ import { InstagramGallery } from "@/components/InstagramGallery"
 import Image from "next/image"
 import Link from "next/link"
 import { formatRelativeDate } from "@/lib/utils"
+import { SITE_URL } from "@/lib/constants"
 import { Check } from "lucide-react"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 
 export const revalidate = 3600
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
-
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Vegan Moto Club",
-  url: siteUrl,
+  url: SITE_URL,
   description:
     "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: `${siteUrl}/products?search={search_term_string}`,
+      urlTemplate: `${SITE_URL}/products?search={search_term_string}`,
     },
     "query-input": "required name=search_term_string",
   },
@@ -72,8 +71,7 @@ const faqJsonLd = {
 }
 
 export default async function Home() {
-  const products = await getProducts()
-  const events = await getEvents()
+  const [products, events] = await Promise.all([getProducts(), getEvents()])
 
   const staffPicks = products
     .filter((p) => p.staffFavorite)
