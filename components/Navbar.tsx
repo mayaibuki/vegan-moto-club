@@ -101,23 +101,30 @@ export function Navbar() {
       </nav>
 
       {/* Mobile Navigation Menu */}
-      {mobileMenuOpen && (
-        <div ref={mobileMenuRef} id="mobile-nav-menu" className="md:hidden border-t border-border/50 bg-background" role="navigation" aria-label="Mobile navigation">
-          <ul className="px-6 py-4 space-y-1 list-none">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus() }}
-                  className="block py-3 text-base font-medium hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div
+        id="mobile-nav-menu"
+        className={`md:hidden grid transition-[grid-template-rows] duration-200 ease-[cubic-bezier(0.2,0,0,1)] ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+        role="navigation"
+        aria-label="Mobile navigation"
+      >
+        <div ref={mobileMenuRef} className="overflow-hidden min-h-0">
+          <div className="border-t border-border/50 bg-background">
+            <ul className="px-6 py-4 space-y-1 list-none">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus() }}
+                    className="block py-3 text-base font-medium hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   )
 }

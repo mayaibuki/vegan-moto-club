@@ -24,7 +24,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
         aria-label={`View ${product.name} by ${product.brand} - ${formatPrice(product.price)}`}
         className="block h-full"
       >
-        <Card className="h-full hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group">
+        <Card className="h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden group">
           {/* Image Section */}
           <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border/30 flex items-center justify-center">
             {product.photos.length > 0 ? (
@@ -57,7 +57,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             </h3>
 
             {/* Price - More prominent */}
-            <p className="text-xl font-bold text-foreground">
+            <p className="text-xl font-bold text-foreground tabular-nums">
               {formatPrice(product.price)}
             </p>
 

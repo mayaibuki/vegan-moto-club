@@ -64,7 +64,7 @@ export default async function BlogPage() {
         <div className="grid gap-6">
           {posts.map((post) => (
             <Link key={post.id} href={`/blog/${post.id}`} aria-label={`Read: ${post.title}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition-all cursor-pointer h-full group">
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full group">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
                   {post.featuredImage && (
                     <div className="relative h-48 md:h-auto bg-muted md:col-span-1 overflow-hidden">
@@ -84,7 +84,7 @@ export default async function BlogPage() {
                       <CardDescription className="text-sm">
                         {formatDate(post.publishDate)}
                       </CardDescription>
-                      <CardTitle className="text-xl line-clamp-2 group-hover:text-primary transition-colors">
+                      <CardTitle className="text-xl line-clamp-2 group-hover:text-primary transition-colors text-balance">
                         {post.title}
                       </CardTitle>
                     </CardHeader>

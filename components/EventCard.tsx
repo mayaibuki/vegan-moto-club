@@ -36,7 +36,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
               alt={`${event.name} event poster`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              className="object-cover"
+              className="object-cover ring-1 ring-border/10"
             />
           ) : (
             <div
@@ -72,7 +72,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
         </div>
 
         {/* Heading */}
-        <h3 className="text-xl font-semibold leading-7 tracking-tight text-foreground line-clamp-2">
+        <h3 className="text-xl font-semibold leading-7 tracking-tight text-foreground line-clamp-2 text-balance">
           {event.name}
         </h3>
 

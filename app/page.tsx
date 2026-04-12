@@ -114,7 +114,7 @@ export default async function Home() {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-balance">
               Ride motorcycles, love animals
             </h1>
 
@@ -163,7 +163,7 @@ export default async function Home() {
       <section aria-labelledby="staff-picks-heading">
         <div className="flex items-center justify-between mb-10">
           <div className="space-y-1">
-            <h2 id="staff-picks-heading" className="text-3xl font-bold tracking-tight">Staff Picks</h2>
+            <h2 id="staff-picks-heading" className="text-3xl font-bold tracking-tight text-balance">Staff Picks</h2>
             <p className="text-muted-foreground text-lg">Our favorite vegan motorcycle gear</p>
           </div>
           <Button variant="outline" asChild>
@@ -195,7 +195,7 @@ export default async function Home() {
         <section aria-labelledby="upcoming-events-heading">
           <div className="flex items-center justify-between mb-10">
             <div className="space-y-1">
-              <h2 id="upcoming-events-heading" className="text-3xl font-bold tracking-tight">Upcoming Events</h2>
+              <h2 id="upcoming-events-heading" className="text-3xl font-bold tracking-tight text-balance">Upcoming Events</h2>
               <p className="text-muted-foreground text-lg">Join the community</p>
             </div>
             <Button variant="outline" asChild>
