@@ -11,7 +11,6 @@ export function Footer() {
             <div className="mb-4 flex justify-center md:justify-start">
               <Logo size="sm" />
             </div>
-            <p className="font-bold mb-3">Vegan Moto Club</p>
             <p className="text-sm text-muted-foreground max-w-xs mx-auto md:mx-0">
               A database of cruelty-free motorcycle gear for compassionate riders.
             </p>

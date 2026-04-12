@@ -36,3 +36,20 @@ lerna-debug.log*
 .cache
 .vercel
 .env*.local
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
+# Claude / AI tooling
+.agents/
+.claude/dev.sh
+.claude/skills/
+skills-lock.json
+.playwright-mcp/
+
+# Scheduled audit outputs (generated files — not source)
+Scheduled audit/audit/
+Scheduled audit/Photos/
+Scheduled audit/__pycache__/
+Scheduled audit/*.html
+Scheduled audit/*.md
