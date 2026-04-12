@@ -70,8 +70,24 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 
 ## Remaining TODOs
 
-- [ ] Add donations section — allow users to support the project via Venmo or a simple PayPal.me link (no complex checkout needed, just a donate button/link)
+- [ ] Add donations section (Venmo / PayPal.me link — no complex checkout)
 - [ ] Manual color contrast check (muted-foreground on backgrounds — near WCAG AA threshold)
-- [ ] Add `/public/favicon.ico` (currently 404)
 - [ ] Add actual `/public/og-image.png` for OpenGraph previews
 - [ ] Configure ESLint (not yet set up — `npm run lint` prompts for config)
+- [ ] Discord → Notion event sync (GitHub Action polling Discord API)
+- [ ] Product audit LLM upgrade (replace keyword matching with LLM extraction)
+- [ ] Product detail writer LLM upgrade (better tone, more detailed specs)
+- [ ] Webflow portfolio case study (mayaibuki.com)
+- [ ] Project folder cleanup
+
+## Shipped TODOs
+
+- [x] Favicon + app icons
+- [x] Vercel Analytics
+- [x] Speed Insights
+- [x] Image cost optimization (AVIF, ISR, notion-image proxy)
+- [x] UTC-safe event date formatting
+- [x] Human-readable product slugs
+- [x] Native suggestion forms (product + event)
+- [x] Design system tokenization + audit script
+- [x] Event card redesign (Figma spec)

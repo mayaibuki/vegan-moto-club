@@ -1,219 +1,101 @@
-# Vegan Moto Club - Website
+# Vegan Moto Club
 
-A modern, fully-functional website for Vegan Moto Club that displays cruelty-free motorcycle gear from a Notion database.
+A curated database of vegan motorcycle gear. Built with Next.js 14 App Router, powered by Notion as a CMS, deployed on Vercel.
+
+**Live:** https://veganmotoclub.com | **GitHub:** https://github.com/mayaibuki/vegan-moto-club
 
 ## Features
 
-✅ **Product Showcase**: Display vegan motorcycle gear with advanced filtering
-- Filter by: Brand, Category, Gender, Riding Style
-- Search by product name
-- Product detail pages with full specifications
-
-✅ **Events Management**: Display upcoming events from Notion
-- Event dates, location, and registration links
-- Automatic sorting by date
-
-✅ **Blog Integration**: Blog posts pulled directly from Notion
-- Featured images support
-- Responsive design
-
-✅ **Design & Branding**
-- Custom typography (Petrona, Zalando Expanded, Havana Script)
-- Brand colors: Red primary, warm grey neutrals, lime green accents
-- Dark mode support
-- Fully responsive (mobile, tablet, desktop)
-
-✅ **Auto-updating**: All content automatically syncs from Notion
-- Change a product price in Notion → Website updates in seconds
-- No manual code changes needed
+- Product database (220+ items) with filters (brand, category, gender, riding style), search, pagination, and human-readable slugs
+- Events calendar with poster images, date overlays, price pills, and upcoming/past separation
+- Blog with featured images
+- Native suggestion forms (product URL and event description submitted directly to Notion)
+- SEO: JSON-LD (Organization, FAQ, Event, ItemList, breadcrumb), sitemap, robots.ts with AI bot access rules
+- Performance: AVIF/WebP images, ISR (revalidate=3600), dynamic imports, stable Notion image proxy
+- Design system: 3-layer token architecture, component specs, automated token audit
+- Dark mode, fully responsive
+- Vercel Analytics and Speed Insights
 
 ## Tech Stack
 
-- **Framework**: Next.js 14 + React 18
-- **Styling**: Tailwind CSS + shadcn/ui components
-- **Data**: Notion API
-- **Deployment**: Vercel
-- **Typography**: Petrona (body), Zalando Expanded (headings), Havana Script (display)
+Next.js 14, React 18, TypeScript, Tailwind CSS, shadcn/ui, Notion API (@notionhq/client), Vercel
 
-## Getting Started
+## Quick Start
 
-### Prerequisites
-
-- Node.js 18+ and npm/yarn
-- Notion workspace with API access
-
-### Setup
-
-1. **Clone the repository**
 ```bash
+git clone https://github.com/mayaibuki/vegan-moto-club.git
 cd vegan-moto-club
 npm install
-```
-
-2. **Configure Notion API**
-   - Copy `.env.example` to `.env.local`
-   - Add your Notion API credentials:
-```bash
-NEXT_PUBLIC_NOTION_API_KEY=your_key_here
-NOTION_PRODUCTS_DB_ID=your_db_id
-NOTION_EVENTS_DB_ID=your_db_id
-NOTION_BLOG_DB_ID=your_db_id
-```
-
-3. **Run locally**
-```bash
+cp .env.example .env.local  # fill in values
 npm run dev
 ```
-Visit `http://localhost:3000`
 
-4. **Build for production**
-```bash
-npm run build
-npm start
-```
-
-## Deployment to Vercel
-
-### Option 1: Using Vercel CLI (Recommended)
-
-1. **Install Vercel CLI**
-```bash
-npm i -g vercel
-```
-
-2. **Deploy**
-```bash
-vercel
-```
-
-3. **Add Environment Variables**
-   - During deployment, Vercel will ask for environment variables
-   - Add your Notion API credentials
-   - Or add them in Vercel dashboard: Settings → Environment Variables
-
-### Option 2: Using GitHub
-
-1. **Push to GitHub**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/yourusername/vegan-moto-club
-git push -u origin main
-```
-
-2. **Connect to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your GitHub repository
-   - Add environment variables
-   - Deploy!
-
-### Option 3: Manual Deployment
-
-1. Build your project locally
-2. Deploy the `.next` folder to any Node.js hosting (AWS, Netlify, etc.)
-3. Set environment variables in your hosting provider's dashboard
-
-## Connecting Your Domain
-
-1. **In Vercel Dashboard**
-   - Go to your project settings
-   - Click "Domains"
-   - Add your domain: `veganmotoclub.com`
-   - Follow the DNS setup instructions
-
-2. **Update DNS Records**
-   - Point your domain's DNS to Vercel's nameservers
-   - Wait for propagation (5-48 hours)
-
-## Customization
-
-### Change Colors
-Edit `app/globals.css` CSS variables:
-```css
---secondary: 30 8% 65%;       /* Warm grey */
---accent: 81 100% 65%;        /* Lime green */
-```
-
-### Change Fonts
-Edit `tailwind.config.ts` font families or import different fonts in `app/globals.css`
-
-### Update Logo
-Replace `/public/images/logo.svg` with your actual logo
-
-### Add More Pages
-Create new routes in `app/` directory following Next.js conventions
+Visit http://localhost:3000
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_NOTION_API_KEY` | Your Notion API key from integrations |
-| `NOTION_PRODUCTS_DB_ID` | Notion Products database ID |
-| `NOTION_EVENTS_DB_ID` | Notion Events database ID |
-| `NOTION_BLOG_DB_ID` | Notion Blog database ID |
+```
+NOTION_API_KEY          # Notion integration token
+NOTION_PRODUCTS_DB_ID   # Products database ID
+NOTION_EVENTS_DB_ID     # Events database ID
+NOTION_BLOG_DB_ID       # Blog database ID
+NEXT_PUBLIC_SITE_URL    # https://veganmotoclub.com
+```
 
 ## Project Structure
 
 ```
-vegan-moto-club/
-├── app/                    # Next.js pages & layouts
-│   ├── page.tsx           # Home page
-│   ├── products/          # Products pages
-│   ├── events/            # Events pages
-│   ├── blog/              # Blog pages
-│   ├── about/             # About page
-│   └── layout.tsx         # Root layout
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   ├── Logo.tsx
-│   ├── Navbar.tsx
-│   ├── Footer.tsx
-│   ├── ProductCard.tsx
-│   └── ProductGrid.tsx
-├── lib/                   # Utility functions
-│   ├── notion.ts         # Notion API integration
-│   ├── types.ts          # TypeScript types
-│   └── utils.ts          # Helper functions
-├── public/               # Static assets
-│   ├── images/           # Logo & images
-│   └── fonts/            # Custom fonts
-└── styles/              # Global styles
+app/                    Pages and layouts (App Router)
+  products/             Listing + [slug] detail
+  events/               Events listing
+  blog/                 Blog listing + [id] detail
+  about/                Static about page
+  api/                  API routes (suggest, suggest-event, notion-image)
+components/             React components
+  ui/                   shadcn/ui primitives
+  ProductGrid.tsx       Client — filters, search, pagination, URL sync
+  ProductCard.tsx       Memoized product card
+  EventCard.tsx         Poster + date overlay + price pill
+  Breadcrumbs.tsx       Dynamic breadcrumbs
+  SuggestProductForm    Native product suggestion form
+  SuggestEventForm      Native event suggestion form
+  InstagramGallery      Behold widget embed
+  Navbar.tsx            Theme toggle, mobile menu
+  Footer.tsx            Nav links, social
+  Logo.tsx              Size variants
+lib/
+  notion.ts             Typed Notion client, unstable_cache fetchers
+  utils.ts              Helpers (cn, formatPrice, filterProducts, generateSlug)
+specs/                  Design system specs (foundations + components)
+scripts/
+  token-audit.js        Design token compliance checker
+Scheduled audit/        Python automation scripts (product audit + enrichment)
 ```
 
-## Troubleshooting
+## Commands
 
-### Products not loading?
-- Check Notion API key in `.env.local`
-- Verify database IDs are correct
-- Make sure integration has access to databases
+```bash
+npm run dev                    # Dev server (port 3000)
+npm run build                  # Production build
+npm run start                  # Serve production build
+node scripts/token-audit.js    # Design token audit (must exit 0)
+```
 
-### Fonts not loading?
-- Check `/public/fonts/` has the font files
-- Verify font imports in `app/globals.css`
-- Check browser console for 404 errors
+## Design System
 
-### Images not displaying?
-- Ensure Notion images are publicly accessible
-- Check Next.js Image component optimization settings
+Three-layer token architecture: primitives (`--ds-*`), semantic (`--color-*`), and component-level Tailwind classes. Stone base with Lime accent, dark mode via `.dark` class. Full specs live in `specs/`. Compliance is enforced by `scripts/token-audit.js`. See `CLAUDE.md` for rules.
 
-## Support
+## Automations
 
-For issues or questions:
-1. Check Notion database is properly configured
-2. Verify all environment variables are set
-3. Run `npm run build` locally to catch build errors
-4. Check Vercel deployment logs
+Two Python scripts in `Scheduled audit/` handle daily product auditing and new product enrichment. See `Scheduled audit/README.md` for details.
+
+## Documentation
+
+- `PROJECT_SUMMARY.md` -- complete project reference
+- `CASESTUDY.md` -- analytical case study
+- `PLAN.md` -- roadmap
+- `CLAUDE.md` -- AI assistant instructions
 
 ## License
 
-All rights reserved - Vegan Moto Club
-
-## Updates
-
-To update your website after making changes:
-1. Edit content in Notion
-2. Website automatically syncs (refresh browser)
-3. For code changes, push to GitHub and Vercel auto-deploys
-4. Or run `vercel --prod` to manually deploy
+All rights reserved -- Vegan Moto Club

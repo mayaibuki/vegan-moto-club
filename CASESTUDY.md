@@ -278,4 +278,74 @@ That's vibe engineering. And it runs on intuition.
 
 **Project:** [Vegan Moto Club](https://vegan-moto-club.vercel.app) | [GitHub](https://github.com/mayaibuki/vegan-moto-club)
 **Built with:** Next.js 14, Notion API, shadcn/ui, Tailwind CSS, Vercel, Claude
-**Date:** February 2026
+**Original Date:** February 2026
+
+---
+
+## Update: April 2026 — Post-Launch Evolution
+
+The original case study captured the build phase. What follows documents the post-launch evolution — the phases where a live product forced new kinds of decisions.
+
+### Phase 12: SEO Infrastructure
+
+**What happened:** Product URLs shifted from `/products/[notion-id]` to `/products/[human-readable-slug]` via a `generateSlug()` function. Breadcrumb navigation added to product detail pages. JSON-LD structured data deployed across all page types: Organization + FAQPage on homepage, breadcrumb on product pages, Event + ItemList on events, ItemList on blog. A `robots.ts` file was added explicitly allowlisting AI crawlers (GPTBot, Google-Extended, etc.) alongside standard search engines. A dynamic sitemap generates product category URLs.
+
+**Framework mapping:**
+- **Morton:** SEO is infrastructure work — invisible to users but critical for discoverability. The designer directed it as a series of discrete agent requests: "add breadcrumbs to product pages," "generate JSON-LD for events," "create robots.ts allowing AI bots."
+- **Wen:** No SEO audit process, no keyword research phase. The designer knew what mattered (slugs, structured data, bot access) from running the community and watching how people find gear.
+- **Harrison:** The decision to allowlist AI crawlers — while many sites block them — reflects domain intuition. A vegan gear database benefits from being indexed by AI assistants that recommend products.
+
+### Phase 13: Design System Audit & Tokenization
+
+**What happened:** A comprehensive design system was formalized: 3-layer token architecture (primitives → semantic → component classes) codified in `tokens.css` and `globals.css`. Foundation specs written for color, spacing, typography, radius, elevation, and motion. Thirteen component specs created. An automated audit script (`scripts/token-audit.js`) was built to catch hardcoded colors or arbitrary values — required to pass (exit 0) before any commit.
+
+**Framework mapping:**
+- **Morton:** This is the maintenance phase Morton's workflow doesn't fully address. The 4-step loop (break down → plan → code → review) still applied, but "review" expanded to mean "enforce systematically via automation."
+- **Wen:** Design systems are traditionally process-heavy — Wen would argue they slow you down. Here, the system was built after the product shipped, retroactively codifying decisions already made through taste. It's documentation of intuition, not a substitute for it.
+- **Harrison:** The audit script is a form of externalized intuition — encoding "what looks right" into automated checks so future changes can't accidentally break the visual language.
+
+### Phase 14: Performance Optimization
+
+**What happened:** Image delivery shifted to AVIF with WebP fallback, with a 31-day minimum cache TTL. A stable `/api/notion-image` proxy was built to solve Notion's signed URL rotation — without it, every URL change busted Vercel's image optimizer cache, causing redundant processing and bandwidth costs. ISR revalidation set to 3600 seconds across all data pages. `ProductGrid` dynamically imported to keep the `/products` page shell static. Vercel Analytics and Speed Insights integrated.
+
+**Framework mapping:**
+- **Morton:** Performance work requires understanding infrastructure constraints (CDN caching, image optimization pipelines, Notion's URL signing behavior). The designer didn't need to understand the implementation details — but needed to identify the problem ("images are being re-processed constantly") and direct the agent toward a proxy solution.
+- **Wen:** The image proxy is a "start from solutions" moment. Rather than auditing all image performance, the designer noticed a specific cost spike, diagnosed it, and asked for a targeted fix.
+- **Harrison:** Recognizing that Notion's URL rotation was the root cause — not image size, not format, not lazy loading — required debugging intuition that comes from watching production systems behave unexpectedly.
+
+### Phase 15: Event Card Redesign
+
+**What happened:** The event card component was redesigned from a Figma spec (frames 149:164 and 149:185) to include poster images with date overlays, price pills, and proper upcoming/past visual distinction. UTC-safe date formatting was implemented after discovering that Notion's date-only fields (no timezone) were being shifted by JavaScript's local timezone interpretation, causing events to display one day early.
+
+**Framework mapping:**
+- **Morton:** The Figma-to-code pipeline is exactly what Morton describes — a designer working in their native tool (Figma) and using an agent to translate it to production code.
+- **Wen:** The UTC bug is a craft-in-the-details moment. Most users wouldn't notice a one-day offset. The designer caught it because he knew the actual event dates and recognized the discrepancy immediately.
+- **Harrison:** The date bug discovery is pattern recognition from domain expertise. Someone unfamiliar with the events would test with arbitrary dates and might never notice the offset. Maya spotted it because he knew "that event is on Saturday, not Friday."
+
+### Phase 16: Automated Product Auditing
+
+**What happened:** Two Python scripts were built for daily automation. The first (`vmc_product_audit.py`) audits existing product entries: scrapes product URLs with BeautifulSoup, maps scraped data onto the Notion schema using keyword matching, writes dated reports. The second (`vmc_new_product_audit.py`) handles new user-submitted products: finds entries with a URL but no description, scrapes the product page, generates a humanized description, downloads photos, and sets the vegan verification status. Both scripts respect the existing Notion schema — they never create new select options, only matching against known values.
+
+**Framework mapping:**
+- **Morton:** Automation is the next frontier beyond Morton's build-phase workflow. The agent isn't just building features anymore — it's building systems that maintain themselves.
+- **Wen:** Automation embodies "start from solutions" at the operational level. Rather than manually reviewing each new product submission, the designer built a pipeline that handles the repetitive work and surfaces only what needs human judgment.
+- **Harrison:** The constraint "never create new select options" is a design decision rooted in domain knowledge. The product taxonomy (brands, categories, materials) is curated — automated systems should match against it, not expand it arbitrarily. This is the kind of guardrail only someone who understands the data model's intent would think to impose.
+
+---
+
+## What the Post-Launch Phases Add to the Thesis
+
+The original case study proved that a designer could build a production website using AI tools. The post-launch phases prove something harder: that the same designer can **maintain and evolve** a production system.
+
+Maintenance requires a different kind of expertise. Building is creative and forward-moving. Maintenance is diagnostic and defensive. The SEO work, the image proxy, the UTC date fix, the token audit script — these aren't features users requested. They're the invisible infrastructure that keeps a live product healthy.
+
+Harrison's framework becomes even more relevant here. The intuition needed to maintain a system is different from the intuition needed to build one. It's the ability to notice when something is slightly wrong (dates off by one day), to diagnose root causes rather than symptoms (Notion's URL rotation, not image size), and to build guardrails that prevent future problems (token audit, schema-respecting automation).
+
+The synthesis still holds, extended: Morton's tools and workflow scale from building to maintaining. Wen's "skip the process" philosophy works for operational decisions too. And Harrison's intuition-from-expertise is what separates a maintainer who fixes symptoms from one who fixes causes.
+
+---
+
+**Project:** [Vegan Moto Club](https://veganmotoclub.com) | [GitHub](https://github.com/mayaibuki/vegan-moto-club)
+**Built with:** Next.js 14, Notion API, shadcn/ui, Tailwind CSS, Vercel, Claude
+**Original Date:** February 2026
+**Updated:** April 2026

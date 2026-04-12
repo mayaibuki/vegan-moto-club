@@ -1,293 +1,84 @@
-# Vegan Moto Club - Project Summary
+# Vegan Moto Club — Project Reference
 
-## 🎉 Your Website is Complete!
+## Overview
+Curated database of vegan motorcycle gear. Live at https://veganmotoclub.com. Next.js 14 App Router, Notion API, Vercel.
 
-You now have a **fully functional, professional website** for Vegan Moto Club that's ready to deploy.
+## Pages
+- `/` — Homepage: hero ("Ride motorcycles, love animals"), Staff Picks carousel, Upcoming Events (EventCard), Instagram Gallery (Behold widget), Suggest Product Form. JSON-LD: WebSite + FAQPage.
+- `/products` — Product listing with ProductGrid (client component): filters (brand, category, gender, riding style), search, pagination, URL param sync. Dynamic import for performance.
+- `/products/[slug]` — Product detail with breadcrumbs, related products, JSON-LD breadcrumb. Human-readable slugs via generateSlug().
+- `/events` — Events with upcoming/past separation (1-week grace period). EventCard with poster, date overlay, price pill. SuggestEventForm. JSON-LD ItemList of Events.
+- `/blog` — Blog listing with featured images, date formatting. JSON-LD ItemList.
+- `/blog/[id]` — Individual blog post.
+- `/about` — Static about page.
 
----
+## API Routes
+- `app/api/suggest/route.ts` — Product suggestion: accepts URL, writes to Notion Products DB. Honeypot + rate limiting.
+- `app/api/suggest-event/route.ts` — Event suggestion: accepts description + URL, writes to Notion Events DB.
+- `app/api/notion-image/route.ts` — Stable proxy for Notion-hosted images. Prevents Vercel image optimizer cache key rotation when Notion rotates signed URLs. Pattern: `/api/notion-image?pageId=...&prop=...&idx=...`
 
-## What Was Built
+## Components
+- ProductGrid (client) — filters, search, pagination, URL sync
+- ProductCard (React.memo) — product display card
+- ProductCardImage — image handling for product cards
+- EventCard — poster image + date overlay + price pill (matches Figma)
+- Breadcrumbs — dynamic breadcrumb navigation
+- RelatedProducts — related product suggestions on detail page
+- InstagramGallery — Behold widget embed
+- SuggestProductForm — native product suggestion (honeypot spam protection)
+- SuggestEventForm — native event suggestion
+- Navbar (client) — theme toggle, mobile hamburger menu
+- Footer (server) — navigation links, social links
+- Logo — SVG logo with size variants
+- ui/ — shadcn/ui primitives (Button, Card, Badge, Input, Select, etc.)
 
-### ✅ Phase 1: Notion API Setup
-- Created Notion API integration
-- Configured 3 databases (Products, Events, Blog)
-- Verified data connection
+## Lib
+- `notion.ts` — Notion API client with typed interfaces (Product, Event, BlogPost, NotionPage, NotionRichText, NotionFile). Cached fetchers via `unstable_cache` (1hr prod, 1min dev). Pagination support. Stable image proxy URL generation.
+- `utils.ts` — cn() (Tailwind merge), formatPrice(), formatDate(), formatRelativeDate(), formatEventMonth(), formatEventDay() (UTC-safe), isSameEventDay() (UTC-safe), filterProducts(), generateSlug(), getUniqueBrands()
 
-### ✅ Phase 2: Website Development
-- **Pages Built**:
-  - Homepage with hero section, featured products, events, and product suggestion form
-  - Products page with advanced filtering (Brand, Category, Gender, Riding Style)
-  - Product detail pages with full specifications
-  - Events listing page
-  - Blog listing and individual post pages
-  - About page
+## Design System
+- 3-layer token architecture: primitives (--ds-*) -> semantic (--color-*) -> component classes (bg-card, text-destructive)
+- Theme: Stone base + Lime accent, DM Sans font
+- Dark mode via .dark class on html
+- Specs in `specs/foundations/` (color, spacing, typography, radius, elevation, motion) and `specs/components/` (13 component specs)
+- Token reference: `specs/tokens/token-reference.md`
+- Automated audit: `node scripts/token-audit.js` (exit 0 required)
+- Bridge variables for shadcn/ui in `app/globals.css`
 
-- **Features Implemented**:
-  - Real-time product search and filtering
-  - Responsive grid layout
-  - Dark/light theme toggle
-  - Mobile-optimized design
-  - Notion API integration for all content
+## SEO
+- Human-readable product slugs
+- JSON-LD: Organization, FAQPage, breadcrumb, Event, ItemList
+- `app/robots.ts` — allowlists AI bots (GPTBot, Google-Extended, etc.)
+- `app/sitemap.xml` — dynamic sitemap with product categories
+- Rich openGraph + twitter metadata on all pages
 
-- **Components Created** (15+):
-  - Product cards with images and badges
-  - Sidebar filter system
-  - Navigation and footer
-  - Logo component
-  - Blog post cards
-  - Event cards
+## Performance
+- AVIF + WebP image optimization via next.config
+- minimumCacheTTL: 2678400 (31 days)
+- ISR: revalidate = 3600 on all data pages
+- ProductGrid dynamically imported (keeps /products static shell fast)
+- Vercel Analytics + Speed Insights installed
+- Stable notion-image proxy prevents cache churn
 
-### ✅ Phase 3: Design & Branding
-- **Typography**:
-  - Petrona font for body text
-  - Zalando Expanded for headings
-  - Havana Script for display text
-
-- **Color System**:
-  - Primary: Red (#E6003D)
-  - Secondary: Warm greys (#A89B8F, #D9D3CC)
-  - Accent: Lime green (#CAFF73)
-  - Full dark mode support with proper contrast
-
-- **Visual Elements**:
-  - Logo component (placeholder SVG ready for your actual logo)
-  - Custom color palette throughout all pages
-  - Consistent spacing and typography
-  - Professional gradients and shadows
-
-### ✅ Phase 4: Deployment Preparation
-- Created comprehensive deployment guides
-- Set up environment variable configuration
-- Prepared GitHub integration documentation
-- Created .gitignore to protect secrets
-- Documented post-deployment workflow
-
----
-
-## Project Structure
-
-```
-vegan-moto-club/
-├── 📄 README.md                    # Full documentation
-├── 📄 QUICKSTART.md               # 5-min deployment guide
-├── 📄 DEPLOYMENT.md               # Step-by-step deployment
-├── 📄 PROJECT_SUMMARY.md          # This file
-├── 📄 package.json                # Dependencies
-├── 📄 tailwind.config.ts          # Tailwind + fonts
-├── 📄 next.config.js              # Next.js config
-├── 📁 app/
-│   ├── page.tsx                   # Home page
-│   ├── layout.tsx                 # Root layout
-│   ├── globals.css                # Global styles & colors
-│   ├── products/
-│   │   ├── page.tsx              # Products grid page
-│   │   └── [id]/page.tsx         # Product detail page
-│   ├── events/page.tsx            # Events page
-│   ├── blog/
-│   │   ├── page.tsx              # Blog listing
-│   │   └── [id]/page.tsx         # Individual post
-│   └── about/page.tsx             # About page
-├── 📁 components/
-│   ├── Navbar.tsx                 # Navigation bar
-│   ├── Footer.tsx                 # Footer
-│   ├── Logo.tsx                   # Logo component
-│   ├── ProductCard.tsx            # Product card
-│   ├── ProductGrid.tsx            # Grid + filters
-│   └── ui/
-│       ├── button.tsx             # Button component
-│       ├── card.tsx               # Card component
-│       ├── input.tsx              # Input component
-│       └── badge.tsx              # Badge component
-├── 📁 lib/
-│   ├── notion.ts                  # Notion API functions
-│   ├── types.ts                   # TypeScript types
-│   └── utils.ts                   # Utilities
-├── 📁 public/
-│   ├── images/logo.svg            # Logo (placeholder)
-│   └── fonts/havana.ttf           # Custom font
-├── .env.local                     # API credentials (SECRET)
-├── .env.example                   # Example env file
-└── .gitignore                     # Git ignore rules
-```
-
----
-
-## Technology Stack
-
-| Layer | Technologies |
-|-------|--------------|
-| **Frontend** | Next.js 14, React 18, TypeScript |
-| **Styling** | Tailwind CSS, shadcn/ui components |
-| **Data** | Notion API, Real-time sync |
-| **Hosting** | Vercel (recommended) |
-| **Domain** | Your custom domain |
-| **Typography** | Petrona, Zalando Expanded, Havana Script |
-
----
-
-## Key Features
-
-### 🔍 Product Discovery
-- Grid layout with beautiful product cards
-- Advanced filtering (4 filters)
-- Real-time search
-- Product detail pages
-- Staff favorites highlighting
-- Badge system for specs (protection level, season, gender)
-
-### 📅 Event Management
-- Automatic event sorting by date
-- Location and registration links
-- Featured upcoming events on homepage
-- Full event detail pages
-
-### 📝 Blog Integration
-- Blog posts from Notion
-- Featured images
-- Date-based sorting
-- Responsive reading experience
-
-### 🎨 Design System
-- Professional typography hierarchy
-- Consistent color palette
-- Dark mode support
-- Fully responsive (mobile-first)
-- Accessibility-focused components
-
-### ⚡ Performance
-- Static generation where possible
-- Image optimization
-- Font loading optimization
-- Caching of Notion data
-
-### 🔄 Auto-updating
-- Notion changes appear within seconds
-- No manual code updates needed
-- Automatic revalidation
-
----
+## Automations (Scheduled audit/)
+Two Python scripts run daily:
+1. `vmc_product_audit.py` — Audits existing Notion product entries. Scrapes product URLs with BeautifulSoup, maps fields using keyword matching (never creates new select options), writes dated .md + .html reports.
+2. `vmc_new_product_audit.py` — Enriches new user-submitted products (URL present, Description empty). Scrapes, writes humanized description, downloads photos, sets Vegan Verified = "Verified Vegan by AI". Batch limit 20/run. Outputs daily reports.
+See `Scheduled audit/README.md` for full details.
 
 ## Environment Variables
-
-Your site needs 4 environment variables (already configured in `.env.local`):
-
 ```
-NEXT_PUBLIC_NOTION_API_KEY
-NOTION_PRODUCTS_DB_ID
-NOTION_EVENTS_DB_ID
-NOTION_BLOG_DB_ID
+NOTION_API_KEY          # Notion integration token
+NOTION_PRODUCTS_DB_ID   # Products database ID
+NOTION_EVENTS_DB_ID     # Events database ID
+NOTION_BLOG_DB_ID       # Blog database ID
+NEXT_PUBLIC_SITE_URL    # https://veganmotoclub.com
 ```
 
-These are safely stored in:
-- Development: `.env.local` (git ignored)
-- Production: Vercel environment variables dashboard
-
----
-
-## Next Steps to Go Live
-
-### 1. Test Locally (2 minutes)
+## Commands
 ```bash
-cd /Users/mayaibuki/Documents/Claude/vegan-moto-club
-npm install
-npm run dev
-# Visit http://localhost:3000
+npm run dev                    # Dev server
+npm run build                  # Production build
+npm run start                  # Serve build
+node scripts/token-audit.js    # Token audit
 ```
-
-### 2. Deploy to Vercel (5 minutes)
-- Option A: Use GitHub + Vercel Dashboard (recommended)
-- Option B: Use Vercel CLI
-- Option C: Use Netlify
-
-See `QUICKSTART.md` for detailed steps.
-
-### 3. Connect Domain (5 minutes)
-- Update DNS nameservers to Vercel
-- Or add DNS records manually
-- Wait for DNS propagation (up to 48 hours)
-
-### 4. Share Your Website!
-- Your site is now live at `veganmotoclub.com`
-- Share with the vegan moto community
-- Start promoting on Discord, Instagram, etc.
-
----
-
-## Ongoing Maintenance
-
-### To Update Products/Events/Blog:
-1. Edit directly in Notion
-2. Changes appear automatically within seconds
-3. No code changes needed!
-
-### To Update Design/Code:
-1. Make changes locally
-2. Test with `npm run dev`
-3. Push to GitHub
-4. Vercel auto-deploys
-
-### To Update Logo:
-1. Replace `/public/images/logo.svg`
-2. Push to GitHub
-3. Done!
-
----
-
-## Support Resources
-
-| Need | Document | Location |
-|------|----------|----------|
-| Quick start | QUICKSTART.md | root directory |
-| Full docs | README.md | root directory |
-| Deployment steps | DEPLOYMENT.md | root directory |
-| Troubleshooting | DEPLOYMENT.md | Troubleshooting section |
-
----
-
-## What You Learned
-
-✅ How to integrate Notion API with a web app
-✅ How to build a modern Next.js application
-✅ How to implement advanced filtering and search
-✅ How to deploy to production using Vercel
-✅ How to manage content through Notion database
-✅ How to implement professional design and branding
-
----
-
-## Stats
-
-| Metric | Count |
-|--------|-------|
-| **Pages** | 7 (Home, Products, Product Detail, Events, Blog, Blog Post, About) |
-| **Components** | 15+ |
-| **Features** | 20+ |
-| **Tailwind Classes** | 500+ |
-| **Lines of Code** | 3000+ |
-| **Development Time** | One session! |
-| **Time to Deploy** | 5 minutes |
-
----
-
-## Credits
-
-Built with:
-- ❤️ Claude (Anthropic)
-- ⚙️ Next.js
-- 🎨 Tailwind CSS & shadcn/ui
-- 📊 Notion API
-- 🚀 Vercel
-
----
-
-## Ready to Launch?
-
-Your website is **production-ready** and waiting to serve the vegan motorcycle community!
-
-**Next action**: Follow `QUICKSTART.md` to deploy.
-
-Good luck! 🏍️💚
-
----
-
-Questions? Check the guides above or review the code comments throughout the project.
