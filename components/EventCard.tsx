@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { Event } from "@/lib/notion"
-import { cn, formatEventDay, formatEventMonth, isSameEventDay } from "@/lib/utils"
+import { cn, formatEventDay, formatEventMonth, isSameEventDay, notionImageUrl } from "@/lib/utils"
 
 interface EventCardProps {
   event: Event
@@ -32,11 +32,12 @@ export function EventCard({ event, muted = false }: EventCardProps) {
         <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted">
           {event.poster ? (
             <Image
-              src={event.poster}
+              src={notionImageUrl(event.poster, 600)}
               alt={`${event.name} event poster`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
               className="object-cover ring-1 ring-border/10"
+              unoptimized={event.poster.startsWith("/api/notion-image")}
             />
           ) : (
             <div

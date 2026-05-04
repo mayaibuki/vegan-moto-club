@@ -3,7 +3,7 @@ import { getBlogPosts } from "@/lib/notion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import Image from "next/image"
-import { formatDate } from "@/lib/utils"
+import { formatDate, notionImageUrl } from "@/lib/utils"
 import { SITE_URL } from "@/lib/constants"
 
 export const metadata: Metadata = {
@@ -68,12 +68,13 @@ export default async function BlogPage() {
                   {post.featuredImage && (
                     <div className="relative h-48 md:h-auto bg-muted md:col-span-1 overflow-hidden">
                       <Image
-                        src={post.featuredImage}
+                        src={notionImageUrl(post.featuredImage, 600)}
                         alt={post.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                         loading="lazy"
+                        unoptimized={post.featuredImage.startsWith("/api/notion-image")}
                       />
                     </div>
                   )}

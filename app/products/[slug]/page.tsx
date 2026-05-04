@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { formatPrice } from "@/lib/utils"
+import { formatPrice, notionImageUrl } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
@@ -163,12 +163,13 @@ export default async function ProductDetailPage({
             <div className="space-y-4">
               <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden">
                 <Image
-                  src={product.photos[0]}
+                  src={notionImageUrl(product.photos[0], 1200)}
                   alt={`${product.name} by ${product.brand} - ${product.category || "motorcycle gear"}`}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                   priority
+                  unoptimized={product.photos[0].startsWith("/api/notion-image")}
                 />
               </div>
               {product.photos.length > 1 && (
@@ -179,12 +180,13 @@ export default async function ProductDetailPage({
                       className="relative aspect-square bg-muted rounded overflow-hidden"
                     >
                       <Image
-                        src={photo}
+                        src={notionImageUrl(photo, 256)}
                         alt={`${product.name} - view ${idx + 2} of ${product.photos.length}`}
                         fill
                         sizes="(max-width: 768px) 33vw, 16vw"
                         className="object-cover"
                         loading="lazy"
+                        unoptimized={photo.startsWith("/api/notion-image")}
                       />
                     </div>
                   ))}

@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    serverComponentsExternalPackages: ['sharp'],
+  },
   images: {
     remotePatterns: [
       {
@@ -8,10 +11,10 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-    formats: ['image/avif', 'image/webp'],
+    formats: ['image/webp'],
     minimumCacheTTL: 2678400,
-    deviceSizes: [640, 1080, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 256],
+    deviceSizes: [640, 1200],
+    imageSizes: [96, 256],
   },
 }
 

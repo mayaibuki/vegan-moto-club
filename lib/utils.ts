@@ -6,6 +6,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Append a width hint to a Notion proxy URL so the proxy returns a resized
+ * WebP. Non-proxy URLs (external images) are returned unchanged. Used together
+ * with `unoptimized` on <Image> to bypass Vercel's image optimizer.
+ */
+export function notionImageUrl(src: string, width: 256 | 600 | 1200): string {
+  if (!src.startsWith("/api/notion-image")) return src
+  const sep = src.includes("?") ? "&" : "?"
+  return `${src}${sep}w=${width}`
+}
+
 export function formatPrice(price: number): string {
   return price % 1 === 0 ? `$${price}` : `$${price.toFixed(2)}`
 }

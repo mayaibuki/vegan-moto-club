@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { formatDate } from "@/lib/utils"
+import { formatDate, notionImageUrl } from "@/lib/utils"
 import { SITE_URL } from "@/lib/constants"
 
 export async function generateStaticParams() {
@@ -114,12 +114,13 @@ export default async function BlogPostPage({
       {post.featuredImage && (
         <div className="relative w-full h-96 bg-muted rounded-lg overflow-hidden">
           <Image
-            src={post.featuredImage}
+            src={notionImageUrl(post.featuredImage, 1200)}
             alt={post.title}
             fill
             sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover"
             priority
+            unoptimized={post.featuredImage.startsWith("/api/notion-image")}
           />
         </div>
       )}
