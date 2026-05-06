@@ -49,7 +49,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li>
                 <a
-                  href="https://discord.gg/GN4jkBRnut"
+                  href="https://discord.gg/J3vDjQvXPn"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-primary transition-colors"

@@ -3,6 +3,7 @@ import { getEvents } from "@/lib/notion"
 import { Card, CardContent } from "@/components/ui/card"
 import { EventCard } from "@/components/EventCard"
 import { SuggestEventForm } from "@/components/SuggestEventForm"
+import { PastEventsList } from "@/components/PastEventsList"
 import { SITE_URL } from "@/lib/constants"
 
 export const metadata: Metadata = {
@@ -101,12 +102,7 @@ export default async function EventsPage() {
           {/* Past Events */}
           {pastEvents.length > 0 && (
             <section aria-labelledby="past-heading" className="space-y-6">
-              <h2 id="past-heading" className="text-2xl font-semibold text-muted-foreground">Past Events</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {pastEvents.map((event) => (
-                  <EventCard key={event.id} event={event} muted />
-                ))}
-              </div>
+              <PastEventsList events={pastEvents} />
             </section>
           )}
         </div>

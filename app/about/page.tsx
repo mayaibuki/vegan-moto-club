@@ -89,7 +89,7 @@ export default function AboutPage() {
             We're building a community of compassionate riders who believe that performance and
             ethics go hand in hand. Join us on{" "}
             <a
-              href="https://discord.gg/GN4jkBRnut"
+              href="https://discord.gg/J3vDjQvXPn"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground hover:underline font-medium"

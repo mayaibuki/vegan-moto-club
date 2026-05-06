@@ -44,7 +44,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   )
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(25)
+  const [rowsPerPage, setRowsPerPage] = useState(24)
 
   // Sync filter state → URL params
   const syncUrl = useCallback(() => {
@@ -376,7 +376,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 
               <nav aria-label="Product pagination" className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
                 <div className="flex items-center gap-2">
-                  <label htmlFor="rows-per-page" className="text-sm text-muted-foreground">Rows per page</label>
+                  <label htmlFor="rows-per-page" className="text-sm text-muted-foreground">Products per page</label>
                   <Select
                     value={rowsPerPage.toString()}
                     onValueChange={(v) => {
@@ -388,9 +388,9 @@ export function ProductGrid({ products }: ProductGridProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
+                      <SelectItem value="24">24</SelectItem>
+                      <SelectItem value="48">48</SelectItem>
+                      <SelectItem value="96">96</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

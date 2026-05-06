@@ -118,7 +118,7 @@ export default function RootLayout({
               logo: `${SITE_URL}/logo.png`,
               description:
                 "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
-              sameAs: ["https://www.instagram.com/veganmotoclub", "https://discord.gg/GN4jkBRnut"],
+              sameAs: ["https://www.instagram.com/veganmotoclub", "https://discord.gg/J3vDjQvXPn"],
             }),
           }}
         />
