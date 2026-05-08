@@ -70,23 +70,62 @@ The tradeoff is that keyword matching can misclassify edge cases or miss valid m
 
 ## Running
 
-Run each script manually from the repository root:
+### Manual / batch mode
 
 ```bash
-# Existing product audit
 NOTION_TOKEN=secret_... python "Scheduled audit/vmc_product_audit.py"
-
-# New product enrichment
 NOTION_TOKEN=secret_... python "Scheduled audit/vmc_new_product_audit.py"
 ```
 
-Both scripts use `logging` at INFO level and print progress to stdout.
+### Single-product mode (event-driven)
+
+```bash
+NOTION_TOKEN=secret_... python "Scheduled audit/vmc_new_product_audit.py" --page-id <notion-page-id>
+```
+
+This skips the database query and processes one page directly. Used by the
+Notion webhook flow (see below).
+
+### Event-driven flow
+
+1. User submits a product via the form on veganmotoclub.com (writes a row to Notion).
+2. Notion fires a webhook to `POST /api/notion-webhook` (handler at `app/api/notion-webhook/route.ts`).
+3. Handler verifies the signature, then calls GitHub's `workflow_dispatch` API to run `.github/workflows/product-audit.yml` with `page_id` set.
+4. The action runs `vmc_new_product_audit.py --page-id <id>` which scrapes, enriches, writes back to Notion, and uploads the markdown + HTML report as a workflow artifact.
+
+A weekly cron in the same workflow (Mondays 09:00 UTC) runs full batch mode as a safety net for anything the webhook missed.
+
+## LLM integration
+
+`lib_anthropic.py` is a thin wrapper around the Anthropic SDK used by the new product audit:
+
+- **Description writing** - replaces the old template stub. Calls Haiku 4.5 with the humanizer rules baked into a cached system prompt.
+- **Vegan adjudication** - only triggered when the keyword pass returns an ambiguous result (both animal and synthetic signals, or neither). Returns one of the three canonical statuses.
+
+Both helpers fall back to deterministic stubs when `ANTHROPIC_API_KEY` is not set, so the script keeps working without the key.
 
 ## Dependencies
 
 - `requests`
 - `beautifulsoup4`
 - `notion-client`
+- `anthropic` (optional; needed for LLM-powered descriptions and vegan adjudication)
+
+## Required secrets (GitHub Actions)
+
+| Secret | Description |
+|---|---|
+| `NOTION_TOKEN` | Notion integration token |
+| `NOTION_DB_ID` | Products database id (optional, has default) |
+| `ANTHROPIC_API_KEY` | Anthropic API key for description writing |
+
+## Vercel env vars (webhook handler)
+
+| Variable | Description |
+|---|---|
+| `NOTION_WEBHOOK_SECRET` | Shared secret used to verify the `x-notion-signature` header |
+| `GH_DISPATCH_TOKEN` | Fine-grained GitHub PAT with `actions:write` on the repo |
+| `GH_OWNER`, `GH_REPO`, `GH_WORKFLOW` | Optional overrides; default to `mayaibuki/vegan-moto-club` and `product-audit.yml` |
 
 ## Known Limitations
 

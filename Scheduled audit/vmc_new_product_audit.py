@@ -22,10 +22,12 @@ OPTIONAL ENV VARS
                    (default: /sessions/gifted-confident-shannon/mnt/Scheduled audit)
 """
 
-import os, re, json, time, datetime, logging, pathlib, hashlib
+import os, re, json, time, datetime, logging, pathlib, hashlib, argparse
 import requests
 from bs4 import BeautifulSoup
 from notion_client import Client
+
+import lib_anthropic
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -317,51 +319,43 @@ def infer_season(full_text: str) -> list[str]:
     return [s for s,kws in s_kw.items() if any(k in full_text for k in kws)]
 
 def infer_vegan_status(full_text: str) -> str:
+    """
+    Cheap keyword pass first. If the signal is clean, return immediately.
+    If signals conflict or are absent, defer to lib_anthropic.adjudicate_vegan.
+    """
     if any(k in full_text for k in ["confirmed vegan","100% vegan","certified vegan","cruelty-free confirmed"]):
         return "Confirmed Vegan by maker"
-    # Animal material red flags
     animal_flags = ["leather","suede","wool","down","fur","sheepskin","nubuck","kangaroo","snake skin"]
     vegan_synthetics = ["synthetic","textile","no animal","animal-free","microfiber","polyester",
                         "nylon","cordura","gore-tex","clarino","amara","axe laredo"]
     has_animal    = any(k in full_text for k in animal_flags)
     has_synthetic = any(k in full_text for k in vegan_synthetics)
-    if has_animal:
-        return "Waiting for confirmation as Vegan"
-    if has_synthetic:
+
+    # Confident calls: skip the LLM.
+    if has_synthetic and not has_animal:
         return "Verified Vegan by AI"
-    return "Waiting for confirmation as Vegan"
+    if has_animal and not has_synthetic:
+        return "Waiting for confirmation as Vegan"
+
+    # Ambiguous: both signals present, or neither. Ask Haiku.
+    label, rationale = lib_anthropic.adjudicate_vegan(full_text)
+    if rationale:
+        log.info(f"Vegan adjudicated: {label} ({rationale})")
+    return label
 
 # ── Humanized description writer ──────────────────────────────────────────────
 
 def write_description(name: str, brand: str, category: str,
-                      full_text: str, price: "float | None") -> str:
+                      full_text: str, price: "float | None",
+                      materials: "list | None" = None) -> str:
     """
-    Write a humanized 4-6 sentence product description.
-    Rules: no em dashes, no bullet points, no AI vocabulary, no rule-of-three,
-    no excessive conjunctive phrases, active voice, honest tone.
+    Delegates to lib_anthropic.write_description (Haiku 4.5 with prompt caching).
+    Falls back to a deterministic stub when ANTHROPIC_API_KEY is absent.
     """
-    # Extract a cleaned excerpt from the page text (first 800 chars of body copy)
-    excerpt = full_text[:800].replace("\n", " ")
-    # We write the description here rather than calling an LLM,
-    # since no API key is guaranteed. This produces a useful stub that can
-    # be refined via the weekly audit task.
-    cat  = category or "motorcycle gear"
-    br   = brand or "the manufacturer"
-    p    = f"${price:.0f}" if price else "prices vary"
-
-    description = (
-        f"The {name} is a {cat.lower()} from {br} designed for riders who "
-        f"want synthetic, animal-free construction. "
-        f"At {p}, it sits in a range that should suit most budgets without "
-        f"requiring a major compromise on quality. "
-        f"The materials listed on the product page suggest an all-synthetic build, "
-        f"which is consistent with what we look for when adding gear to the site. "
-        f"Check the sizing guide before ordering, as fit can vary between brands "
-        f"and a proper fit makes a real difference to both comfort and protection. "
-        f"If you have questions about vegan credentials, the brand contact details "
-        f"are usually the fastest way to get a direct confirmation."
+    return lib_anthropic.write_description(
+        name=name, brand=brand, category=category,
+        full_text=full_text, price=price, materials=materials,
     )
-    return description.strip()
 
 # ── Notion helpers ────────────────────────────────────────────────────────────
 
@@ -655,7 +649,8 @@ def process_entry(entry: dict) -> dict:
     # ── Description ────────────────────────────────────────────────────────
     cats   = mapped.get("Category") or []
     cat_str = cats[0] if cats else ""
-    desc   = write_description(name, mapped.get("Brand",""), cat_str, full_text, price)
+    desc   = write_description(name, mapped.get("Brand",""), cat_str, full_text, price,
+                               materials=mapped.get("Materials") or [])
     mapped["Description"]   = desc
     result["description"]   = desc
     result["vegan_verified"] = mapped["Vegan Verified"]
@@ -674,9 +669,25 @@ def process_entry(entry: dict) -> dict:
     return result
 
 
-def run_audit():
+def run_audit(page_id: "str | None" = None):
+    """
+    page_id=None (default) -> batch mode: process up to BATCH_LIMIT entries
+                              with empty Description (the original behaviour).
+    page_id=<id>           -> single-product mode used by the Notion webhook.
+                              Skips the database query entirely.
+    """
     log.info("=== VMC New Product Audit Started ===")
-    entries = get_new_entries()
+
+    if page_id:
+        try:
+            entry = notion.pages.retrieve(page_id=page_id)
+            entries = [entry]
+            log.info(f"Single-product mode: {page_id}")
+        except Exception as e:
+            log.error(f"Failed to retrieve {page_id}: {e}")
+            return
+    else:
+        entries = get_new_entries()
 
     if not entries:
         log.info("No new entries to process. Done.")
@@ -704,4 +715,7 @@ def run_audit():
 
 
 if __name__ == "__main__":
-    run_audit()
+    parser = argparse.ArgumentParser(description="VMC new product audit")
+    parser.add_argument("--page-id", help="Process a single Notion page id (event-driven mode)")
+    args = parser.parse_args()
+    run_audit(page_id=args.page_id)

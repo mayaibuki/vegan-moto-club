@@ -1,0 +1,52 @@
+name: Product audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      page_id:
+        description: "Notion page id to enrich (omit for batch mode)"
+        required: false
+        default: ""
+  schedule:
+    # Weekly safety net: Mondays 09:00 UTC. Catches anything the webhook missed.
+    - cron: "0 9 * * 1"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 notion-client anthropic
+
+      - name: Run audit
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WORKSPACE_DIR: ${{ github.workspace }}/Scheduled audit
+        run: |
+          if [ -n "${{ github.event.inputs.page_id }}" ]; then
+            python "Scheduled audit/vmc_new_product_audit.py" --page-id "${{ github.event.inputs.page_id }}"
+          else
+            python "Scheduled audit/vmc_new_product_audit.py"
+          fi
+
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-${{ github.run_id }}
+          path: |
+            Scheduled audit/new-product-audit-*.md
+            Scheduled audit/new-product-audit-*.html
+            Scheduled audit/audit/**
+          if-no-files-found: ignore
