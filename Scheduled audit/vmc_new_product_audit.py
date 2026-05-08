@@ -367,7 +367,7 @@ def get_new_entries() -> list[dict]:
             "database_id": NOTION_DB_ID,
             "filter": {
                 "and": [
-                    {"property": "userDefined:URL",  "url":       {"is_not_empty": True}},
+                    {"property": "URL",  "url":       {"is_not_empty": True}},
                     {"property": "Description",       "rich_text": {"is_empty":     True}},
                 ]
             },
@@ -564,7 +564,7 @@ def process_entry(entry: dict) -> dict:
     props        = entry.get("properties", {})
 
     # Get user-submitted URL
-    url_prop     = props.get("userDefined:URL", {})
+    url_prop     = props.get("URL", {})
     product_url  = url_prop.get("url") or ""
 
     result = {
