@@ -1,4 +1,4 @@
 requests>=2.31
 beautifulsoup4>=4.12
-notion-client>=2.2
+notion-client>=1.0,<2
 anthropic>=0.40
