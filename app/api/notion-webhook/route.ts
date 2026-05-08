@@ -44,12 +44,15 @@ async function dispatchWorkflow(pageId: string) {
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
-  // Notion's verification handshake on first setup posts a verification_token
-  // that must be echoed back. Handle that first.
+  // Notion's verification handshake: log the token loud and clear so it can be
+  // retrieved from Vercel runtime logs and pasted into the Notion UI.
   try {
     const parsed = JSON.parse(rawBody);
     if (parsed?.verification_token) {
-      return NextResponse.json({ verification_token: parsed.verification_token });
+      console.log("=== NOTION VERIFICATION TOKEN ===");
+      console.log(parsed.verification_token);
+      console.log("=================================");
+      return NextResponse.json({ ok: true });
     }
   } catch { /* not JSON, fall through */ }
 
