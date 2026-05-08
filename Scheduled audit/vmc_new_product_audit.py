@@ -167,7 +167,9 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
         src = img.get("src") or img.get("data-src") or ""
         if not src or "data:" in src:
             continue
-        if not src.startswith("http"):
+        if src.startswith("//"):
+            src = "https:" + src
+        elif not src.startswith("http"):
             src = base_url.rstrip("/") + "/" + src.lstrip("/")
         # prefer product images
         if any(k in src.lower() for k in ["product","variant","featured","original","large"]):
@@ -177,6 +179,8 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
     if not imgs:
         for img in soup.select("img[src]"):
             src = img.get("src","")
+            if src.startswith("//"):
+                src = "https:" + src
             if src.startswith("http") and src not in imgs:
                 imgs.append(src)
     return imgs[:7]
@@ -632,11 +636,28 @@ def process_entry(entry: dict) -> dict:
     result["photos_uploaded"] = "yes" if saved_urls else "no"
 
     # ── Map fields ─────────────────────────────────────────────────────────
+    # Brand / Category / Gender go through Haiku first (the keyword versions
+    # were noisy: substring matches on "icon", footer cross-sells, etc).
+    # Keyword inference stays as the fallback when the LLM is unavailable.
+    llm_fields = lib_anthropic.infer_fields(
+        name=name,
+        url=product_url,
+        full_text=full_text,
+        valid_brands=VALID["Brand"],
+        valid_categories=VALID["Category"],
+        valid_genders=VALID["Gender"],
+    )
+    brand    = llm_fields.get("brand")    or infer_brand(full_text, product_url)
+    cats_llm = llm_fields.get("categories") or []
+    cats     = cats_llm if cats_llm else infer_categories(full_text)
+    gend_llm = llm_fields.get("gender")     or []
+    gend     = gend_llm if gend_llm else infer_gender(full_text)
+
     mapped = {
         "name":               name,
-        "Brand":              infer_brand(full_text, product_url),
-        "Category":           infer_categories(full_text),
-        "Gender":             infer_gender(full_text),
+        "Brand":              brand,
+        "Category":           cats,
+        "Gender":             gend,
         "Level of Protection": infer_protection(full_text),
         "Level of Waterproof": infer_waterproof(full_text),
         "Materials":          infer_materials(full_text),

@@ -132,6 +132,78 @@ def write_description(
         return _fallback_description(name, brand, category, price)
 
 
+FIELDS_SYSTEM = """You extract three structured fields from a motorcycle product page.
+
+You MUST choose values from the provided allowed lists exactly as written, or null.
+Never invent new options. If unsure, return null for that field.
+
+Return ONLY a JSON object with this exact shape, nothing else:
+{"brand": "<one of allowed brands or null>",
+ "categories": ["<zero or more allowed categories>"],
+ "gender": ["<zero or more allowed genders>"]}
+
+Decision rules:
+- "brand" is the actual maker of the product, not the retailer. If the page is on revzilla.com but sells a Dainese jacket, brand is Dainese.
+- "categories" should reflect what the product IS, not related items in cross-sell modules. A pair of gloves listed alongside jackets is still just Gloves.
+- "gender" - include "Women" or "Men" only if the product copy explicitly targets that gender (e.g. women's-specific cut, men's sizing). Default to ["Unisex"] when unclear."""
+
+
+def infer_fields(
+    name: str,
+    url: str,
+    full_text: str,
+    valid_brands: list,
+    valid_categories: list,
+    valid_genders: list,
+) -> dict:
+    """
+    Returns {"brand": str|None, "categories": [...], "gender": [...]}.
+    On any failure (no key, parse error, validation error) returns an empty dict
+    so the caller can fall back to keyword inference.
+    """
+    client = _get_client()
+    if client is None:
+        return {}
+
+    excerpt = (full_text or "")[:3000]
+    user_msg = (
+        f"Allowed brands: {valid_brands}\n"
+        f"Allowed categories: {valid_categories}\n"
+        f"Allowed genders: {valid_genders}\n\n"
+        f"Product name: {name}\n"
+        f"URL: {url}\n\n"
+        f"Page text:\n{excerpt}\n\n"
+        f"Return the JSON object now."
+    )
+    try:
+        import json as _json
+        resp = client.messages.create(
+            model=MODEL_ID,
+            max_tokens=300,
+            system=[{
+                "type": "text",
+                "text": FIELDS_SYSTEM,
+                "cache_control": {"type": "ephemeral"},
+            }],
+            messages=[{"role": "user", "content": user_msg}],
+        )
+        raw = resp.content[0].text.strip()
+        # Strip code fences if the model added them.
+        if raw.startswith("```"):
+            raw = raw.split("```", 2)[1].lstrip("json").strip()
+        data = _json.loads(raw)
+
+        brand = data.get("brand")
+        if brand not in valid_brands:
+            brand = None
+        cats = [c for c in (data.get("categories") or []) if c in valid_categories]
+        gend = [g for g in (data.get("gender") or []) if g in valid_genders]
+        return {"brand": brand, "categories": cats, "gender": gend}
+    except Exception as e:
+        log.warning(f"Haiku field inference failed ({e}); falling back to keywords")
+        return {}
+
+
 def adjudicate_vegan(full_text: str) -> tuple[str, str]:
     """
     Returns (label, rationale). Caller decides whether to call this -
