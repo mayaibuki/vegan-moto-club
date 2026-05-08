@@ -571,8 +571,8 @@ def process_entry(entry: dict) -> dict:
         "page_id":        page_id,
         "notion_url":     notion_url,
         "product_url":    product_url,
-        "name":           (props.get("Name of product",{}).get("title",[{}])[0]
-                          .get("plain_text", "Unknown product")),
+        "name":           (lambda t: t[0].get("plain_text", "Unknown product") if t else "Unknown product")(
+                              props.get("Name of product", {}).get("title", []) or []),
         "url_status":     "not checked",
         "price":          None,
         "photos_found":   0,
