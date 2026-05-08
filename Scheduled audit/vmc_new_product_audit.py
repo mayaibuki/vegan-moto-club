@@ -22,7 +22,7 @@ OPTIONAL ENV VARS
                    (default: /sessions/gifted-confident-shannon/mnt/Scheduled audit)
 """
 
-import os, re, json, time, datetime, logging, pathlib, hashlib, argparse
+import os, re, sys, json, time, datetime, logging, pathlib, hashlib, argparse
 import requests
 from bs4 import BeautifulSoup
 from notion_client import Client
@@ -702,11 +702,14 @@ def run_audit(page_id: "str | None" = None):
     if page_id:
         try:
             entry = notion.pages.retrieve(page_id=page_id)
-            entries = [entry]
-            log.info(f"Single-product mode: {page_id}")
         except Exception as e:
             log.error(f"Failed to retrieve {page_id}: {e}")
+            sys.exit(1)
+        if entry.get("archived") or entry.get("in_trash"):
+            log.warning(f"Page {page_id} is archived/trashed - skipping")
             return
+        entries = [entry]
+        log.info(f"Single-product mode: {page_id}")
     else:
         entries = get_new_entries()
 
@@ -733,6 +736,12 @@ def run_audit(page_id: "str | None" = None):
     log.info(f"=== Done: {ok} updated, {sk} skipped, {er} errors ===")
     log.info(f"Report:  {md_path}")
     log.info(f"Review:  {html_path}")
+
+    # In single-page mode (webhook-driven), surface failures as a non-zero exit
+    # so the GitHub Action goes red and the issue is visible. Batch mode keeps
+    # exit 0 so one bad scrape doesn't fail the whole nightly run.
+    if page_id and er > 0:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
