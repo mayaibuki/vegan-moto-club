@@ -108,9 +108,50 @@ VALID = {
     "Season": ["☀️ Summer","🌦 Mid season","❄️ Winter"],
     "Vegan Verified": [
         "Verified Vegan by us","Confirmed Vegan by maker",
-        "Waiting for confirmation as Vegan","Verified Vegan by AI"
+        "Waiting for confirmation as Vegan","Verified Vegan by AI",
+        "Not vegan",
     ],
 }
+
+# ── Animal-material detection (precision-first) ───────────────────────────────
+# We check word-bounded matches for clearly-named animal materials, then look
+# at the surrounding text for negations or vegan-alternative qualifiers that
+# would invalidate the match (e.g. "vegan leather", "no leather", "leather
+# alternative"). Materials field is mapped only to vegan options by design,
+# so this signal lives in the scraped page text, not the structured Materials.
+
+ANIMAL_MATERIAL_TERMS = [
+    "leather", "suede", "nubuck", "sheepskin",
+    "kangaroo", "wool", "down", "fur",
+]
+
+# Phrases that, when adjacent to an animal term, mean it is NOT animal-derived.
+NEGATION_QUALIFIERS = [
+    "vegan ", "synthetic ", "faux ", "pu ", "p.u.", "pleather",
+    "no ", "not ", "free of ", "without ",
+    "alternative", "look", "feel", "style", "imitation",
+    "amica suede",  # the explicit vegan suede in the curated Materials list
+    "alcantara",    # always synthetic
+    "axe laredo",   # synthetic leather brand on the curated list
+]
+
+def detect_animal_materials(full_text: str) -> list[str]:
+    """
+    Return a list of animal-material terms confidently detected in the page text.
+    Empty list means no clear non-vegan signal. Negations and vegan-alternative
+    qualifiers within ~30 chars before/after the match are treated as
+    invalidating that hit.
+    """
+    text = full_text.lower()
+    confirmed = []
+    for term in ANIMAL_MATERIAL_TERMS:
+        for m in re.finditer(rf"\b{term}\b", text):
+            window = text[max(0, m.start() - 30) : m.end() + 30]
+            if any(q in window for q in NEGATION_QUALIFIERS):
+                continue
+            confirmed.append(term)
+            break  # one confirmed instance per term is enough
+    return sorted(set(confirmed))
 
 TRUSTED_DOMAINS = [
     "revzilla.com","fortnine.ca","cyclegear.com","sportbiketrackgear.com",
@@ -322,30 +363,37 @@ def infer_season(full_text: str) -> list[str]:
     }
     return [s for s,kws in s_kw.items() if any(k in full_text for k in kws)]
 
-def infer_vegan_status(full_text: str) -> str:
+def infer_vegan_status(full_text: str) -> tuple[str, list[str]]:
     """
-    Cheap keyword pass first. If the signal is clean, return immediately.
-    If signals conflict or are absent, defer to lib_anthropic.adjudicate_vegan.
+    Returns (status, animal_materials_detected). The second value is a list of
+    animal-material terms we found unambiguously in the page text — used by the
+    audit report to flag rejected products. Empty list when nothing flagged.
+
+    Decision order:
+      1. Confident "vegan by maker" claim wins immediately.
+      2. Precision-first animal-material detection. Any unambiguous hit -> "Not vegan".
+      3. Synthetic-keyword pass for the affirmative case.
+      4. Ambiguous: defer to Haiku (returns "Waiting for confirmation as Vegan"
+         when no LLM is available).
     """
-    if any(k in full_text for k in ["confirmed vegan","100% vegan","certified vegan","cruelty-free confirmed"]):
-        return "Confirmed Vegan by maker"
-    animal_flags = ["leather","suede","wool","down","fur","sheepskin","nubuck","kangaroo","snake skin"]
-    vegan_synthetics = ["synthetic","textile","no animal","animal-free","microfiber","polyester",
-                        "nylon","cordura","gore-tex","clarino","amara","axe laredo"]
-    has_animal    = any(k in full_text for k in animal_flags)
-    has_synthetic = any(k in full_text for k in vegan_synthetics)
+    if any(k in full_text for k in ["confirmed vegan", "100% vegan", "certified vegan", "cruelty-free confirmed"]):
+        return "Confirmed Vegan by maker", []
 
-    # Confident calls: skip the LLM.
-    if has_synthetic and not has_animal:
-        return "Verified Vegan by AI"
-    if has_animal and not has_synthetic:
-        return "Waiting for confirmation as Vegan"
+    animal_hits = detect_animal_materials(full_text)
+    if animal_hits:
+        return "Not vegan", animal_hits
 
-    # Ambiguous: both signals present, or neither. Ask Haiku.
+    vegan_synthetics = ["synthetic", "textile", "no animal", "animal-free", "microfiber",
+                        "polyester", "nylon", "cordura", "gore-tex", "clarino", "amara",
+                        "axe laredo"]
+    if any(k in full_text for k in vegan_synthetics):
+        return "Verified Vegan by AI", []
+
+    # Genuinely ambiguous - no animal hit, no synthetic hit either.
     label, rationale = lib_anthropic.adjudicate_vegan(full_text)
     if rationale:
         log.info(f"Vegan adjudicated: {label} ({rationale})")
-    return label
+    return label, []
 
 # ── Humanized description writer ──────────────────────────────────────────────
 
@@ -448,12 +496,25 @@ def build_md_report(products: list[dict]) -> str:
     ok = sum(1 for p in products if p["status"] == "updated")
     sk = sum(1 for p in products if p["status"] == "skipped")
     er = sum(1 for p in products if p["status"] == "error")
+    rejected = [p for p in products if p.get("vegan_verified") == "Not vegan"]
     lines += [
-        f"**Updated:** {ok}  |  **Skipped:** {sk}  |  **Errors:** {er}",
-        "",
-        "---",
+        f"**Updated:** {ok}  |  **Skipped:** {sk}  |  **Errors:** {er}  |  **Flagged not vegan:** {len(rejected)}",
         "",
     ]
+    if rejected:
+        lines += [
+            "## ⚠️ FLAGGED — likely not vegan",
+            "",
+            "These rows were tagged `Not vegan` because the product page listed animal materials. They were NOT auto-archived; review and archive in Notion if confirmed.",
+            "",
+        ]
+        for p in rejected:
+            lines.append(
+                f"- **{p['name']}** — animal materials: `{', '.join(p.get('animal_flags', []))}` — "
+                f"[Notion]({p['notion_url']}) — [source]({p['product_url']})"
+            )
+        lines += ["", "---", ""]
+    lines += ["---", ""]
     for p in products:
         lines += [
             f"## {p['name']}",
@@ -477,13 +538,34 @@ def build_md_report(products: list[dict]) -> str:
 
 def build_html_review(products: list[dict]) -> str:
     cards = ""
+    rejected = [p for p in products if p.get("vegan_verified") == "Not vegan"]
+    if rejected:
+        rows = "".join(
+            f"<li><strong>{p['name']}</strong> — <code>{', '.join(p.get('animal_flags', []))}</code> "
+            f"<a href='{p['notion_url']}' target='_blank'>open in Notion</a></li>"
+            for p in rejected
+        )
+        cards += (
+            f"<div class='flag-banner'>"
+            f"<h2>⚠️ {len(rejected)} flagged as not vegan</h2>"
+            f"<p>Page text listed animal materials. Not auto-archived — review and archive in Notion.</p>"
+            f"<ul>{rows}</ul>"
+            f"</div>"
+        )
     for p in products:
-        status_color = {"updated":"#22c55e","skipped":"#f59e0b","error":"#ef4444"}.get(p["status"],"#6b7280")
+        is_rejected = p.get("vegan_verified") == "Not vegan"
+        status_color = "#dc2626" if is_rejected else (
+            {"updated":"#22c55e","skipped":"#f59e0b","error":"#ef4444"}.get(p["status"],"#6b7280")
+        )
+        flag_label = "NOT VEGAN" if is_rejected else p['status'].upper()
+        flag_chip = (f"<span class='animal-chip'>animal: {', '.join(p.get('animal_flags', []))}</span>"
+                     if is_rejected else "")
         cards += f"""
-        <div class="card" id="card-{p['page_id']}">
+        <div class="card{' rejected' if is_rejected else ''}" id="card-{p['page_id']}">
           <div class="card-header">
-            <span class="badge" style="background:{status_color}">{p['status'].upper()}</span>
+            <span class="badge" style="background:{status_color}">{flag_label}</span>
             <strong>{p['name']}</strong>
+            {flag_chip}
           </div>
           <div class="card-body">
             <p><strong>URL:</strong> <a href="{p['product_url']}" target="_blank">{p['product_url']}</a>
@@ -533,6 +615,15 @@ def build_html_review(products: list[dict]) -> str:
   #decisions pre{{margin:0;font-size:.8rem;white-space:pre-wrap}}
   .submit-btn{{margin-top:16px;background:#6366f1;color:#fff;padding:10px 20px;font-size:1rem;border:none;border-radius:8px;cursor:pointer;font-weight:700}}
   a{{color:#6366f1}}
+  .flag-banner{{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px 20px;margin-bottom:24px}}
+  .flag-banner h2{{margin:0 0 6px;color:#991b1b;font-size:1.05rem}}
+  .flag-banner p{{margin:0 0 10px;color:#7f1d1d;font-size:.85rem}}
+  .flag-banner ul{{margin:0;padding-left:20px}}
+  .flag-banner li{{font-size:.85rem;line-height:1.6;color:#7f1d1d}}
+  .flag-banner code{{background:#fee2e2;color:#991b1b;padding:1px 4px;border-radius:3px;font-size:.8em}}
+  .card.rejected{{border-color:#fecaca;background:#fffbfb}}
+  .card.rejected .card-header{{background:#fef2f2}}
+  .animal-chip{{font-size:.7rem;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:99px;margin-left:auto}}
 </style>
 </head>
 <body>
@@ -583,6 +674,7 @@ def process_entry(entry: dict) -> dict:
         "photos_broken":  0,
         "photos_uploaded": "no",
         "vegan_verified": None,
+        "animal_flags":   [],
         "description":    "",
         "status":         "skipped",
     }
@@ -653,6 +745,10 @@ def process_entry(entry: dict) -> dict:
     gend_llm = llm_fields.get("gender")     or []
     gend     = gend_llm if gend_llm else infer_gender(full_text)
 
+    vegan_status, animal_hits = infer_vegan_status(full_text)
+    if animal_hits:
+        log.warning(f"NOT VEGAN: {name} - animal materials detected: {', '.join(animal_hits)}")
+
     mapped = {
         "name":               name,
         "Brand":              brand,
@@ -663,18 +759,26 @@ def process_entry(entry: dict) -> dict:
         "Materials":          infer_materials(full_text),
         "Riding style":       infer_riding_style(full_text),
         "Season":             infer_season(full_text),
-        "Vegan Verified":     infer_vegan_status(full_text),
+        "Vegan Verified":     vegan_status,
         "Price":              price,
     }
 
     # ── Description ────────────────────────────────────────────────────────
-    cats   = mapped.get("Category") or []
-    cat_str = cats[0] if cats else ""
-    desc   = write_description(name, mapped.get("Brand",""), cat_str, full_text, price,
-                               materials=mapped.get("Materials") or [])
+    # Not-vegan rows get a one-line flag note instead of a normal description -
+    # makes them obvious in the Notion list view and avoids burning Haiku tokens
+    # on a product that should be archived anyway.
+    cats_for_desc = mapped.get("Category") or []
+    cat_str = cats_for_desc[0] if cats_for_desc else ""
+    if vegan_status == "Not vegan":
+        desc = (f"FLAGGED - product page lists animal-derived materials "
+                f"({', '.join(animal_hits)}). Review and archive if confirmed non-vegan.")
+    else:
+        desc = write_description(name, mapped.get("Brand", ""), cat_str, full_text, price,
+                                 materials=mapped.get("Materials") or [])
     mapped["Description"]   = desc
     result["description"]   = desc
-    result["vegan_verified"] = mapped["Vegan Verified"]
+    result["vegan_verified"] = vegan_status
+    result["animal_flags"]  = animal_hits
 
     # ── Write to Notion ────────────────────────────────────────────────────
     notion_props = build_notion_props(mapped)
