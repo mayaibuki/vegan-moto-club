@@ -221,10 +221,14 @@ def infer_brand(full_text: str, url: str) -> "str | None":
 
 def infer_categories(name: str, full_text: str) -> list[str]:
     """
-    Name-first: a "Knox Orsa 4 Gloves" h1 trivially matches Gloves and
-    excludes false positives from cross-sell modules in the page body.
-    Falls back to full_text only when nothing matches the product name.
+    Name-only keyword matching. Returning empty for names that don't clearly
+    indicate a category is intentional - empty fields are reviewable; wrong
+    fields disappear into the clutter. The full_text fallback was removed
+    after observing cross-sell modules consistently corrupting results.
+    The full_text arg is kept for signature compatibility with the LLM path
+    that consumes the same page content.
     """
+    _ = full_text  # intentionally unused; kept for symmetry with LLM signature
     kw = {
         "Jackets":      ["jacket","coat","gilet","vest"],
         "Gloves":       ["glove"],
@@ -235,10 +239,7 @@ def infer_categories(name: str, full_text: str) -> list[str]:
         "Street wear":  ["hoodie","t-shirt","shirt","casual","sweater","knitwear"],
     }
     name_lc = (name or "").lower()
-    primary = [c for c, words in kw.items() if any(w in name_lc for w in words)]
-    if primary:
-        return primary
-    return [c for c, words in kw.items() if any(w in full_text for w in words)]
+    return [c for c, words in kw.items() if any(w in name_lc for w in words)]
 
 def infer_gender(full_text: str) -> list[str]:
     g = []
@@ -314,39 +315,33 @@ def infer_materials(full_text: str) -> list[str]:
 
 def infer_riding_style(name: str, full_text: str) -> list[str]:
     """
-    Name-first to avoid cross-sell pollution. A 'Klim Krios Karbon ADV Helmet'
-    matches Adventure / Touring from its name; the page body's cross-sells
-    might mention 'racing' or 'commute' and we don't want those.
+    Name-only keyword matching. See infer_categories for the rationale on
+    not falling back to full_text.
     """
+    _ = full_text
     style_kw = {
         "Off-roading":         ["off-road","offroad","enduro","motocross","dirt bike","mx ","dirt"],
         "Adventure / Touring": ["adventure","adv ","dual sport","touring","tourer"],
         "Commute / Street":    ["commute","commuting","urban","city"],
-        "Street":              ["street","streetbike"],
-        "Sport / Canyons":     ["sport","canyon","spirited","superbike"],
-        "Racing / Trackdays":  ["racing","race","trackday","track day","circuit","gp"],
+        "Street":              ["streetbike"],
+        "Sport / Canyons":     ["canyon","superbike"],
+        "Racing / Trackdays":  ["racing","trackday","track day","circuit"],
     }
     name_lc = (name or "").lower()
-    primary = [s for s, kws in style_kw.items() if any(k in name_lc for k in kws)]
-    if primary:
-        return primary
-    return [s for s, kws in style_kw.items() if any(k in full_text for k in kws)]
+    return [s for s, kws in style_kw.items() if any(k in name_lc for k in kws)]
 
 def infer_season(name: str, full_text: str) -> list[str]:
     """
-    Name-first when possible. Many product names directly state season
-    (e.g. 'Alpinestars Stella Andes V3 Drystar 4-season jacket').
+    Name-only keyword matching. See infer_categories for rationale.
     """
+    _ = full_text
     s_kw = {
-        "☀️ Summer":     ["summer","warm weather","ventilated","breathable","airflow","mesh","hot weather"],
-        "🌦 Mid season": ["mid season","mid-season","spring","autumn","fall","transition","3-season","4-season","all season","all-season"],
-        "❄️ Winter":     ["winter","cold weather","thermal","insulated","heated","fleece lined","cold-weather"],
+        "☀️ Summer":     ["summer","airflow","mesh","ventilated"],
+        "🌦 Mid season": ["mid season","mid-season","3-season","4-season","all season","all-season"],
+        "❄️ Winter":     ["winter","thermal","insulated","heated"],
     }
     name_lc = (name or "").lower()
-    primary = [s for s, kws in s_kw.items() if any(k in name_lc for k in kws)]
-    if primary:
-        return primary
-    return [s for s, kws in s_kw.items() if any(k in full_text for k in kws)]
+    return [s for s, kws in s_kw.items() if any(k in name_lc for k in kws)]
 
 def infer_vegan_status(full_text: str) -> str:
     """
