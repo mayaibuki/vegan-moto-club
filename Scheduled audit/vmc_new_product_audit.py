@@ -219,17 +219,26 @@ def infer_brand(full_text: str, url: str) -> "str | None":
             return brand
     return None
 
-def infer_categories(full_text: str) -> list[str]:
+def infer_categories(name: str, full_text: str) -> list[str]:
+    """
+    Name-first: a "Knox Orsa 4 Gloves" h1 trivially matches Gloves and
+    excludes false positives from cross-sell modules in the page body.
+    Falls back to full_text only when nothing matches the product name.
+    """
     kw = {
         "Jackets":      ["jacket","coat","gilet","vest"],
         "Gloves":       ["glove"],
-        "Pants":        ["pant","trouser","jean","chino","breeche"],
+        "Pants":        ["pant","trouser","jean","chino","breeche","legging"],
         "Boots":        ["boot","shoe","sneaker","footwear"],
-        "Racing Suits": ["suit","race suit","one-piece","overall"],
-        "Protection":   ["protector","armor","armour","airbag","back protector","body armor","impact"],
+        "Racing Suits": ["race suit","one-piece","one piece","overall","racing suit"],
+        "Protection":   ["protector","airbag","back protector","body armor","chest protector","impact vest"],
         "Street wear":  ["hoodie","t-shirt","shirt","casual","sweater","knitwear"],
     }
-    return [c for c,words in kw.items() if any(w in full_text for w in words)]
+    name_lc = (name or "").lower()
+    primary = [c for c, words in kw.items() if any(w in name_lc for w in words)]
+    if primary:
+        return primary
+    return [c for c, words in kw.items() if any(w in full_text for w in words)]
 
 def infer_gender(full_text: str) -> list[str]:
     g = []
@@ -303,24 +312,41 @@ def infer_materials(full_text: str) -> list[str]:
             found.append(mat)
     return found
 
-def infer_riding_style(full_text: str) -> list[str]:
+def infer_riding_style(name: str, full_text: str) -> list[str]:
+    """
+    Name-first to avoid cross-sell pollution. A 'Klim Krios Karbon ADV Helmet'
+    matches Adventure / Touring from its name; the page body's cross-sells
+    might mention 'racing' or 'commute' and we don't want those.
+    """
     style_kw = {
-        "Off-roading":         ["off-road","offroad","enduro","motocross","dirt bike","mx"],
-        "Adventure / Touring": ["adventure","adv riding","dual sport","touring"],
+        "Off-roading":         ["off-road","offroad","enduro","motocross","dirt bike","mx ","dirt"],
+        "Adventure / Touring": ["adventure","adv ","dual sport","touring","tourer"],
         "Commute / Street":    ["commute","commuting","urban","city"],
-        "Street":              ["street riding","streetbike"],
-        "Sport / Canyons":     ["sport riding","canyon","spirited","superbike"],
-        "Racing / Trackdays":  ["racing","race","trackday","track day","circuit"],
+        "Street":              ["street","streetbike"],
+        "Sport / Canyons":     ["sport","canyon","spirited","superbike"],
+        "Racing / Trackdays":  ["racing","race","trackday","track day","circuit","gp"],
     }
-    return [s for s,kws in style_kw.items() if any(k in full_text for k in kws)]
+    name_lc = (name or "").lower()
+    primary = [s for s, kws in style_kw.items() if any(k in name_lc for k in kws)]
+    if primary:
+        return primary
+    return [s for s, kws in style_kw.items() if any(k in full_text for k in kws)]
 
-def infer_season(full_text: str) -> list[str]:
+def infer_season(name: str, full_text: str) -> list[str]:
+    """
+    Name-first when possible. Many product names directly state season
+    (e.g. 'Alpinestars Stella Andes V3 Drystar 4-season jacket').
+    """
     s_kw = {
-        "☀️ Summer": ["summer","warm weather","ventilated","breathable","airflow","mesh"],
-        "🌦 Mid season": ["mid season","mid-season","spring","autumn","fall","transition","3-season"],
-        "❄️ Winter": ["winter","cold weather","thermal","insulated","heated","fleece lined"],
+        "☀️ Summer":     ["summer","warm weather","ventilated","breathable","airflow","mesh","hot weather"],
+        "🌦 Mid season": ["mid season","mid-season","spring","autumn","fall","transition","3-season","4-season","all season","all-season"],
+        "❄️ Winter":     ["winter","cold weather","thermal","insulated","heated","fleece lined","cold-weather"],
     }
-    return [s for s,kws in s_kw.items() if any(k in full_text for k in kws)]
+    name_lc = (name or "").lower()
+    primary = [s for s, kws in s_kw.items() if any(k in name_lc for k in kws)]
+    if primary:
+        return primary
+    return [s for s, kws in s_kw.items() if any(k in full_text for k in kws)]
 
 def infer_vegan_status(full_text: str) -> str:
     """
@@ -646,12 +672,18 @@ def process_entry(entry: dict) -> dict:
         valid_brands=VALID["Brand"],
         valid_categories=VALID["Category"],
         valid_genders=VALID["Gender"],
+        valid_riding_styles=VALID["Riding style"],
+        valid_seasons=VALID["Season"],
     )
     brand    = llm_fields.get("brand")    or infer_brand(full_text, product_url)
-    cats_llm = llm_fields.get("categories") or []
-    cats     = cats_llm if cats_llm else infer_categories(full_text)
-    gend_llm = llm_fields.get("gender")     or []
-    gend     = gend_llm if gend_llm else infer_gender(full_text)
+    cats_llm   = llm_fields.get("categories")   or []
+    cats       = cats_llm   if cats_llm   else infer_categories(name, full_text)
+    gend_llm   = llm_fields.get("gender")       or []
+    gend       = gend_llm   if gend_llm   else infer_gender(full_text)
+    styles_llm = llm_fields.get("riding_style") or []
+    styles     = styles_llm if styles_llm else infer_riding_style(name, full_text)
+    season_llm = llm_fields.get("season")       or []
+    seasons    = season_llm if season_llm else infer_season(name, full_text)
 
     mapped = {
         "name":               name,
@@ -661,8 +693,8 @@ def process_entry(entry: dict) -> dict:
         "Level of Protection": infer_protection(full_text),
         "Level of Waterproof": infer_waterproof(full_text),
         "Materials":          infer_materials(full_text),
-        "Riding style":       infer_riding_style(full_text),
-        "Season":             infer_season(full_text),
+        "Riding style":       styles,
+        "Season":             seasons,
         "Vegan Verified":     infer_vegan_status(full_text),
         "Price":              price,
     }

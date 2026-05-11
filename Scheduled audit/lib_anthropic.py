@@ -132,20 +132,24 @@ def write_description(
         return _fallback_description(name, brand, category, price)
 
 
-FIELDS_SYSTEM = """You extract three structured fields from a motorcycle product page.
+FIELDS_SYSTEM = """You extract five structured fields from a motorcycle product page.
 
-You MUST choose values from the provided allowed lists exactly as written, or null.
-Never invent new options. If unsure, return null for that field.
+You MUST choose values from the provided allowed lists exactly as written, or null/empty.
+Never invent new options. If unsure for a field, return null or an empty list.
 
 Return ONLY a JSON object with this exact shape, nothing else:
 {"brand": "<one of allowed brands or null>",
  "categories": ["<zero or more allowed categories>"],
- "gender": ["<zero or more allowed genders>"]}
+ "gender": ["<zero or more allowed genders>"],
+ "riding_style": ["<zero or more allowed riding styles>"],
+ "season": ["<zero or more allowed seasons>"]}
 
 Decision rules:
 - "brand" is the actual maker of the product, not the retailer. If the page is on revzilla.com but sells a Dainese jacket, brand is Dainese.
-- "categories" should reflect what the product IS, not related items in cross-sell modules. A pair of gloves listed alongside jackets is still just Gloves.
-- "gender" - include "Women" or "Men" only if the product copy explicitly targets that gender (e.g. women's-specific cut, men's sizing). Default to ["Unisex"] when unclear."""
+- "categories" should reflect what the product IS, not related items in cross-sell modules. A pair of gloves listed alongside jackets is still just Gloves. Use the product name as the strongest signal.
+- "gender" - include "Women" or "Men" only if the product copy explicitly targets that gender (e.g. women's-specific cut, men's sizing). Default to ["Unisex"] when unclear.
+- "riding_style" - the intended use case described in the product's own marketing copy, not in related products. A touring jacket is Adventure / Touring even if the page sidebar lists race suits.
+- "season" - infer from explicit weather claims in the product copy. Ventilated/mesh/summer = Summer. Thermal/insulated/heated/winter = Winter. 3-season/transitional = Mid season. Leave empty if the page does not clearly indicate a season."""
 
 
 def infer_fields(
@@ -155,9 +159,12 @@ def infer_fields(
     valid_brands: list,
     valid_categories: list,
     valid_genders: list,
+    valid_riding_styles: list = None,
+    valid_seasons: list = None,
 ) -> dict:
     """
-    Returns {"brand": str|None, "categories": [...], "gender": [...]}.
+    Returns {"brand": str|None, "categories": [...], "gender": [...],
+             "riding_style": [...], "season": [...]}.
     On any failure (no key, parse error, validation error) returns an empty dict
     so the caller can fall back to keyword inference.
     """
@@ -169,7 +176,9 @@ def infer_fields(
     user_msg = (
         f"Allowed brands: {valid_brands}\n"
         f"Allowed categories: {valid_categories}\n"
-        f"Allowed genders: {valid_genders}\n\n"
+        f"Allowed genders: {valid_genders}\n"
+        f"Allowed riding styles: {valid_riding_styles or []}\n"
+        f"Allowed seasons: {valid_seasons or []}\n\n"
         f"Product name: {name}\n"
         f"URL: {url}\n\n"
         f"Page text:\n{excerpt}\n\n"
@@ -196,9 +205,14 @@ def infer_fields(
         brand = data.get("brand")
         if brand not in valid_brands:
             brand = None
-        cats = [c for c in (data.get("categories") or []) if c in valid_categories]
-        gend = [g for g in (data.get("gender") or []) if g in valid_genders]
-        return {"brand": brand, "categories": cats, "gender": gend}
+        cats   = [c for c in (data.get("categories") or [])   if c in valid_categories]
+        gend   = [g for g in (data.get("gender") or [])       if g in valid_genders]
+        styles = [s for s in (data.get("riding_style") or []) if s in (valid_riding_styles or [])]
+        seas   = [s for s in (data.get("season") or [])       if s in (valid_seasons or [])]
+        return {
+            "brand": brand, "categories": cats, "gender": gend,
+            "riding_style": styles, "season": seas,
+        }
     except Exception as e:
         log.warning(f"Haiku field inference failed ({e}); falling back to keywords")
         return {}
