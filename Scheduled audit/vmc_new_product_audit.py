@@ -161,6 +161,39 @@ def extract_price(soup: BeautifulSoup) -> "float | None":
                 return float(m.group(1).replace(",", ""))
     return None
 
+def detect_sku(soup: BeautifulSoup) -> "str | None":
+    """
+    Pull the product's style/SKU code from the page so we can tie images to the
+    product being audited. Shopify and most retail platforms embed the code in a
+    JSON blob ("sku", "barcode", or a numeric variant id) and reuse it as the
+    leading token of every gallery image filename (e.g. 3201026_9298_..._FR.jpg).
+
+    Returns a leading run of >=5 digits (the style code) or None if the page
+    does not expose one. Marketing/lifestyle assets do not carry this code, which
+    is what lets the caller filter them out.
+    """
+    html = str(soup)
+    candidates: list[str] = []
+    # Explicit fields first - these name the product directly.
+    for pat in (r'"sku"\s*:\s*"([^"]+)"', r'"barcode"\s*:\s*"([^"]+)"'):
+        for raw in re.findall(pat, html):
+            m = re.match(r"\D*(\d{5,})", raw)
+            if m:
+                candidates.append(m.group(1))
+    if not candidates:
+        return None
+    # The most-repeated code is the product's own (variants reuse it).
+    from collections import Counter
+    return Counter(candidates).most_common(1)[0][0]
+
+
+def _img_style_token(url: str) -> "str | None":
+    """Leading run of >=5 digits in the image's filename, or None."""
+    fname = url.rsplit("/", 1)[-1]
+    m = re.match(r"(\d{5,})", fname)
+    return m.group(1) if m else None
+
+
 def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
     imgs = []
     for img in soup.select("img[src], img[data-src]"):
@@ -183,6 +216,28 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
                 src = "https:" + src
             if src.startswith("http") and src not in imgs:
                 imgs.append(src)
+
+    # SKU-aware filtering: keep only images whose filename carries the product's
+    # style code. This drops cross-sell thumbnails, lifestyle renders, and nav
+    # GIFs that share no code with the product. Two ways to find the target code:
+    #   1. an explicit SKU from the page JSON, if it appears in a filename, or
+    #   2. the dominant filename token, when several gallery shots share one.
+    # If neither is available we fall back to the unfiltered list (no regression
+    # for sites that don't encode a SKU in image names).
+    from collections import Counter
+    tokens = {src: _img_style_token(src) for src in imgs}
+    sku = detect_sku(soup)
+    target = sku if (sku and sku in tokens.values()) else None
+    if target is None:
+        counts = Counter(t for t in tokens.values() if t)
+        if counts:
+            top, n = counts.most_common(1)[0]
+            if n >= 2:
+                target = top
+    if target:
+        matched = [src for src in imgs if tokens[src] == target]
+        if matched:
+            return matched[:7]
     return imgs[:7]
 
 def check_image_url(url: str) -> bool:
