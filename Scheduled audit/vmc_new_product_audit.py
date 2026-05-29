@@ -27,7 +27,10 @@ import requests
 from bs4 import BeautifulSoup
 from notion_client import Client
 
-import lib_anthropic
+# NOTE: This audit is fully deterministic — no LLM / Anthropic API is used.
+# Fields come from Shopify tags (authoritative) and keyword heuristics; the
+# description is built from the mapped fields. Polished, feature-focused
+# descriptions are authored separately (see upload_revit_descriptions.py).
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -536,8 +539,9 @@ def maker_marks_vegan(soup) -> bool:
 
 def infer_vegan_status(full_text: str, soup=None) -> str:
     """
-    Cheap keyword pass first. If the signal is clean, return immediately.
-    If signals conflict or are absent, defer to lib_anthropic.adjudicate_vegan.
+    Deterministic keyword pass. When signals conflict or are absent we choose
+    the safer label ("Waiting for confirmation as Vegan") rather than guessing —
+    a human reviewer then confirms. No LLM is used.
     """
     # First-party structured claim on the page outranks everything.
     if maker_marks_vegan(soup):
@@ -550,31 +554,69 @@ def infer_vegan_status(full_text: str, soup=None) -> str:
     has_animal    = any(k in full_text for k in animal_flags)
     has_synthetic = any(k in full_text for k in vegan_synthetics)
 
-    # Confident calls: skip the LLM.
     if has_synthetic and not has_animal:
         return "Verified Vegan by AI"
-    if has_animal and not has_synthetic:
-        return "Waiting for confirmation as Vegan"
-
-    # Ambiguous: both signals present, or neither. Ask Haiku.
-    label, rationale = lib_anthropic.adjudicate_vegan(full_text)
-    if rationale:
-        log.info(f"Vegan adjudicated: {label} ({rationale})")
-    return label
+    # Animal material present, or signals ambiguous/absent: default to the safe
+    # label so a human confirms rather than the audit over-claiming.
+    return "Waiting for confirmation as Vegan"
 
 # ── Humanized description writer ──────────────────────────────────────────────
 
-def write_description(name: str, brand: str, category: str,
-                      full_text: str, price: "float | None",
-                      materials: "list | None" = None) -> str:
+def write_description(mapped: dict) -> str:
     """
-    Delegates to lib_anthropic.write_description (Haiku 4.5 with prompt caching).
-    Falls back to a deterministic stub when ANTHROPIC_API_KEY is absent.
+    Build a short, factual description from the already-mapped fields. No LLM.
+
+    This intentionally stays terse and honest — its job is to (a) give the row
+    a baseline summary and (b) mark the row "processed" so the audit's
+    Description-empty queue drains. Polished, feature-focused descriptions are
+    authored separately and overwrite this (build_notion_props only fills
+    currently-empty fields, so a human/curated description is never clobbered).
     """
-    return lib_anthropic.write_description(
-        name=name, brand=brand, category=category,
-        full_text=full_text, price=price, materials=materials,
-    )
+    name  = mapped.get("name") or "This product"
+    brand = mapped.get("Brand")
+    cats  = mapped.get("Category") or []
+    cat   = (cats[0] if cats else "motorcycle gear").lower()
+    gender = mapped.get("Gender") or []
+    prot  = mapped.get("Level of Protection")
+    wp    = mapped.get("Level of Waterproof")
+    riding = mapped.get("Riding style") or []
+    seasons = mapped.get("Season") or []
+
+    s1 = f"The {name} is a {cat}"
+    s1 += f" from {brand}." if brand else "."
+
+    facts = []
+    if riding:
+        facts.append(f"Intended for {', '.join(riding).lower()} riding")
+    if prot:
+        facts.append(f"rated {prot.lower()}")
+    if wp and wp != "Not waterproof":
+        facts.append(f"with a {wp.strip().lower()} construction")
+    elif wp == "Not waterproof":
+        facts.append("not waterproof")
+    s2 = ""
+    if facts:
+        s2 = facts[0][0].upper() + facts[0][1:]
+        if len(facts) > 1:
+            s2 += " " + " ".join(facts[1:])
+        s2 += "."
+
+    extras = []
+    if seasons:
+        clean = [re.sub(r"[^\w/ ]", "", s).strip() for s in seasons]
+        extras.append(f"Suited to {', '.join(c.lower() for c in clean if c)} riding")
+    if gender and gender != ["Unisex"]:
+        extras.append(f"cut for {', '.join(g.lower() for g in gender)}")
+    elif gender == ["Unisex"]:
+        extras.append("a unisex fit")
+    s3 = ""
+    if extras:
+        s3 = extras[0][0].upper() + extras[0][1:]
+        if len(extras) > 1:
+            s3 += ", " + ", ".join(extras[1:])
+        s3 += "."
+
+    return " ".join(part for part in [s1, s2, s3] if part).strip()
 
 # ── Notion helpers ────────────────────────────────────────────────────────────
 
@@ -869,29 +911,14 @@ def process_entry(entry: dict) -> dict:
                 saved_urls.append(url)
     result["photos_uploaded"] = "yes" if saved_urls else "no"
 
-    # ── Map fields ─────────────────────────────────────────────────────────
-    # Brand / Category / Gender go through Haiku first (the keyword versions
-    # were noisy: substring matches on "icon", footer cross-sells, etc).
-    # Keyword inference stays as the fallback when the LLM is unavailable.
-    llm_fields = lib_anthropic.infer_fields(
-        name=name,
-        url=product_url,
-        full_text=full_text,
-        valid_brands=VALID["Brand"],
-        valid_categories=VALID["Category"],
-        valid_genders=VALID["Gender"],
-        valid_riding_styles=VALID["Riding style"],
-        valid_seasons=VALID["Season"],
-    )
-    brand    = llm_fields.get("brand")    or infer_brand(full_text, product_url)
-    cats_llm   = llm_fields.get("categories")   or []
-    cats       = cats_llm   if cats_llm   else infer_categories(name, full_text)
-    gend_llm   = llm_fields.get("gender")       or []
-    gend       = gend_llm   if gend_llm   else infer_gender(full_text)
-    styles_llm = llm_fields.get("riding_style") or []
-    styles     = styles_llm if styles_llm else infer_riding_style(name, full_text)
-    season_llm = llm_fields.get("season")       or []
-    seasons    = season_llm if season_llm else infer_season(name, full_text)
+    # ── Map fields (deterministic: keyword heuristics, no LLM) ───────────────
+    # The Shopify-tags override below is authoritative for supported storefronts
+    # and corrects the known keyword noise (e.g. substring "bison"/"icon").
+    brand      = infer_brand(full_text, product_url)
+    cats       = infer_categories(name, full_text)
+    gend       = infer_gender(full_text)
+    styles     = infer_riding_style(name, full_text)
+    seasons    = infer_season(name, full_text)
     waterproof = infer_waterproof(full_text)
 
     # ── Authoritative override: Shopify-backed brands have curated `tags` ────
@@ -922,11 +949,8 @@ def process_entry(entry: dict) -> dict:
         "Price":              price,
     }
 
-    # ── Description ────────────────────────────────────────────────────────
-    cats   = mapped.get("Category") or []
-    cat_str = cats[0] if cats else ""
-    desc   = write_description(name, mapped.get("Brand",""), cat_str, full_text, price,
-                               materials=mapped.get("Materials") or [])
+    # ── Description (deterministic, built from mapped fields) ────────────────
+    desc   = write_description(mapped)
     mapped["Description"]   = desc
     result["description"]   = desc
     result["vegan_verified"] = mapped["Vegan Verified"]
