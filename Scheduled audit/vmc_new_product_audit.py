@@ -485,11 +485,63 @@ def infer_season(name: str, full_text: str) -> list[str]:
     name_lc = (name or "").lower()
     return [s for s, kws in s_kw.items() if any(k in name_lc for k in kws)]
 
-def infer_vegan_status(full_text: str) -> str:
+# A maker's *structured* vegan claim is a short label, not prose. We accept a
+# label whose text is essentially just "Vegan" (optionally "100% Vegan",
+# "Vegan friendly", "Vegan construction/materials", "Vegan: Yes").
+_VEGAN_LABEL_RE = re.compile(
+    r"^\s*(100%\s*|fully\s*)?vegan"
+    r"(\s*[:\-–]?\s*(yes|✓|true|certified|approved|friendly|construction|materials?|fabric|product))?"
+    r"\s*$",
+    re.IGNORECASE,
+)
+# Tags/classes that mark an element as a label/spec/feature rather than body copy.
+_LABEL_SELECTORS = "h1,h2,h3,h4,h5,h6,dt,th,summary,strong,b,caption,figcaption"
+_LABEL_CLASS_RE = re.compile(
+    r"feature|badge|spec|attribute|tag|label|sustainab|chip|pill|highlight|icon",
+    re.IGNORECASE,
+)
+
+def maker_marks_vegan(soup) -> bool:
+    """
+    Brand-agnostic detection of a maker's explicit 'Vegan' label on the product
+    page. Looks only at label-like elements (headings, spec/feature cells,
+    definition terms, badge/sustainability nodes) so incidental prose mentions
+    (e.g. '...vegan leather alternative...') don't trigger a false positive.
+    Works whether or not the brand uses a 'Sustainability' tab like REV'IT!.
+    """
+    if soup is None:
+        return False
+    try:
+        candidates = list(soup.select(_LABEL_SELECTORS))
+        # elements whose class/id hints they are a label/spec/feature/badge
+        for el in soup.find_all(True):
+            attr = " ".join(el.get("class", []) or []) + " " + (el.get("id") or "")
+            if attr.strip() and _LABEL_CLASS_RE.search(attr):
+                candidates.append(el)
+        for el in candidates:
+            txt = el.get_text(" ", strip=True)
+            if txt and len(txt) <= 40 and _VEGAN_LABEL_RE.match(txt):
+                return True
+        # spec/definition rows: key cell 'Vegan' with an affirmative value cell
+        for dt in soup.select("dt,th"):
+            key = dt.get_text(" ", strip=True).lower().rstrip(":")
+            if key == "vegan":
+                sib = dt.find_next_sibling(["dd", "td"])
+                val = (sib.get_text(" ", strip=True).lower() if sib else "")
+                if val in ("", "yes", "✓", "true") or val.startswith("yes"):
+                    return True
+    except Exception as e:
+        log.debug(f"maker_marks_vegan parse error: {e}")
+    return False
+
+def infer_vegan_status(full_text: str, soup=None) -> str:
     """
     Cheap keyword pass first. If the signal is clean, return immediately.
     If signals conflict or are absent, defer to lib_anthropic.adjudicate_vegan.
     """
+    # First-party structured claim on the page outranks everything.
+    if maker_marks_vegan(soup):
+        return "Confirmed Vegan by maker"
     if any(k in full_text for k in ["confirmed vegan","100% vegan","certified vegan","cruelty-free confirmed"]):
         return "Confirmed Vegan by maker"
     animal_flags = ["leather","suede","wool","down","fur","sheepskin","nubuck","kangaroo","snake skin"]
@@ -866,7 +918,7 @@ def process_entry(entry: dict) -> dict:
         "Materials":          infer_materials(full_text),
         "Riding style":       styles,
         "Season":             seasons,
-        "Vegan Verified":     infer_vegan_status(full_text),
+        "Vegan Verified":     infer_vegan_status(full_text, soup),
         "Price":              price,
     }
 
