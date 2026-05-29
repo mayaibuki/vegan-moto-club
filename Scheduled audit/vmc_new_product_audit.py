@@ -119,6 +119,93 @@ TRUSTED_DOMAINS = [
     "forma-usa.com","spidi.it","rukka.fi","belstaff.com","merlinbikegear.com",
 ]
 
+# ── Shopify tag-driven field mapping (authoritative for Shopify-backed brands) ─
+# Merchant-curated `tags` from {base}/products/{handle}.json are structured data,
+# unlike rendered-page prose which carries footer/nav chrome (the "GORE-TEX
+# Gloves" cross-sell link that previously over-tagged waterproof). When a product
+# URL is on a known Shopify storefront, we trust its tags over scraped text for
+# Gender / Riding style / Level of Waterproof.
+SHOPIFY_BRAND_DOMAINS = {
+    "revitsport.com": "REV'IT!",
+}
+
+def shopify_handle(url: str) -> "str | None":
+    m = re.search(r"/products/([^/?#]+)", url or "")
+    return m.group(1) if m else None
+
+def shopify_base(url: str) -> "str | None":
+    m = re.match(r"(https?://[^/]+)", url or "")
+    if not m:
+        return None
+    host = m.group(1)
+    for dom in SHOPIFY_BRAND_DOMAINS:
+        if dom in host:
+            return host
+    return None
+
+def fetch_shopify_tags(url: str) -> "set[str] | None":
+    """Return lowercased tag set for a Shopify product URL, or None if N/A."""
+    base   = shopify_base(url)
+    handle = shopify_handle(url)
+    if not base or not handle:
+        return None
+    try:
+        r = safe_get(f"{base}/products/{handle}.json", timeout=15)
+        if not r or r.status_code != 200:
+            return None
+        tags = r.json().get("product", {}).get("tags") or []
+        if isinstance(tags, str):           # some stores return CSV string
+            tags = [t.strip() for t in tags.split(",")]
+        return {t.lower() for t in tags}
+    except Exception as e:
+        log.debug(f"shopify tag fetch failed for {url}: {e}")
+        return None
+
+def tags_map_gender(tags: set) -> list:
+    has_w = "women's" in tags or "women" in tags
+    has_m = "men's" in tags or "men" in tags
+    has_u = "unisex" in tags
+    if has_u or (has_w and has_m):
+        return ["Unisex"]
+    if has_w and not has_m:
+        return ["Women"]
+    return ["Men"]
+
+def tags_map_riding(tags: set) -> list:
+    styles = set()
+    joined = " | ".join(tags)
+    if "off-road" in joined or "offroad" in joined:
+        styles.update({"Off-roading", "Adventure / Touring"})
+    if "adventure" in joined:
+        styles.add("Adventure / Touring")
+    if "sport" in joined:
+        styles.add("Sport / Canyons")
+    if "urban" in joined:
+        styles.add("Commute / Street")
+    if "race" in joined or "racing" in joined or "track" in joined:
+        styles.add("Racing / Trackdays")
+    order = ["Off-roading","Adventure / Touring","Commute / Street",
+             "Sport / Canyons","Racing / Trackdays"]
+    return [s for s in order if s in styles]
+
+def _wp_opt(substr: str) -> "str | None":
+    for o in VALID["Level of Waterproof"]:
+        if substr.lower() in o.lower():
+            return o
+    return None
+
+def tags_map_waterproof(tags: set) -> str:
+    joined = " | ".join(tags)
+    if "gore-tex" in joined or "goretex" in joined or "gore tex" in joined:
+        return _wp_opt("gore-tex") or "Waterproof"
+    if "hydratex" in joined:
+        return _wp_opt("hydratex") or "Waterproof"
+    if "waterproof" in joined or "aquadefence" in joined or "tizip" in joined:
+        return _wp_opt("waterproof") or "Waterproof"
+    if "water resistant" in joined or "water-resistant" in joined:
+        return _wp_opt("water resistant") or "Water resistant"
+    return "Not waterproof"
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def safe_get(url: str, method="GET", timeout=15):
@@ -464,32 +551,51 @@ def get_new_entries() -> list[dict]:
     log.info(f"Found {len(results)} new entries to process")
     return results[:BATCH_LIMIT]
 
-def build_notion_props(p: dict) -> dict:
-    """Convert mapped-fields dict to Notion property update payload."""
+def notion_field_empty(existing: dict, field: str) -> bool:
+    """True if a Notion property currently holds no value. Used to make the
+    audit non-destructive: we only fill blanks, never overwrite curated data."""
+    prop = (existing or {}).get(field)
+    if not prop:                       # property not present at all
+        return True
+    kind = prop.get("type") or next((k for k in prop if k != "id"), None)
+    val  = prop.get(kind)
+    if kind in ("multi_select", "rich_text", "title", "files", "relation"):
+        return not val
+    if kind in ("select", "status", "date", "url", "number", "email"):
+        return val in (None, "", [])
+    return val in (None, "", [])
+
+def build_notion_props(p: dict, existing: "dict | None" = None) -> dict:
+    """Convert mapped-fields dict to Notion property update payload.
+
+    When `existing` (the page's current properties) is given, only fields that
+    are currently empty are written — curated/manual values are never clobbered.
+    """
+    skip = (lambda f: existing is not None and not notion_field_empty(existing, f))
     out = {}
-    if p.get("name"):
+    if p.get("name") and not skip("Name of product"):
         out["Name of product"] = {"title": [{"text": {"content": p["name"]}}]}
-    if p.get("Description"):
+    if p.get("Description") and not skip("Description"):
         out["Description"] = {"rich_text": [{"text": {"content": p["Description"][:2000]}}]}
-    if p.get("Price"):
+    if p.get("Price") and not skip("Price"):
         out["Price"] = {"number": p["Price"]}
-    if p.get("Brand"):
+    if p.get("Brand") and not skip("Brand"):
         out["Brand"] = {"select": {"name": p["Brand"]}}
-    if p.get("Category"):
+    if p.get("Category") and not skip("Category"):
         out["Category"] = {"multi_select": [{"name": c} for c in p["Category"]]}
-    if p.get("Gender"):
+    if p.get("Gender") and not skip("Gender"):
         out["Gender"] = {"multi_select": [{"name": g} for g in p["Gender"]]}
-    if p.get("Level of Protection"):
+    if p.get("Level of Protection") and not skip("Level of Protection"):
         out["Level of Protection"] = {"select": {"name": p["Level of Protection"]}}
-    if p.get("Level of Waterproof"):
+    if p.get("Level of Waterproof") and not skip("Level of Waterproof"):
         out["Level of Waterproof"] = {"select": {"name": p["Level of Waterproof"]}}
-    if p.get("Materials"):
+    if p.get("Materials") and not skip("Materials"):
         out["Materials"] = {"multi_select": [{"name": m} for m in p["Materials"]]}
-    if p.get("Riding style"):
+    if p.get("Riding style") and not skip("Riding style"):
         out["Riding style"] = {"multi_select": [{"name": s} for s in p["Riding style"]]}
-    if p.get("Season"):
+    if p.get("Season") and not skip("Season"):
         out["Season"] = {"multi_select": [{"name": s} for s in p["Season"]]}
-    if p.get("Vegan Verified"):
+    if p.get("Vegan Verified") and not skip("Vegan Verified"):
         out["Vegan Verified"] = {"select": {"name": p["Vegan Verified"]}}
     return out
 
@@ -734,6 +840,21 @@ def process_entry(entry: dict) -> dict:
     styles     = styles_llm if styles_llm else infer_riding_style(name, full_text)
     season_llm = llm_fields.get("season")       or []
     seasons    = season_llm if season_llm else infer_season(name, full_text)
+    waterproof = infer_waterproof(full_text)
+
+    # ── Authoritative override: Shopify-backed brands have curated `tags` ────
+    # Tags are structured data; they beat page-text heuristics for gender,
+    # riding style, and waterproofing (and pin the brand, avoiding the noisy
+    # substring "icon"/"bison" mislabels). Only applied when tags are present.
+    sp_tags = fetch_shopify_tags(product_url)
+    if sp_tags:
+        brand      = SHOPIFY_BRAND_DOMAINS.get(shopify_base(product_url).split("//")[-1], brand) \
+                     if shopify_base(product_url) else brand
+        gend       = tags_map_gender(sp_tags)
+        styles     = tags_map_riding(sp_tags) or styles
+        waterproof = tags_map_waterproof(sp_tags)
+        log.info(f"Shopify tags applied for {name}: gender={gend} "
+                 f"styles={styles} waterproof={waterproof}")
 
     mapped = {
         "name":               name,
@@ -741,7 +862,7 @@ def process_entry(entry: dict) -> dict:
         "Category":           cats,
         "Gender":             gend,
         "Level of Protection": infer_protection(full_text),
-        "Level of Waterproof": infer_waterproof(full_text),
+        "Level of Waterproof": waterproof,
         "Materials":          infer_materials(full_text),
         "Riding style":       styles,
         "Season":             seasons,
@@ -758,8 +879,8 @@ def process_entry(entry: dict) -> dict:
     result["description"]   = desc
     result["vegan_verified"] = mapped["Vegan Verified"]
 
-    # ── Write to Notion ────────────────────────────────────────────────────
-    notion_props = build_notion_props(mapped)
+    # ── Write to Notion (non-destructive: only fill currently-empty fields) ──
+    notion_props = build_notion_props(mapped, existing=props)
     try:
         notion.pages.update(page_id=page_id, properties=notion_props)
         upload_photos_to_notion(page_id, saved_urls)
