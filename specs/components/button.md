@@ -41,13 +41,14 @@ Primary interactive element for user actions. Uses Radix `Slot` for `asChild` co
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `variant` | `"default" \| "destructive" \| "outline" \| "secondary" \| "ghost" \| "link"` | `"default"` | Visual style |
-| `size` | `"default" \| "sm" \| "lg" \| "icon"` | `"default"` | Size preset |
+| `size` | `"default" \| "xs" \| "sm" \| "lg" \| "icon"` | `"default"` | Size preset |
 | `asChild` | `boolean` | `false` | Render as child element (e.g., `<Link>`) |
 
 ## Sizes
 
 | Size | Height | Padding | Font |
 |------|--------|---------|------|
+| `xs` | `h-8` (32px) | `px-3` | `text-xs` |
 | `sm` | `h-10` (40px) | `px-5` | `text-sm` |
 | `default` | `h-11` (44px) | `px-6 py-2.5` | `text-sm` |
 | `lg` | `h-12` (48px) | `px-8` | `text-base` |
