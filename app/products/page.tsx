@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import dynamic from "next/dynamic"
 import { getProducts } from "@/lib/notion"
+import { PromoBanner } from "@/components/PromoBanner"
 
 const ProductGrid = dynamic(() => import("@/components/ProductGrid").then(m => m.ProductGrid), { ssr: false })
 
@@ -27,6 +28,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="space-y-10">
+      <PromoBanner />
       <div className="space-y-2">
         <h1 className="text-3xl md:text-4xl font-bold">Vegan Motorcycle Gear</h1>
         <p className="text-lg text-muted-foreground">

@@ -11,6 +11,7 @@ import { formatRelativeDate } from "@/lib/utils"
 import { SITE_URL } from "@/lib/constants"
 import { Check } from "lucide-react"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
+import { PromoBanner } from "@/components/PromoBanner"
 
 export const revalidate = 3600
 
@@ -99,6 +100,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="space-y-16">
+        <PromoBanner />
         {/* Hero Section */}
       <section className="overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-stretch">
