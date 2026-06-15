@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     const resized = await sharp(upstreamBytes)
       .rotate()
       .resize({ width, withoutEnlargement: true })
-      .webp({ quality: 80 })
+      .webp({ quality: 80, effort: 2 })
       .toBuffer()
 
     return new NextResponse(new Uint8Array(resized), {
