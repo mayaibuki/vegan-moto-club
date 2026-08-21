@@ -77,6 +77,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    types: {
+      "application/rss+xml": [{ url: "/feed.xml", title: "Vegan Moto Club: New Gear" }],
+    },
   },
 }
 
@@ -130,7 +133,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <div className="min-h-screen flex flex-col bg-stone-50 dark:bg-stone-950">
+        <div className="min-h-screen flex flex-col bg-background">
           <Navbar />
           <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 py-8" tabIndex={-1}>
             {children}

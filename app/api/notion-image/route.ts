@@ -48,10 +48,15 @@ export async function GET(request: NextRequest) {
 
   const upstreamBytes = Buffer.from(await upstream.arrayBuffer())
 
+  // Browsers cache for 31 days via max-age; s-maxage additionally lets
+  // Vercel's edge CDN cache the response, so the Notion lookup + sharp
+  // re-encode runs once per image per month instead of once per visitor.
+  const cacheControl =
+    "public, max-age=2678400, s-maxage=2678400, stale-while-revalidate=86400"
+
   // When ?w= is supplied (and matches an allowed width), resize and re-encode
   // as WebP server-side. The downstream <Image> uses unoptimized so Vercel's
   // image optimizer is bypassed entirely — zero transformations consumed.
-  // Result is cached for 31 days, keyed on the full URL incl. width.
   if (width) {
     const resized = await sharp(upstreamBytes)
       .rotate()
@@ -62,7 +67,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse(new Uint8Array(resized), {
       headers: {
         "Content-Type": "image/webp",
-        "Cache-Control": "public, max-age=2678400, stale-while-revalidate=86400",
+        "Cache-Control": cacheControl,
       },
     })
   }
@@ -71,7 +76,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(new Uint8Array(upstreamBytes), {
     headers: {
       "Content-Type": contentType,
-      "Cache-Control": "public, max-age=2678400, stale-while-revalidate=86400",
+      "Cache-Control": cacheControl,
     },
   })
 }

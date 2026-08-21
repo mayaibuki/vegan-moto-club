@@ -71,8 +71,9 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 ## Remaining TODOs
 
 - [ ] Add donations section (Venmo / PayPal.me link — no complex checkout)
-- [ ] Manual color contrast check (muted-foreground on backgrounds — near WCAG AA threshold)
-- [ ] Add actual `/public/og-image.png` for OpenGraph previews
+- [ ] Newsletter (Buttondown) hooked to the new `/feed.xml` RSS feed
+- [ ] Move user suggestions out of the products DB (own DB or Status property; currently filtered out by name prefix in `lib/notion.ts`)
+- [ ] Decide canonical host (apex vs www) and align `NEXT_PUBLIC_SITE_URL` + Vercel domain redirect
 - [ ] Configure ESLint (not yet set up — `npm run lint` prompts for config)
 - [ ] Discord → Notion event sync (GitHub Action polling Discord API)
 - [ ] Product audit LLM upgrade (replace keyword matching with LLM extraction)
@@ -91,3 +92,12 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [x] Native suggestion forms (product + event)
 - [x] Design system tokenization + audit script
 - [x] Event card redesign (Figma spec)
+- [x] Color contrast fix (light-mode muted-foreground now WCAG AA, stone-600 primitive)
+- [x] Notion fetch resilience (retries, no caching of failures — fixes empty-catalog outages)
+- [x] Edge-cache image proxy responses (s-maxage — sharp runs once per image, not per visitor)
+- [x] Server-rendered product grid + price/protection/season/waterproof filters, sort, search synonyms
+- [x] Branded 404 + root error boundary
+- [x] Static category landing pages (`app/[category]/page.tsx`, config in `lib/constants.ts` CATEGORY_PAGES)
+- [x] "How we verify" page (`/verification`), product badges link to it
+- [x] RSS feed of newly added products (`/feed.xml`)
+- [x] OG image (`/public/og-image.png`, generator script pattern: sharp + SVG)

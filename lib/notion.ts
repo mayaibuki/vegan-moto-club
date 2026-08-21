@@ -4,6 +4,9 @@ import { generateSlug } from "./utils";
 
 export const notion = new Client({
   auth: process.env.NOTION_API_KEY,
+  // Fail fast instead of the 60s default — a healthy query answers in
+  // seconds, and slow requests burn billed CPU time. Retries handle the rest.
+  timeoutMs: 15_000,
 });
 
 const REVALIDATE_TIME = process.env.NODE_ENV === "production" ? 3600 : 60;
@@ -13,6 +16,7 @@ const REVALIDATE_TIME = process.env.NODE_ENV === "production" ? 3600 : 60;
 export interface Product {
   id: string;
   slug: string;
+  createdTime: string;
   name: string;
   brand: string;
   category: string;
@@ -83,6 +87,7 @@ interface NotionPageProperties {
 
 interface NotionPage {
   id: string
+  created_time: string
   last_edited_time: string
   properties: NotionPageProperties
 }
@@ -111,24 +116,41 @@ function resolveFileUrl(
   return file.external?.url ?? "";
 }
 
-/** Generic Notion database pagination — returns all pages matching the query. */
-async function paginateDatabase(
-  databaseId: string,
-  filter: Record<string, unknown>,
-  sorts: Record<string, unknown>[]
-): Promise<NotionPage[]> {
+/** Retry transient Notion failures (timeouts, 429s, 5xx) with a short backoff. */
+async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+      }
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Generic Notion database pagination — returns every page in the database.
+ * Deliberately unfiltered and unsorted: property filters/sorts make Notion's
+ * query slower and couple us to property names, and the large products DB was
+ * timing out on them. Callers filter and sort in JS instead.
+ */
+async function paginateDatabase(databaseId: string): Promise<NotionPage[]> {
   const allResults: NotionPage[] = [];
   let hasMore = true;
   let startCursor: string | undefined = undefined;
 
   while (hasMore) {
-    const response = await notion.databases.query({
-      database_id: databaseId,
-      filter,
-      sorts,
-      start_cursor: startCursor,
-      page_size: 100,
-    } as Parameters<typeof notion.databases.query>[0]);
+    const response = await withRetry(() =>
+      notion.databases.query({
+        database_id: databaseId,
+        start_cursor: startCursor,
+        page_size: 50,
+      })
+    );
 
     allResults.push(...(response.results as NotionPage[]));
     hasMore = response.has_more;
@@ -147,6 +169,7 @@ function mapNotionPageToProduct(page: NotionPage): Product {
   return {
     id: page.id,
     slug: generateSlug(name),
+    createdTime: page.created_time,
     lastEditedTime: page.last_edited_time,
     name,
     brand: properties.Brand?.select?.name || "",
@@ -182,41 +205,55 @@ function mapNotionPageToBlogPost(page: NotionPage): BlogPost {
 
 // ─── Products ────────────────────────────────────────────────────
 
+// Fetchers deliberately do NOT catch errors: a throw inside unstable_cache
+// leaves the last good value in place, whereas returning [] would cache an
+// empty catalog for the full revalidate window. The exported wrappers catch
+// per-request so pages degrade gracefully without poisoning the cache.
+
 async function fetchProductsFromNotion(): Promise<Product[]> {
+  const pages = await paginateDatabase(process.env.NOTION_PRODUCTS_DB_ID!);
+  return pages
+    .map(mapNotionPageToProduct)
+    // Rows created by the suggestion form live in the same database until
+    // they're reviewed — keep them out of the public catalog and sitemap.
+    .filter((product) => product.name !== "" && !product.name.startsWith("User Suggestion -"))
+    .sort((a, b) => b.lastEditedTime.localeCompare(a.lastEditedTime));
+}
+
+const getProductsCached = unstable_cache(
+  fetchProductsFromNotion,
+  ["products"],
+  { revalidate: REVALIDATE_TIME, tags: ["products"] }
+);
+
+export async function getProducts(): Promise<Product[]> {
   try {
-    const pages = await paginateDatabase(
-      process.env.NOTION_PRODUCTS_DB_ID!,
-      { property: "Name of product", title: { is_not_empty: true } },
-      [{ timestamp: "last_edited_time", direction: "descending" }]
-    );
-    return pages.map(mapNotionPageToProduct);
+    return await getProductsCached();
   } catch (error) {
     console.error("[Notion] Failed to fetch products:", error);
     return [];
   }
 }
 
-export const getProducts = unstable_cache(
-  fetchProductsFromNotion,
-  ["products"],
+async function fetchProductFromNotion(id: string): Promise<Product | null> {
+  const page = await withRetry(() => notion.pages.retrieve({ page_id: id }));
+  return mapNotionPageToProduct(page as NotionPage);
+}
+
+const getProductCached = unstable_cache(
+  fetchProductFromNotion,
+  ["product"],
   { revalidate: REVALIDATE_TIME, tags: ["products"] }
 );
 
-async function fetchProductFromNotion(id: string): Promise<Product | null> {
+export async function getProduct(id: string): Promise<Product | null> {
   try {
-    const page = await notion.pages.retrieve({ page_id: id });
-    return mapNotionPageToProduct(page as NotionPage);
+    return await getProductCached(id);
   } catch (error) {
     console.error("[Notion] Failed to fetch product:", error);
     return null;
   }
 }
-
-export const getProduct = unstable_cache(
-  fetchProductFromNotion,
-  ["product"],
-  { revalidate: REVALIDATE_TIME, tags: ["products"] }
-);
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const products = await getProducts();
@@ -226,14 +263,10 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 // ─── Events ──────────────────────────────────────────────────────
 
 async function fetchEventsFromNotion(): Promise<Event[]> {
-  try {
-    const pages = await paginateDatabase(
-      process.env.NOTION_EVENTS_DB_ID!,
-      { property: "Name of event", title: { is_not_empty: true } },
-      [{ property: "Date", direction: "ascending" }]
-    );
+  const pages = await paginateDatabase(process.env.NOTION_EVENTS_DB_ID!);
 
-    return pages.map((page: NotionPage) => {
+  return pages
+    .map((page: NotionPage) => {
       const properties = page.properties;
       const dateRange = properties.Date?.date;
       const priceNumber = properties.Price?.number;
@@ -249,53 +282,67 @@ async function fetchEventsFromNotion(): Promise<Event[]> {
         price: priceNumber ? `$${priceNumber.toFixed(2)}` : "Free",
         poster: resolveFileUrl(page.id, properties["Event poster"]?.files?.[0] as NotionFile | undefined, "Event poster", 0),
       };
-    });
+    })
+    .filter((event) => event.name !== "")
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+}
+
+const getEventsCached = unstable_cache(
+  fetchEventsFromNotion,
+  ["events"],
+  { revalidate: REVALIDATE_TIME, tags: ["events"] }
+);
+
+export async function getEvents(): Promise<Event[]> {
+  try {
+    return await getEventsCached();
   } catch (error) {
     console.error("[Notion] Failed to fetch events:", error);
     return [];
   }
 }
 
-export const getEvents = unstable_cache(
-  fetchEventsFromNotion,
-  ["events"],
-  { revalidate: REVALIDATE_TIME, tags: ["events"] }
-);
-
 // ─── Blog ────────────────────────────────────────────────────────
 
 async function fetchBlogPostsFromNotion(): Promise<BlogPost[]> {
+  const pages = await paginateDatabase(process.env.NOTION_BLOG_DB_ID!);
+  return pages
+    .map(mapNotionPageToBlogPost)
+    .filter((post) => post.title !== "")
+    .sort((a, b) => b.publishDate.localeCompare(a.publishDate));
+}
+
+const getBlogPostsCached = unstable_cache(
+  fetchBlogPostsFromNotion,
+  ["blog-posts"],
+  { revalidate: REVALIDATE_TIME, tags: ["blog"] }
+);
+
+export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    const pages = await paginateDatabase(
-      process.env.NOTION_BLOG_DB_ID!,
-      { property: "Name", title: { is_not_empty: true } },
-      [{ property: "Date", direction: "descending" }]
-    );
-    return pages.map(mapNotionPageToBlogPost);
+    return await getBlogPostsCached();
   } catch (error) {
     console.error("[Notion] Failed to fetch blog posts:", error);
     return [];
   }
 }
 
-export const getBlogPosts = unstable_cache(
-  fetchBlogPostsFromNotion,
-  ["blog-posts"],
+async function fetchBlogPostFromNotion(id: string): Promise<BlogPost | null> {
+  const page = await withRetry(() => notion.pages.retrieve({ page_id: id }));
+  return mapNotionPageToBlogPost(page as NotionPage);
+}
+
+const getBlogPostCached = unstable_cache(
+  fetchBlogPostFromNotion,
+  ["blog-post"],
   { revalidate: REVALIDATE_TIME, tags: ["blog"] }
 );
 
-async function fetchBlogPostFromNotion(id: string): Promise<BlogPost | null> {
+export async function getBlogPost(id: string): Promise<BlogPost | null> {
   try {
-    const page = await notion.pages.retrieve({ page_id: id });
-    return mapNotionPageToBlogPost(page as NotionPage);
+    return await getBlogPostCached(id);
   } catch (error) {
     console.error("[Notion] Failed to fetch blog post:", error);
     return null;
   }
 }
-
-export const getBlogPost = unstable_cache(
-  fetchBlogPostFromNotion,
-  ["blog-post"],
-  { revalidate: REVALIDATE_TIME, tags: ["blog"] }
-);

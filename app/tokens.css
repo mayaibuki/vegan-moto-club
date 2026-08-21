@@ -24,6 +24,7 @@
   --ds-stone-300: 12 5.4% 84%;
   --ds-stone-400: 12 4.9% 64%;
   --ds-stone-500: 12 6.5% 51.5%;
+  --ds-stone-600: 12 6.5% 44%; /* darkest "muted" that clears WCAG AA (4.9:1 on white, 4.65:1 on stone-100) */
   --ds-stone-800: 12 6.3% 18.8%;
   --ds-stone-900: 12 8.7% 11.8%;
   --ds-stone-950: 12 8.3% 7.2%;
@@ -139,7 +140,7 @@
   --color-bg-inverse:      var(--ds-stone-950, 12 8.3% 7.2%);
 
   --color-text:            var(--ds-stone-900, 12 8.7% 11.8%);
-  --color-text-muted:      var(--ds-stone-500, 12 6.5% 51.5%);
+  --color-text-muted:      var(--ds-stone-600, 12 6.5% 44%);
   --color-text-inverse:    var(--ds-stone-50, 0 0% 98%);
   --color-text-on-primary: var(--ds-stone-950, 12 8.3% 7.2%);
 
