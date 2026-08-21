@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { formatPrice, notionImageUrl } from "@/lib/utils"
+import { formatPrice, notionImageUrl, splitCategories } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
@@ -79,6 +79,8 @@ export default async function ProductDetailPage({
     notFound()
   }
 
+  const primaryCategory = splitCategories(product.category)[0]
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -118,7 +120,6 @@ export default async function ProductDetailPage({
       "@type": "Offer",
       price: product.price,
       priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
       url: product.url || `${SITE_URL}/products/${product.slug}`,
     },
     category: product.category,
@@ -152,7 +153,11 @@ export default async function ProductDetailPage({
         items={[
           { label: "Home", href: "/" },
           { label: "Products", href: "/products" },
-          { label: product.category, href: `/products?category=${encodeURIComponent(product.category)}` },
+          // First category only: the joined multi-select string ("Jackets,
+          // Protection") isn't a valid category filter value
+          ...(primaryCategory
+            ? [{ label: primaryCategory, href: `/products?category=${encodeURIComponent(primaryCategory)}` }]
+            : []),
           { label: product.name },
         ]}
       />
@@ -262,19 +267,27 @@ export default async function ProductDetailPage({
                 </Badge>
               )}
               {product.veganVerified && (
-                <Badge
+                <Link
+                  href="/verification"
                   role="listitem"
-                  variant={
-                    product.veganVerified === "Verified Vegan by Us" ||
-                    product.veganVerified === "Confirmed Vegan by maker"
-                      ? "default"
-                      : product.veganVerified === "Verified Vegan by AI"
-                      ? "outline"
-                      : "destructive"
-                  }
+                  aria-label={`${product.veganVerified} — learn how we verify vegan gear`}
+                  className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <span aria-hidden="true">✓</span> {product.veganVerified}
-                </Badge>
+                  <Badge
+                    variant={
+                      // Notion value is lowercase "us" — matching "Us" made
+                      // our own strongest tier render as a red warning badge
+                      product.veganVerified === "Verified Vegan by us" ||
+                      product.veganVerified === "Confirmed Vegan by maker"
+                        ? "default"
+                        : product.veganVerified === "Verified Vegan by AI"
+                        ? "outline"
+                        : "destructive"
+                    }
+                  >
+                    <span aria-hidden="true">✓</span> {product.veganVerified}
+                  </Badge>
+                </Link>
               )}
             </div>
           </div>

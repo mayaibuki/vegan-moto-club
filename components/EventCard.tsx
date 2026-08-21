@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { Event } from "@/lib/notion"
-import { cn, formatEventDay, formatEventMonth, isSameEventDay, notionImageUrl } from "@/lib/utils"
+import { cn, formatDate, formatEventDay, formatEventMonth, isSameEventDay, notionImageUrl } from "@/lib/utils"
 
 interface EventCardProps {
   event: Event
@@ -60,8 +60,8 @@ export function EventCard({ event, muted = false }: EventCardProps) {
               )}
               <span className="sr-only">
                 {multiDay
-                  ? `From ${event.startDate} to ${event.endDate}`
-                  : `On ${event.startDate}`}
+                  ? `From ${formatDate(event.startDate)} to ${formatDate(event.endDate)}`
+                  : `On ${formatDate(event.startDate)}`}
               </span>
             </div>
 

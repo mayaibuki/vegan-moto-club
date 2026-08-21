@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 import { getProducts, getBlogPosts } from "@/lib/notion"
-import { SITE_URL } from "@/lib/constants"
+import { SITE_URL, CATEGORY_PAGES } from "@/lib/constants"
 const STATIC_LAST_MODIFIED = new Date("2026-02-07")
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -36,22 +36,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${SITE_URL}/verification`,
+      lastModified: STATIC_LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
   ]
 
-  // Category filter pages (indexable filtered views)
-  const categories = ["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"]
-  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
-    url: `${SITE_URL}/products?category=${encodeURIComponent(cat)}`,
+  // Static category landing pages (real server-rendered pages, not
+  // query-param views of /products)
+  const categoryPages: MetadataRoute.Sitemap = CATEGORY_PAGES.map((page) => ({
+    url: `${SITE_URL}/${page.slug}`,
     lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }))
 
-  // Dynamic product pages
+  // Dynamic product pages — real lastModified so crawlers can prioritize
+  // actual changes instead of seeing every URL "modified" on every build
   const products = await getProducts()
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${SITE_URL}/products/${product.slug}`,
-    lastModified: new Date(),
+    lastModified: product.lastEditedTime ? new Date(product.lastEditedTime) : new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }))

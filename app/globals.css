@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;                 /* White */
     --popover-foreground: 12 8.7% 11.8%;  /* stone-900 */
     --muted: 12 6.5% 97.5%;               /* stone-100 */
-    --muted-foreground: 12 6.5% 51.5%;    /* stone-500 */
+    --muted-foreground: 12 6.5% 44%;      /* stone-600 — stone-500 fails WCAG AA on white (3.9:1) */
 
     /* Primary: Lime green */
     --primary: 77.9 54.4% 47.4%;          /* lime-500 */

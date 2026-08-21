@@ -21,9 +21,19 @@ export function formatPrice(price: number): string {
   return price % 1 === 0 ? `$${price}` : `$${price.toFixed(2)}`
 }
 
+/**
+ * The first 10 chars of a Notion date string are the wall-clock date in the
+ * event's own timezone, for both date-only and datetime-with-offset values.
+ * Formatting that part avoids UTC-conversion day shifts (a 5pm PDT end time
+ * is already midnight UTC the next day).
+ */
+function localDatePart(dateString: string): string {
+  return dateString.slice(0, 10)
+}
+
 export function formatDate(dateString: string): string {
   if (!dateString) return ""
-  const date = new Date(dateString)
+  const date = new Date(localDatePart(dateString))
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -35,21 +45,17 @@ export function formatDate(dateString: string): string {
 export function isSameEventDay(start: string, end: string): boolean {
   if (!start) return true
   if (!end || end === start) return true
-  const d1 = new Date(start)
-  const d2 = new Date(end)
-  return d1.getUTCFullYear() === d2.getUTCFullYear() &&
-    d1.getUTCMonth() === d2.getUTCMonth() &&
-    d1.getUTCDate() === d2.getUTCDate()
+  return localDatePart(start) === localDatePart(end)
 }
 
 export function formatEventMonth(dateString: string): string {
   if (!dateString) return ""
-  return new Date(dateString).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })
+  return new Date(localDatePart(dateString)).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })
 }
 
 export function formatEventDay(dateString: string): string {
   if (!dateString) return ""
-  return String(new Date(dateString).getUTCDate())
+  return String(new Date(localDatePart(dateString)).getUTCDate())
 }
 
 export function formatRelativeDate(dateString: string): string {
@@ -71,31 +77,66 @@ export function formatRelativeDate(dateString: string): string {
   return `${Math.floor(diffDays / 30)} months ago`
 }
 
-export function filterProducts(
-  products: Product[],
-  filters: {
-    brand?: string
-    category?: string
-    genders?: string[]
-    ridingStyles?: string[]
-    search?: string
-  }
-): Product[] {
+export interface ProductFilters {
+  brand?: string
+  category?: string
+  genders?: string[]
+  ridingStyles?: string[]
+  protectionLevels?: string[]
+  seasons?: string[]
+  waterproofLevels?: string[]
+  priceMin?: number
+  priceMax?: number
+  search?: string
+}
+
+/** Terms riders type that the catalog spells differently. */
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  trousers: ["pants"],
+  pants: ["trousers"],
+  adv: ["adventure"],
+  mc: ["motorcycle"],
+  waterproof: ["water resistant"],
+}
+
+export function splitCategories(category: string): string[] {
+  return category.split(",").map((c) => c.trim()).filter(Boolean)
+}
+
+export function filterProducts(products: Product[], filters: ProductFilters): Product[] {
   return products.filter((product) => {
     if (filters.search) {
-      const searchLower = filters.search.toLowerCase()
-      if (
-        !product.name.toLowerCase().includes(searchLower) &&
-        !product.brand.toLowerCase().includes(searchLower)
-      ) {
-        return false
-      }
+      const haystack = [
+        product.name,
+        product.brand,
+        product.description,
+        product.category,
+        product.materials.join(" "),
+        product.season.join(" "),
+        product.waterproofLevel,
+        product.ridingStyle.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase()
+      // Every word the rider typed must match somewhere (directly or via synonym)
+      const terms = filters.search.toLowerCase().split(/\s+/).filter(Boolean)
+      const allTermsMatch = terms.every((term) =>
+        [term, ...(SEARCH_SYNONYMS[term] || [])].some((t) => haystack.includes(t))
+      )
+      if (!allTermsMatch) return false
     }
     if (filters.brand && product.brand !== filters.brand) {
       return false
     }
-    if (filters.category && product.category !== filters.category) {
-      return false
+    if (filters.category) {
+      // category is a joined multi-select string ("Jackets, Protection") —
+      // match individual values so multi-category products stay findable
+      if (
+        product.category !== filters.category &&
+        !splitCategories(product.category).includes(filters.category)
+      ) {
+        return false
+      }
     }
     if (filters.genders && filters.genders.length > 0) {
       if (!filters.genders.some(g => product.gender.includes(g))) {
@@ -107,8 +148,44 @@ export function filterProducts(
         return false
       }
     }
+    if (filters.protectionLevels && filters.protectionLevels.length > 0) {
+      if (!filters.protectionLevels.includes(product.levelOfProtection)) {
+        return false
+      }
+    }
+    if (filters.seasons && filters.seasons.length > 0) {
+      if (!filters.seasons.some(s => product.season.includes(s))) {
+        return false
+      }
+    }
+    if (filters.waterproofLevels && filters.waterproofLevels.length > 0) {
+      if (!filters.waterproofLevels.includes(product.waterproofLevel)) {
+        return false
+      }
+    }
+    if (filters.priceMin !== undefined && product.price < filters.priceMin) {
+      return false
+    }
+    if (filters.priceMax !== undefined && product.price > filters.priceMax) {
+      return false
+    }
     return true
   })
+}
+
+/** Sorted unique non-empty values of a product field (string or string[]). */
+export function getUniqueValues(
+  products: Product[],
+  get: (product: Product) => string | string[]
+): string[] {
+  const values = new Set<string>()
+  for (const product of products) {
+    const value = get(product)
+    for (const v of Array.isArray(value) ? value : [value]) {
+      if (v) values.add(v)
+    }
+  }
+  return Array.from(values).sort()
 }
 
 export function generateSlug(name: string): string {
