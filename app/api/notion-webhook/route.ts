@@ -79,11 +79,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "no page id in payload" }, { status: 400 });
   }
 
+  // Always acknowledge with 200 once the event is verified. Notion pauses the
+  // subscription after sustained non-2xx responses, and a failed GitHub
+  // dispatch is our problem, not a delivery problem. The weekly cron in
+  // product-audit.yml picks up anything missed here.
   try {
     await dispatchWorkflow(pageId);
   } catch (e) {
     console.error("dispatchWorkflow failed", e);
-    return NextResponse.json({ error: String(e) }, { status: 502 });
+    return NextResponse.json({ ok: true, dispatched: false, error: String(e) });
   }
   return NextResponse.json({ ok: true, dispatched: pageId });
 }
