@@ -101,3 +101,4 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [x] "How we verify" page (`/verification`), product badges link to it
 - [x] RSS feed of newly added products (`/feed.xml`)
 - [x] OG image (`/public/og-image.png`, generator script pattern: sharp + SVG)
+- [x] Store link + price audit pipeline (`Scheduled audit/link_check/`, see its README)
