@@ -18,7 +18,7 @@ Site-wide footer with brand info, navigation links, and social links.
   └─ [container]                   — max-w-7xl, px-6 py-10
        ├─ [3-column grid]          — md:grid-cols-3, gap-10, mb-10
        │    ├─ [Brand]             — Logo (sm), name, tagline
-       │    ├─ [Nav]               — Products, Events, Blog, About
+       │    ├─ [Nav]               — Products, Events, About
        │    └─ [Connect]           — Discord, Instagram (external)
        └─ [Copyright bar]          — border-t, pt-8, text-center
 ```
