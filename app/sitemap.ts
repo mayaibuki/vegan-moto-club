@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next"
-import { getProducts, getBlogPosts } from "@/lib/notion"
+import { getProducts } from "@/lib/notion"
 import { SITE_URL, CATEGORY_PAGES } from "@/lib/constants"
 const STATIC_LAST_MODIFIED = new Date("2026-02-07")
 
@@ -20,12 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${SITE_URL}/events`,
-      lastModified: STATIC_LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/blog`,
       lastModified: STATIC_LAST_MODIFIED,
       changeFrequency: "weekly",
       priority: 0.8,
@@ -63,14 +57,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  // Dynamic blog pages
-  const blogPosts = await getBlogPosts()
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${SITE_URL}/blog/${post.id}`,
-    lastModified: post.publishDate ? new Date(post.publishDate) : new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }))
-
-  return [...staticPages, ...categoryPages, ...productPages, ...blogPages]
+  return [...staticPages, ...categoryPages, ...productPages]
 }

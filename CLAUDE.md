@@ -22,7 +22,7 @@ npm run start    # Serve production build
 app/               Server components (pages, layouts)
   products/        Product listing + [id] detail pages
   events/          Events listing
-  blog/            Blog listing + [id] detail pages
+  _blog/           Blog listing + [id] detail (hidden: `_` = private folder, not routed; rename to `blog/` to restore)
   about/           Static about page
 components/        React components
   ui/              shadcn/ui primitives (Button, Card, Badge, etc.)
