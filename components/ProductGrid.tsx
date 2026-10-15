@@ -440,6 +440,7 @@ export function ProductGrid({ products }: ProductGridProps) {
         </aside>
 
         <section className="flex-1 scroll-mt-24 focus:outline-none" aria-label="Product results" ref={resultsRef} tabIndex={-1}>
+          <h2 className="sr-only">Products</h2>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
               Showing <span className="font-semibold text-foreground tabular-nums">
@@ -551,7 +552,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       resetPage()
                     }}
                   >
-                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`${rowsPerPage} rows per page`}>
+                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`Products per page, currently ${rowsPerPage}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

@@ -231,10 +231,9 @@ export default async function ProductDetailPage({
 
           <div>
             <p className="text-sm text-muted-foreground font-medium mb-2">Specs</p>
-            <div className="flex flex-wrap gap-2" role="list" aria-label="Product specifications">
+            <ul className="flex flex-wrap gap-2 list-none" role="list" aria-label="Product specifications">
               {product.levelOfProtection && (
-                <Badge
-                  role="listitem"
+                <li><Badge
                   variant={
                     product.levelOfProtection === "Most protective" ||
                     product.levelOfProtection === "Highly protective"
@@ -247,16 +246,15 @@ export default async function ProductDetailPage({
                   }
                 >
                   {product.levelOfProtection}
-                </Badge>
+                </Badge></li>
               )}
               {product.season.map((s) => (
-                <Badge key={s} variant="outline" role="listitem">
+                <li key={s}><Badge variant="outline">
                   <span aria-hidden="true">{seasonEmojis[s] || ""}</span> {s}
-                </Badge>
+                </Badge></li>
               ))}
               {product.waterproofLevel && (
-                <Badge
-                  role="listitem"
+                <li><Badge
                   variant={
                     product.waterproofLevel === "Water resistant" ||
                     product.waterproofLevel === "Not waterproof"
@@ -265,13 +263,12 @@ export default async function ProductDetailPage({
                   }
                 >
                   {product.waterproofLevel}
-                </Badge>
+                </Badge></li>
               )}
               {product.veganVerified && (
-                <Link
+                <li><Link
                   href="/verification"
-                  role="listitem"
-                  aria-label={`${product.veganVerified} — learn how we verify vegan gear`}
+                  aria-label={`${product.veganVerified}, learn how we verify vegan gear`}
                   className="focus-ring rounded-full"
                 >
                   <Badge
@@ -288,9 +285,9 @@ export default async function ProductDetailPage({
                   >
                     <span aria-hidden="true">✓</span> {product.veganVerified}
                   </Badge>
-                </Link>
+                </Link></li>
               )}
-            </div>
+            </ul>
           </div>
 
           {product.ridingStyle.length > 0 && (
