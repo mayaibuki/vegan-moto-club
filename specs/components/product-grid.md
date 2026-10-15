@@ -120,3 +120,12 @@ const products = await getProducts()
 - **Checkbox**: `specs/components/checkbox.md` — multi-select filters
 - **RadioGroup**: `specs/components/radio-group.md` — single-select filters
 - **Tokens**: `specs/tokens/token-reference.md`
+
+## Sort control and category pages
+
+`components/SortSelect.tsx` holds `SORT_OPTIONS`, `sortProducts()` and `<SortSelect>` ("Sort by" label plus a 44px select). ProductGrid and the category landing pages share it.
+
+Category landing pages (`app/[category]/page.tsx`) render, above the grid:
+
+- A category switcher `<nav aria-label="Gear categories">`: every category as a 44px chip (`inline-flex h-11 rounded-full border border-border bg-card px-4 text-sm hover:bg-muted`). The current page has `aria-current="page"` and fills `bg-primary text-primary-foreground`. Below md the row scrolls sideways (`no-scrollbar overflow-x-auto snap-x`, bleeding to the screen edge with `-mx-4 px-4 sm:-mx-6 sm:px-6`); from md it wraps.
+- `CategoryProductList` (client): the product count, a "More filters" outline button to `/products?category=…`, the Sort by select (client-side, not saved to the URL) and the card grid (`gap-4 sm:gap-6`).

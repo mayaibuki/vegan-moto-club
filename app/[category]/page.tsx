@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import { getProducts } from "@/lib/notion"
 import { splitCategories } from "@/lib/utils"
 import { CATEGORY_PAGES, SITE_URL } from "@/lib/constants"
-import { ProductCard } from "@/components/ProductCard"
+import { CategoryProductList } from "@/components/CategoryProductList"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { Button } from "@/components/ui/button"
 
@@ -45,7 +45,6 @@ export default async function CategoryLandingPage({
   const products = allProducts.filter((product) =>
     splitCategories(product.category).includes(page.category)
   )
-  const otherCategories = CATEGORY_PAGES.filter((p) => p.slug !== page.slug)
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -101,19 +100,32 @@ export default async function CategoryLandingPage({
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <p className="text-sm font-medium text-foreground">
-            <span className="tabular-nums">{products.length}</span>{" "}
-            {products.length === 1 ? "product" : "products"} in this category
-          </p>
-          <Button variant="outline" size="sm" asChild>
+        {/* Category switcher: scrolls sideways on phones, wraps from md */}
+        <nav aria-label="Gear categories">
+          <ul className="no-scrollbar flex gap-2 overflow-x-auto -mx-4 px-4 scroll-px-4 snap-x sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:flex-wrap md:overflow-visible">
+            {CATEGORY_PAGES.map((cat) => (
+              <li key={cat.slug} className="snap-start shrink-0">
+                <Link
+                  href={`/${cat.slug}`}
+                  aria-current={cat.slug === page.slug ? "page" : undefined}
+                  className="inline-flex h-11 items-center rounded-full border border-border bg-card px-4 text-sm transition-colors duration-150 hover:bg-muted focus-ring aria-[current=page]:border-primary aria-[current=page]:bg-primary aria-[current=page]:font-semibold aria-[current=page]:text-primary-foreground"
+                >
+                  {cat.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <CategoryProductList products={products}>
+          <Button variant="outline" asChild>
             <Link href={`/products?category=${encodeURIComponent(page.category)}`}>
-              Filter &amp; sort these products
+              More filters
             </Link>
           </Button>
-        </div>
+        </CategoryProductList>
 
-        {products.length === 0 ? (
+        {products.length === 0 && (
           <p className="text-muted-foreground py-8">
             No products in this category right now. Check back soon, or{" "}
             <Link href="/products" className="underline hover:text-foreground">
@@ -121,32 +133,7 @@ export default async function CategoryLandingPage({
             </Link>
             .
           </p>
-        ) : (
-          <>
-          <h2 className="sr-only">Products</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-          </>
         )}
-
-        <nav aria-label="Other categories" className="border-t border-border pt-8">
-          <p className="text-sm text-muted-foreground mb-3">Browse other categories:</p>
-          <ul className="flex flex-wrap gap-3">
-            {otherCategories.map((other) => (
-              <li key={other.slug}>
-                <Link
-                  href={`/${other.slug}`}
-                  className="inline-flex h-11 items-center rounded-full border border-border px-4 text-sm hover:bg-muted focus-ring"
-                >
-                  {other.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
       </div>
     </>
   )

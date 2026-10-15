@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select"
+import { SORT_OPTIONS, SortSelect, sortProducts, type SortValue } from "./SortSelect"
 import { Checkbox } from "./ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Label } from "./ui/label"
@@ -37,15 +38,6 @@ const PRICE_RANGES = [
 
 // Filter option rows: the whole label is the 44px tap target; the control stays 20px.
 const optionRow = "flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium leading-snug"
-
-const SORT_OPTIONS = [
-  { value: "updated", label: "Recently updated" },
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
-  { value: "name", label: "Name: A to Z" },
-] as const
-
-type SortValue = (typeof SORT_OPTIONS)[number]["value"]
 
 export function ProductGrid({ products }: ProductGridProps) {
   const router = useRouter()
@@ -132,16 +124,7 @@ export function ProductGrid({ products }: ProductGridProps) {
       priceMax: priceRange?.max,
       search: search || undefined,
     })
-    switch (sortBy) {
-      case "price-asc":
-        return filtered.sort((a, b) => a.price - b.price)
-      case "price-desc":
-        return filtered.sort((a, b) => b.price - a.price)
-      case "name":
-        return filtered.sort((a, b) => a.name.localeCompare(b.name))
-      default:
-        return filtered.sort((a, b) => new Date(b.lastEditedTime).getTime() - new Date(a.lastEditedTime).getTime())
-    }
+    return sortProducts(filtered, sortBy)
   }, [products, search, selectedBrand, selectedCategory, selectedGenders, selectedRidingStyles, selectedProtection, selectedSeasons, selectedWaterproof, priceRange, sortBy])
 
   const activeFilterCount = [
@@ -435,27 +418,13 @@ export function ProductGrid({ products }: ProductGridProps) {
               </span> of {filteredProducts.length} products
             </p>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <label htmlFor="sort-products" className="text-sm text-muted-foreground whitespace-nowrap">Sort by</label>
-                <Select
-                  value={sortBy}
-                  onValueChange={(v) => {
-                    setSortBy(v as SortValue)
-                    resetPage()
-                  }}
-                >
-                  <SelectTrigger id="sort-products" className="w-44">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <SortSelect
+                value={sortBy}
+                onChange={(v) => {
+                  setSortBy(v)
+                  resetPage()
+                }}
+              />
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}

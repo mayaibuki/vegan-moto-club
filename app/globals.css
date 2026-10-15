@@ -101,6 +101,14 @@
 }
 
 @layer utilities {
+  /* Horizontal scrollers (category chip row) without a visible scrollbar */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
   /* Bottom padding that clears the iPhone home indicator on fixed bottom bars and sheets */
   .pb-safe-3 {
     padding-bottom: calc(theme(spacing.3) + env(safe-area-inset-bottom));
