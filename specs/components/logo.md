@@ -38,6 +38,7 @@ Renders the Vegan Moto Club logo at one of three predefined sizes. Optionally wr
 |--------|-------------------------|----------|---------|---------------------|
 | `size` | `"sm" \| "md" \| "lg"` | No       | `"md"`  | Predefined size     |
 | `href` | `string`                | No       | `"/"`   | Link destination    |
+| `className` | `string` | No | — | Extra classes on the link wrapper. The footer passes `-my-1.5 py-1.5` so the 32px logo link is a 44px tap target without moving the layout |
 
 ## Size Map
 

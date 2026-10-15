@@ -46,7 +46,7 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 |----------------------|------------------------------|-----------------------|
 | Sidebar bg (mobile)  | `bg-card`                    | Raised panel          |
 | Filter labels        | `text-foreground`            | Primary text          |
-| Filter option labels | `text-sm font-medium`        | Form labels           |
+| Filter option rows   | `<Label>` wrapping the control: `flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium leading-snug`, no vertical spacing between rows | 44px tap target per option; control stays 20px |
 | Muted text           | `text-muted-foreground`      | Counts, descriptions  |
 | Dividers             | `border-border`              | Section separators    |
 | Sidebar border       | `border-border` (mobile)     | Panel outline         |
@@ -54,7 +54,9 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 | Grid gaps            | `gap-6`                      | Card spacing          |
 | Sidebar gap          | `gap-8`                      | Section spacing       |
 | Pagination border    | `border-border`              | Top divider           |
-| Filter badge remove  | `hover:text-foreground`      | Interactive feedback  |
+| Active filter chip   | Whole chip is a `<button>` `inline-flex h-11 items-center` around a `bg-secondary` pill (`px-3 py-1 text-xs`) with an X icon; hover `bg-muted` | 44px tap target, one tap removes the filter |
+| Clear all link       | `inline-flex min-h-11 items-center px-1` | 44px tap target |
+| Pagination buttons   | `variant="ghost"` default size (44px) | Tap target |
 
 ## Props
 
@@ -92,7 +94,7 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 - Results count uses `aria-live="polite"` and `aria-atomic="true"`, styled `text-sm font-medium text-foreground` (same as the category page count line)
 - Results section has a visually hidden `<h2>Products</h2>` so card titles (h3) sit under an h2
 - Page changes scroll the results section into view (`auto` when the user prefers reduced motion) and move focus to it (`tabIndex={-1}`, `scroll-mt-24` to clear the sticky header)
-- Chip remove buttons and "Clear all" use `.focus-ring`
+- Chip buttons and "Clear all" use `.focus-ring`; every filter row, chip and pagination button is at least 44px tall
 - Active filters region has `role="region"` and `aria-label`
 - Remove-filter buttons have descriptive `aria-label`
 - Pagination nav has `aria-label="Product pagination"`

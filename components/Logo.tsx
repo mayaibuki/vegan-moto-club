@@ -1,13 +1,16 @@
 import Link from "next/link"
 import Image from "next/image"
+import { cn } from "@/lib/utils"
 
 interface LogoProps {
   size?: "sm" | "md" | "lg"
   href?: string
   showName?: boolean
+  /** Extra classes for the link wrapper (e.g. padding to grow the tap target) */
+  className?: string
 }
 
-export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
+export function Logo({ size = "md", href = "/", showName = true, className }: LogoProps) {
   const sizes = {
     sm: { width: 32, height: 32 },
     md: { width: 40, height: 40 },
@@ -45,7 +48,7 @@ export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
 
   if (href) {
     return (
-      <Link href={href} className="focus-ring block w-fit rounded-lg">
+      <Link href={href} className={cn("focus-ring block w-fit rounded-lg", className)}>
         {logoElement}
       </Link>
     )

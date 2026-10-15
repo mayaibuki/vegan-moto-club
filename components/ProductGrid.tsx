@@ -35,6 +35,9 @@ const PRICE_RANGES = [
   { value: "500-", label: "$500 and up", min: 500, max: undefined },
 ] as const
 
+// Filter option rows: the whole label is the 44px tap target; the control stays 20px.
+const optionRow = "flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium leading-snug"
+
 const SORT_OPTIONS = [
   { value: "updated", label: "Recently updated" },
   { value: "price-asc", label: "Price: Low to High" },
@@ -197,9 +200,9 @@ export function ProductGrid({ products }: ProductGridProps) {
   ) => (
     <fieldset>
       <legend className="text-sm font-semibold text-foreground mb-3 block">{legend}</legend>
-      <div className="space-y-2">
+      <div>
         {options.map((option) => (
-          <div key={option} className="flex items-center space-x-3">
+          <Label key={option} htmlFor={`${idPrefix}-${option}`} className={optionRow}>
             <Checkbox
               id={`${idPrefix}-${option}`}
               checked={selected.includes(option)}
@@ -210,30 +213,30 @@ export function ProductGrid({ products }: ProductGridProps) {
                 resetPage()
               }}
             />
-            <Label htmlFor={`${idPrefix}-${option}`} className="text-sm font-medium cursor-pointer">
-              {option}
-            </Label>
-          </div>
+            <span>{option}</span>
+          </Label>
         ))}
       </div>
     </fieldset>
   )
 
+  // Active filter chip: the whole chip is the remove button, with a 44px-tall hit
+  // area around the compact pill.
   const filterChip = (label: string, onRemove: () => void, removeLabel: string) => (
-    <Badge variant="secondary" className="gap-1">
-      {label}
-      <button
-        onClick={() => {
-          onRemove()
-          resetPage()
-        }}
-        className="-mr-1 p-1 hover:text-foreground focus-ring"
-        aria-label={removeLabel}
-        type="button"
-      >
-        <X className="h-3 w-3" aria-hidden="true" />
-      </button>
-    </Badge>
+    <button
+      type="button"
+      onClick={() => {
+        onRemove()
+        resetPage()
+      }}
+      className="group inline-flex h-11 items-center rounded-full focus-ring"
+      aria-label={removeLabel}
+    >
+      <span className="inline-flex items-center gap-1 rounded-full border border-transparent bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
+        {label}
+        <X className="-mr-1 h-3 w-3" aria-hidden="true" />
+      </span>
+    </button>
   )
 
   return (
@@ -290,21 +293,17 @@ export function ProductGrid({ products }: ProductGridProps) {
                   setSelectedCategory(value === "all" ? null : value)
                   resetPage()
                 }}
-                className="space-y-2"
+                className="gap-0"
               >
-                <div className="flex items-center space-x-3">
+                <Label htmlFor="category-all" className={optionRow}>
                   <RadioGroupItem value="all" id="category-all" />
-                  <Label htmlFor="category-all" className="text-sm font-medium cursor-pointer">
-                    All Categories
-                  </Label>
-                </div>
+                  <span>All Categories</span>
+                </Label>
                 {["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"].map((category) => (
-                  <div key={category} className="flex items-center space-x-3">
+                  <Label key={category} htmlFor={`category-${category}`} className={optionRow}>
                     <RadioGroupItem value={category} id={`category-${category}`} />
-                    <Label htmlFor={`category-${category}`} className="text-sm font-medium cursor-pointer">
-                      {category}
-                    </Label>
-                  </div>
+                    <span>{category}</span>
+                  </Label>
                 ))}
               </RadioGroup>
             </fieldset>
@@ -317,21 +316,17 @@ export function ProductGrid({ products }: ProductGridProps) {
                   setSelectedPriceRange(value === "all" ? null : value)
                   resetPage()
                 }}
-                className="space-y-2"
+                className="gap-0"
               >
-                <div className="flex items-center space-x-3">
+                <Label htmlFor="price-all" className={optionRow}>
                   <RadioGroupItem value="all" id="price-all" />
-                  <Label htmlFor="price-all" className="text-sm font-medium cursor-pointer">
-                    Any Price
-                  </Label>
-                </div>
+                  <span>Any Price</span>
+                </Label>
                 {PRICE_RANGES.map((range) => (
-                  <div key={range.value} className="flex items-center space-x-3">
+                  <Label key={range.value} htmlFor={`price-${range.value}`} className={optionRow}>
                     <RadioGroupItem value={range.value} id={`price-${range.value}`} />
-                    <Label htmlFor={`price-${range.value}`} className="text-sm font-medium cursor-pointer">
-                      {range.label}
-                    </Label>
-                  </div>
+                    <span>{range.label}</span>
+                  </Label>
                 ))}
               </RadioGroup>
             </fieldset>
@@ -347,9 +342,9 @@ export function ProductGrid({ products }: ProductGridProps) {
 
             <fieldset>
               <legend className="text-sm font-semibold text-foreground mb-3 block">Gender</legend>
-              <div className="space-y-2">
+              <div>
                 {["Women", "Men", "Unisex"].map((gender) => (
-                  <div key={gender} className="flex items-center space-x-3">
+                  <Label key={gender} htmlFor={`gender-${gender}`} className={optionRow}>
                     <Checkbox
                       id={`gender-${gender}`}
                       checked={selectedGenders.includes(gender)}
@@ -362,19 +357,17 @@ export function ProductGrid({ products }: ProductGridProps) {
                         resetPage()
                       }}
                     />
-                    <Label htmlFor={`gender-${gender}`} className="text-sm font-medium cursor-pointer">
-                      {gender}
-                    </Label>
-                  </div>
+                    <span>{gender}</span>
+                  </Label>
                 ))}
               </div>
             </fieldset>
 
             <fieldset>
               <legend className="text-sm font-semibold text-foreground mb-3 block">Riding Style</legend>
-              <div className="space-y-2">
+              <div>
                 {["Commute / Street", "Adventure / Touring", "Sport / Canyons", "Racing / Trackdays", "Off-roading"].map((style) => (
-                  <div key={style} className="flex items-center space-x-3">
+                  <Label key={style} htmlFor={`style-${style}`} className={optionRow}>
                     <Checkbox
                       id={`style-${style}`}
                       checked={selectedRidingStyles.includes(style)}
@@ -387,10 +380,8 @@ export function ProductGrid({ products }: ProductGridProps) {
                         resetPage()
                       }}
                     />
-                    <Label htmlFor={`style-${style}`} className="text-sm font-medium cursor-pointer">
-                      {style}
-                    </Label>
-                  </div>
+                    <span>{style}</span>
+                  </Label>
                 ))}
               </div>
             </fieldset>
@@ -403,21 +394,17 @@ export function ProductGrid({ products }: ProductGridProps) {
                   setSelectedBrand(value === "all" ? null : value)
                   resetPage()
                 }}
-                className="space-y-2 max-h-48 overflow-y-auto"
+                className="gap-0 max-h-48 overflow-y-auto"
               >
-                <div className="flex items-center space-x-3">
+                <Label htmlFor="brand-all" className={optionRow}>
                   <RadioGroupItem value="all" id="brand-all" />
-                  <Label htmlFor="brand-all" className="text-sm font-medium cursor-pointer">
-                    All {brands.length} Brands
-                  </Label>
-                </div>
+                  <span>All {brands.length} Brands</span>
+                </Label>
                 {brands.map((brand) => (
-                  <div key={brand} className="flex items-center space-x-3">
+                  <Label key={brand} htmlFor={`brand-${brand}`} className={optionRow}>
                     <RadioGroupItem value={brand} id={`brand-${brand}`} />
-                    <Label htmlFor={`brand-${brand}`} className="text-sm font-medium cursor-pointer">
-                      {brand}
-                    </Label>
-                  </div>
+                    <span>{brand}</span>
+                  </Label>
                 ))}
               </RadioGroup>
             </fieldset>
@@ -489,7 +476,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           </div>
 
           {hasAnyFilters && (
-            <div className="mb-6 flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
+            <div className="mb-6 flex flex-wrap items-center gap-x-2" role="region" aria-label="Active filters">
               <span className="text-sm text-muted-foreground" id="active-filters-label">Active:</span>
               {selectedBrand &&
                 filterChip(selectedBrand, () => setSelectedBrand(null), `Remove ${selectedBrand} brand filter`)}
@@ -516,7 +503,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                 filterChip(`"${search}"`, () => setSearch(""), `Remove search for "${search}"`)}
               <button
                 onClick={clearAllFilters}
-                className="text-sm text-muted-foreground hover:text-foreground underline focus-ring"
+                className="inline-flex min-h-11 items-center px-1 text-sm text-muted-foreground hover:text-foreground underline focus-ring"
                 type="button"
               >
                 Clear all
@@ -567,10 +554,9 @@ export function ProductGrid({ products }: ProductGridProps) {
                   <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</span>
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="gap-1"
+                    className="gap-1 px-4"
                     aria-label="Go to previous page"
                   >
                     <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -578,10 +564,9 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage >= totalPages}
-                    className="gap-1"
+                    className="gap-1 px-4"
                     aria-label="Go to next page"
                   >
                     Next
