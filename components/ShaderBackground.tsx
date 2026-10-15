@@ -1,13 +1,13 @@
 "use client"
 
-// Site-wide animated grain gradient behind all content. Loaded from layout.tsx with
-// next/dynamic (ssr: false); until it mounts, the body's bg-background shows instead.
+// Site-wide animated grain gradient behind all content, mounted in layout.tsx. Renders
+// nothing on the server and until mounted, so the body's bg-background shows first.
 
 import { useEffect, useState } from "react"
 import { GrainGradient } from "@paper-design/shaders-react"
 
-// Same tint as the bg-primary/15 utility.
-const PRIMARY_ALPHA = 0.15
+// Full-strength primary, same as the bg-primary utility.
+const PRIMARY_ALPHA = 1
 
 /**
  * "77.9 54.4% 47.4%" -> "hsla(78, 54%, 47%, 1)".

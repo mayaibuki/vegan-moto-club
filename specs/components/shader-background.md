@@ -26,7 +26,7 @@ The layout wrapper (`min-h-screen flex flex-col`) has no background of its own s
 | Prop         | Token          | Light           | Dark             | Note                                  |
 |--------------|----------------|-----------------|------------------|---------------------------------------|
 | `colorBack`  | `--background` | stone-50        | stone-950        | Same as `bg-background`               |
-| `colors[0]`  | `--primary`    | lime-500 @ 15%  | lime-400 @ 15%   | Same as `bg-primary/15`               |
+| `colors[0]`  | `--primary`    | lime-500        | lime-400         | Same as `bg-primary` (full opacity)   |
 
 Token values are read with `getComputedStyle` and converted to `hsla(h, s%, l%, a)` with integer components, the only HSL form the shader's colour parser accepts. A `MutationObserver` on `<html class>` re-reads them when the theme toggles. Never pass hex values.
 
@@ -48,4 +48,4 @@ Token values are read with `getComputedStyle` and converted to `hsla(h, s%, l%, 
 
 ## Accessibility
 
-Decorative only: `aria-hidden`, `pointer-events-none`. The 15% tint keeps text contrast on the page background close to plain `bg-background`.
+Decorative only: `aria-hidden`, `pointer-events-none`. Text sits on the shader where the gradient is near `colorBack`; check contrast where the lime corners reach headings or body copy.
