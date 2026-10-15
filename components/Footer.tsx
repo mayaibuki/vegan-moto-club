@@ -5,33 +5,33 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-card mt-12" role="contentinfo">
       <div className="page-container py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-8 md:gap-10 mb-10">
           {/* Brand Section */}
-          <div className="text-center md:text-left">
-            <div className="mb-4 flex justify-center md:justify-start">
-              <Logo size="sm" />
+          <div className="col-span-2 md:col-span-1">
+            <div className="mb-4 flex">
+              <Logo size="sm" className="-my-1.5 py-1.5" />
             </div>
-            <p className="text-sm text-muted-foreground max-w-xs mx-auto md:mx-0">
+            <p className="text-sm text-muted-foreground max-w-xs">
               A database of cruelty-free motorcycle gear for compassionate riders.
             </p>
           </div>
 
           {/* Navigation Section */}
-          <nav aria-label="Footer navigation" className="text-center md:text-left">
-            <h2 className="font-bold mb-4 text-base">Navigation</h2>
-            <ul className="space-y-3 text-sm">
+          <nav aria-label="Footer navigation">
+            <h2 className="text-sm font-semibold mb-2">Navigation</h2>
+            <ul className="text-sm">
               <li>
-                <Link href="/products" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                <Link href="/products" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   Products
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                <Link href="/events" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   Events
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                <Link href="/about" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   About
                 </Link>
               </li>
@@ -39,15 +39,15 @@ export function Footer() {
           </nav>
 
           {/* Connect Section */}
-          <div className="text-center md:text-left">
-            <h2 className="font-bold mb-4 text-base">Connect</h2>
-            <ul className="space-y-3 text-sm">
+          <div>
+            <h2 className="text-sm font-semibold mb-2">Connect</h2>
+            <ul className="text-sm">
               <li>
                 <a
                   href="https://discord.gg/J3vDjQvXPn"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
+                  className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
                   aria-label="Join us on Discord (opens in new tab)"
                 >
                   Discord<span className="sr-only"> (opens in new tab)</span>
@@ -58,7 +58,7 @@ export function Footer() {
                   href="https://www.instagram.com/veganmotoclub"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
+                  className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
                   aria-label="Follow us on Instagram (opens in new tab)"
                 >
                   Instagram<span className="sr-only"> (opens in new tab)</span>
@@ -69,7 +69,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2026 Vegan Moto Club. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Vegan Moto Club. All rights reserved.</p>
         </div>
       </div>
     </footer>

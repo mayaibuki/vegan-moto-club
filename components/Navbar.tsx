@@ -57,7 +57,7 @@ export function Navbar() {
   ]
 
   return (
-    <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
       <nav aria-label="Main navigation" className="page-container py-4 flex items-center justify-between">
         <Logo size="md" href="/" />
 
@@ -125,7 +125,7 @@ export function Navbar() {
         aria-label="Mobile navigation"
       >
         <div ref={mobileMenuRef} className={cn("overflow-hidden min-h-0", !mobileMenuOpen && "invisible transition-[visibility] duration-200")}>
-          <div className="border-t border-border/50 bg-card">
+          <div className="border-t border-border bg-card">
             <ul className="page-container py-4 space-y-1 list-none">
               {navLinks.map((link) => (
                 <li key={link.href}>

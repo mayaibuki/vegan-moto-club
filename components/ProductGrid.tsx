@@ -20,9 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select"
+import { SORT_OPTIONS, SortSelect, sortProducts, type SortValue } from "./SortSelect"
 import { Checkbox } from "./ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Label } from "./ui/label"
+import * as Dialog from "@radix-ui/react-dialog"
 
 interface ProductGridProps {
   products: Product[]
@@ -35,14 +37,8 @@ const PRICE_RANGES = [
   { value: "500-", label: "$500 and up", min: 500, max: undefined },
 ] as const
 
-const SORT_OPTIONS = [
-  { value: "updated", label: "Recently updated" },
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
-  { value: "name", label: "Name: A to Z" },
-] as const
-
-type SortValue = (typeof SORT_OPTIONS)[number]["value"]
+// Filter option rows: the whole label is the 44px tap target; the control stays 20px.
+const optionRow = "flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium leading-snug"
 
 export function ProductGrid({ products }: ProductGridProps) {
   const router = useRouter()
@@ -60,6 +56,8 @@ export function ProductGrid({ products }: ProductGridProps) {
   const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<SortValue>("updated")
   const [showFilters, setShowFilters] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+  const filtersButtonRef = useRef<HTMLButtonElement>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(24)
 
@@ -129,16 +127,7 @@ export function ProductGrid({ products }: ProductGridProps) {
       priceMax: priceRange?.max,
       search: search || undefined,
     })
-    switch (sortBy) {
-      case "price-asc":
-        return filtered.sort((a, b) => a.price - b.price)
-      case "price-desc":
-        return filtered.sort((a, b) => b.price - a.price)
-      case "name":
-        return filtered.sort((a, b) => a.name.localeCompare(b.name))
-      default:
-        return filtered.sort((a, b) => new Date(b.lastEditedTime).getTime() - new Date(a.lastEditedTime).getTime())
-    }
+    return sortProducts(filtered, sortBy)
   }, [products, search, selectedBrand, selectedCategory, selectedGenders, selectedRidingStyles, selectedProtection, selectedSeasons, selectedWaterproof, priceRange, sortBy])
 
   const activeFilterCount = [
@@ -153,6 +142,14 @@ export function ProductGrid({ products }: ProductGridProps) {
   ].filter(Boolean).length
 
   const hasAnyFilters = activeFilterCount > 0 || search
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)")
+    const update = () => setIsDesktop(mq.matches)
+    update()
+    mq.addEventListener("change", update)
+    return () => mq.removeEventListener("change", update)
+  }, [])
 
   // Pagination calculations
   const totalPages = Math.max(Math.ceil(filteredProducts.length / rowsPerPage), 1)
@@ -197,9 +194,9 @@ export function ProductGrid({ products }: ProductGridProps) {
   ) => (
     <fieldset>
       <legend className="text-sm font-semibold text-foreground mb-3 block">{legend}</legend>
-      <div className="space-y-2">
+      <div>
         {options.map((option) => (
-          <div key={option} className="flex items-center space-x-3">
+          <Label key={option} htmlFor={`${idPrefix}-${option}`} className={optionRow}>
             <Checkbox
               id={`${idPrefix}-${option}`}
               checked={selected.includes(option)}
@@ -210,234 +207,263 @@ export function ProductGrid({ products }: ProductGridProps) {
                 resetPage()
               }}
             />
-            <Label htmlFor={`${idPrefix}-${option}`} className="text-sm font-medium cursor-pointer">
-              {option}
-            </Label>
-          </div>
+            <span>{option}</span>
+          </Label>
         ))}
       </div>
     </fieldset>
   )
 
+  // Active filter chip: the whole chip is the remove button, with a 44px-tall hit
+  // area around the compact pill.
   const filterChip = (label: string, onRemove: () => void, removeLabel: string) => (
-    <Badge variant="secondary" className="gap-1">
-      {label}
-      <button
-        onClick={() => {
-          onRemove()
-          resetPage()
-        }}
-        className="-mr-1 p-1 hover:text-foreground focus-ring"
-        aria-label={removeLabel}
-        type="button"
-      >
-        <X className="h-3 w-3" aria-hidden="true" />
-      </button>
-    </Badge>
+    <button
+      type="button"
+      onClick={() => {
+        onRemove()
+        resetPage()
+      }}
+      className="group inline-flex h-11 items-center rounded-full focus-ring"
+      aria-label={removeLabel}
+    >
+      <span className="inline-flex items-center gap-1 rounded-full border border-transparent bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
+        {label}
+        <X className="-mr-1 h-3 w-3" aria-hidden="true" />
+      </span>
+    </button>
+  )
+
+  // Below lg the filters open as a bottom sheet (Radix Dialog: focus trap, Escape,
+  // scroll lock, focus returns to the Filters button). lg+ keeps the sidebar.
+  const sheetOpen = showFilters && !isDesktop
+
+  const filterFields = (
+    <>
+      <div role="search" className="md:col-span-2 lg:col-span-1">
+        <label htmlFor="product-search" className="text-sm font-semibold text-foreground mb-3 block">Search</label>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Input
+            id="product-search"
+            type="search"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              resetPage()
+            }}
+            className="pl-9"
+            aria-describedby="search-description"
+          />
+          <span id="search-description" className="sr-only">Search by product name, brand, description, category, or material</span>
+          {search && (
+            <button
+              onClick={() => {
+                setSearch("")
+                resetPage()
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:text-foreground"
+              aria-label="Clear search"
+              type="button"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="border-t border-border md:col-span-2 lg:col-span-1" aria-hidden="true" />
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-foreground mb-3 block">Category</legend>
+        <RadioGroup
+          value={selectedCategory || "all"}
+          onValueChange={(value) => {
+            setSelectedCategory(value === "all" ? null : value)
+            resetPage()
+          }}
+          className="gap-0"
+        >
+          <Label htmlFor="category-all" className={optionRow}>
+            <RadioGroupItem value="all" id="category-all" />
+            <span>All Categories</span>
+          </Label>
+          {["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"].map((category) => (
+            <Label key={category} htmlFor={`category-${category}`} className={optionRow}>
+              <RadioGroupItem value={category} id={`category-${category}`} />
+              <span>{category}</span>
+            </Label>
+          ))}
+        </RadioGroup>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-foreground mb-3 block">Price</legend>
+        <RadioGroup
+          value={selectedPriceRange || "all"}
+          onValueChange={(value) => {
+            setSelectedPriceRange(value === "all" ? null : value)
+            resetPage()
+          }}
+          className="gap-0"
+        >
+          <Label htmlFor="price-all" className={optionRow}>
+            <RadioGroupItem value="all" id="price-all" />
+            <span>Any Price</span>
+          </Label>
+          {PRICE_RANGES.map((range) => (
+            <Label key={range.value} htmlFor={`price-${range.value}`} className={optionRow}>
+              <RadioGroupItem value={range.value} id={`price-${range.value}`} />
+              <span>{range.label}</span>
+            </Label>
+          ))}
+        </RadioGroup>
+      </fieldset>
+
+      {protectionLevels.length > 0 &&
+        checkboxFieldset("Protection Level", protectionLevels, selectedProtection, setSelectedProtection, "protection")}
+
+      {seasons.length > 0 &&
+        checkboxFieldset("Season", seasons, selectedSeasons, setSelectedSeasons, "season")}
+
+      {waterproofLevels.length > 0 &&
+        checkboxFieldset("Waterproofing", waterproofLevels, selectedWaterproof, setSelectedWaterproof, "waterproof")}
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-foreground mb-3 block">Gender</legend>
+        <div>
+          {["Women", "Men", "Unisex"].map((gender) => (
+            <Label key={gender} htmlFor={`gender-${gender}`} className={optionRow}>
+              <Checkbox
+                id={`gender-${gender}`}
+                checked={selectedGenders.includes(gender)}
+                onCheckedChange={(checked) => {
+                  setSelectedGenders(prev =>
+                    checked
+                      ? [...prev, gender]
+                      : prev.filter(g => g !== gender)
+                  )
+                  resetPage()
+                }}
+              />
+              <span>{gender}</span>
+            </Label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-foreground mb-3 block">Riding Style</legend>
+        <div>
+          {["Commute / Street", "Adventure / Touring", "Sport / Canyons", "Racing / Trackdays", "Off-roading"].map((style) => (
+            <Label key={style} htmlFor={`style-${style}`} className={optionRow}>
+              <Checkbox
+                id={`style-${style}`}
+                checked={selectedRidingStyles.includes(style)}
+                onCheckedChange={(checked) => {
+                  setSelectedRidingStyles(prev =>
+                    checked
+                      ? [...prev, style]
+                      : prev.filter(s => s !== style)
+                  )
+                  resetPage()
+                }}
+              />
+              <span>{style}</span>
+            </Label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-foreground mb-3 block">Brand</legend>
+        <RadioGroup
+          value={selectedBrand || "all"}
+          onValueChange={(value) => {
+            setSelectedBrand(value === "all" ? null : value)
+            resetPage()
+          }}
+          className="gap-0 max-h-48 overflow-y-auto"
+        >
+          <Label htmlFor="brand-all" className={optionRow}>
+            <RadioGroupItem value="all" id="brand-all" />
+            <span>All {brands.length} Brands</span>
+          </Label>
+          {brands.map((brand) => (
+            <Label key={brand} htmlFor={`brand-${brand}`} className={optionRow}>
+              <RadioGroupItem value={brand} id={`brand-${brand}`} />
+              <span>{brand}</span>
+            </Label>
+          ))}
+        </RadioGroup>
+      </fieldset>
+
+      {hasAnyFilters && (
+        <>
+          <div className="border-t border-border md:col-span-2 lg:col-span-1" aria-hidden="true" />
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={clearAllFilters}
+            aria-label={`Clear all ${activeFilterCount} active filters`}
+          >
+            <X className="h-4 w-4 mr-2" aria-hidden="true" />
+            Clear All Filters
+          </Button>
+        </>
+      )}
+    </>
   )
 
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row gap-8">
-        <aside
-          aria-label="Product filters"
-          id="product-filters"
-          className={`lg:w-64 flex-shrink-0 ${
-            showFilters ? "block" : "hidden lg:block"
-          }`}
-        >
-          <div className="space-y-6 sticky top-24 bg-card lg:bg-transparent p-4 lg:p-0 rounded-xl lg:rounded-none border lg:border-0 border-border max-h-[calc(100vh-7rem)] overflow-y-auto">
-            <div role="search">
-              <label htmlFor="product-search" className="text-sm font-semibold text-foreground mb-3 block">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                <Input
-                  id="product-search"
-                  type="search"
-                  placeholder="Search products..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value)
-                    resetPage()
-                  }}
-                  className="pl-9"
-                  aria-describedby="search-description"
-                />
-                <span id="search-description" className="sr-only">Search by product name, brand, description, category, or material</span>
-                {search && (
-                  <button
-                    onClick={() => {
-                      setSearch("")
-                      resetPage()
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-                    aria-label="Clear search"
-                    type="button"
-                  >
-                    <X className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="border-t border-border" />
-
-            <fieldset>
-              <legend className="text-sm font-semibold text-foreground mb-3 block">Category</legend>
-              <RadioGroup
-                value={selectedCategory || "all"}
-                onValueChange={(value) => {
-                  setSelectedCategory(value === "all" ? null : value)
-                  resetPage()
-                }}
-                className="space-y-2"
-              >
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="all" id="category-all" />
-                  <Label htmlFor="category-all" className="text-sm font-medium cursor-pointer">
-                    All Categories
-                  </Label>
-                </div>
-                {["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"].map((category) => (
-                  <div key={category} className="flex items-center space-x-3">
-                    <RadioGroupItem value={category} id={`category-${category}`} />
-                    <Label htmlFor={`category-${category}`} className="text-sm font-medium cursor-pointer">
-                      {category}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </fieldset>
-
-            <fieldset>
-              <legend className="text-sm font-semibold text-foreground mb-3 block">Price</legend>
-              <RadioGroup
-                value={selectedPriceRange || "all"}
-                onValueChange={(value) => {
-                  setSelectedPriceRange(value === "all" ? null : value)
-                  resetPage()
-                }}
-                className="space-y-2"
-              >
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="all" id="price-all" />
-                  <Label htmlFor="price-all" className="text-sm font-medium cursor-pointer">
-                    Any Price
-                  </Label>
-                </div>
-                {PRICE_RANGES.map((range) => (
-                  <div key={range.value} className="flex items-center space-x-3">
-                    <RadioGroupItem value={range.value} id={`price-${range.value}`} />
-                    <Label htmlFor={`price-${range.value}`} className="text-sm font-medium cursor-pointer">
-                      {range.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </fieldset>
-
-            {protectionLevels.length > 0 &&
-              checkboxFieldset("Protection Level", protectionLevels, selectedProtection, setSelectedProtection, "protection")}
-
-            {seasons.length > 0 &&
-              checkboxFieldset("Season", seasons, selectedSeasons, setSelectedSeasons, "season")}
-
-            {waterproofLevels.length > 0 &&
-              checkboxFieldset("Waterproofing", waterproofLevels, selectedWaterproof, setSelectedWaterproof, "waterproof")}
-
-            <fieldset>
-              <legend className="text-sm font-semibold text-foreground mb-3 block">Gender</legend>
-              <div className="space-y-2">
-                {["Women", "Men", "Unisex"].map((gender) => (
-                  <div key={gender} className="flex items-center space-x-3">
-                    <Checkbox
-                      id={`gender-${gender}`}
-                      checked={selectedGenders.includes(gender)}
-                      onCheckedChange={(checked) => {
-                        setSelectedGenders(prev =>
-                          checked
-                            ? [...prev, gender]
-                            : prev.filter(g => g !== gender)
-                        )
-                        resetPage()
-                      }}
-                    />
-                    <Label htmlFor={`gender-${gender}`} className="text-sm font-medium cursor-pointer">
-                      {gender}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend className="text-sm font-semibold text-foreground mb-3 block">Riding Style</legend>
-              <div className="space-y-2">
-                {["Commute / Street", "Adventure / Touring", "Sport / Canyons", "Racing / Trackdays", "Off-roading"].map((style) => (
-                  <div key={style} className="flex items-center space-x-3">
-                    <Checkbox
-                      id={`style-${style}`}
-                      checked={selectedRidingStyles.includes(style)}
-                      onCheckedChange={(checked) => {
-                        setSelectedRidingStyles(prev =>
-                          checked
-                            ? [...prev, style]
-                            : prev.filter(s => s !== style)
-                        )
-                        resetPage()
-                      }}
-                    />
-                    <Label htmlFor={`style-${style}`} className="text-sm font-medium cursor-pointer">
-                      {style}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend className="text-sm font-semibold text-foreground mb-3 block">Brand</legend>
-              <RadioGroup
-                value={selectedBrand || "all"}
-                onValueChange={(value) => {
-                  setSelectedBrand(value === "all" ? null : value)
-                  resetPage()
-                }}
-                className="space-y-2 max-h-48 overflow-y-auto"
-              >
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="all" id="brand-all" />
-                  <Label htmlFor="brand-all" className="text-sm font-medium cursor-pointer">
-                    All {brands.length} Brands
-                  </Label>
-                </div>
-                {brands.map((brand) => (
-                  <div key={brand} className="flex items-center space-x-3">
-                    <RadioGroupItem value={brand} id={`brand-${brand}`} />
-                    <Label htmlFor={`brand-${brand}`} className="text-sm font-medium cursor-pointer">
-                      {brand}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </fieldset>
-
-            {hasAnyFilters && (
-              <>
-                <div className="border-t border-border" aria-hidden="true" />
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={clearAllFilters}
-                  aria-label={`Clear all ${activeFilterCount} active filters`}
-                >
-                  <X className="h-4 w-4 mr-2" aria-hidden="true" />
-                  Clear All Filters
-                </Button>
-              </>
-            )}
+        {/* lg+: sidebar. Below lg the same fields render in the bottom sheet instead
+            (only one copy is mounted at a time, so ids stay unique). */}
+        <aside aria-label="Product filters" className="hidden lg:block lg:w-64 flex-shrink-0">
+          <div className="space-y-6 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
+            {!sheetOpen && filterFields}
           </div>
         </aside>
+
+        <Dialog.Root open={sheetOpen} onOpenChange={setShowFilters}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 z-overlay bg-foreground/40 lg:hidden" />
+            <Dialog.Content
+              id="product-filters"
+              aria-describedby={undefined}
+              // Focus the sheet itself (not the search field) so phones do not open the keyboard
+              onOpenAutoFocus={(e) => {
+                e.preventDefault()
+                ;(e.currentTarget as HTMLElement | null)?.focus()
+              }}
+              onCloseAutoFocus={(e) => {
+                e.preventDefault()
+                filtersButtonRef.current?.focus()
+              }}
+              className="fixed inset-x-0 bottom-0 z-overlay flex max-h-sheet flex-col rounded-t-2xl border-t border-border bg-card text-card-foreground shadow-lg focus:outline-none lg:hidden"
+            >
+              <div className="flex items-center justify-between border-b border-border py-1 pl-4 pr-1">
+                <Dialog.Title className="text-lg font-semibold">Filters</Dialog.Title>
+                <Dialog.Close asChild>
+                  <Button variant="ghost" size="icon" aria-label="Close filters">
+                    <X className="h-5 w-5" aria-hidden="true" />
+                  </Button>
+                </Dialog.Close>
+              </div>
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4">
+                <div className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
+                  {filterFields}
+                </div>
+              </div>
+              <div className="border-t border-border px-4 pt-3 pb-safe-3">
+                <Button className="w-full" onClick={() => setShowFilters(false)}>
+                  Show {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"}
+                </Button>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         <section className="flex-1 scroll-mt-24 focus:outline-none" aria-label="Product results" ref={resultsRef} tabIndex={-1}>
           <h2 className="sr-only">Products</h2>
@@ -448,34 +474,22 @@ export function ProductGrid({ products }: ProductGridProps) {
               </span> of {filteredProducts.length} products
             </p>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <label htmlFor="sort-products" className="text-sm text-muted-foreground whitespace-nowrap">Sort by</label>
-                <Select
-                  value={sortBy}
-                  onValueChange={(v) => {
-                    setSortBy(v as SortValue)
-                    resetPage()
-                  }}
-                >
-                  <SelectTrigger id="sort-products" className="h-9 w-44">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <SortSelect
+                value={sortBy}
+                onChange={(v) => {
+                  setSortBy(v)
+                  resetPage()
+                }}
+              />
               <Button
+                ref={filtersButtonRef}
                 variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
+                onClick={() => setShowFilters(true)}
                 className="lg:hidden"
-                aria-expanded={showFilters}
+                aria-haspopup="dialog"
+                aria-expanded={sheetOpen}
                 aria-controls="product-filters"
-                aria-label={`${showFilters ? "Hide" : "Show"} filters${activeFilterCount > 0 ? `, ${activeFilterCount} active` : ""}`}
+                aria-label={`Show filters${activeFilterCount > 0 ? `, ${activeFilterCount} active` : ""}`}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-2" aria-hidden="true" />
                 Filters
@@ -489,7 +503,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           </div>
 
           {hasAnyFilters && (
-            <div className="mb-6 flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
+            <div className="mb-6 flex flex-wrap items-center gap-x-2" role="region" aria-label="Active filters">
               <span className="text-sm text-muted-foreground" id="active-filters-label">Active:</span>
               {selectedBrand &&
                 filterChip(selectedBrand, () => setSelectedBrand(null), `Remove ${selectedBrand} brand filter`)}
@@ -516,7 +530,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                 filterChip(`"${search}"`, () => setSearch(""), `Remove search for "${search}"`)}
               <button
                 onClick={clearAllFilters}
-                className="text-sm text-muted-foreground hover:text-foreground underline focus-ring"
+                className="inline-flex min-h-11 items-center px-1 text-sm text-muted-foreground hover:text-foreground underline focus-ring"
                 type="button"
               >
                 Clear all
@@ -536,7 +550,7 @@ export function ProductGrid({ products }: ProductGridProps) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -552,7 +566,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       resetPage()
                     }}
                   >
-                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`Products per page, currently ${rowsPerPage}`}>
+                    <SelectTrigger id="rows-per-page" className="w-20" aria-label={`Products per page, currently ${rowsPerPage}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -567,10 +581,9 @@ export function ProductGrid({ products }: ProductGridProps) {
                   <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</span>
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="gap-1"
+                    className="gap-1 px-4"
                     aria-label="Go to previous page"
                   >
                     <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -578,10 +591,9 @@ export function ProductGrid({ products }: ProductGridProps) {
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage >= totalPages}
-                    className="gap-1"
+                    className="gap-1 px-4"
                     aria-label="Go to next page"
                   >
                     Next

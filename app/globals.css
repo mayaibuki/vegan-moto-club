@@ -100,6 +100,32 @@
   }
 }
 
+@layer utilities {
+  /* Horizontal scrollers (category chip row) without a visible scrollbar */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Bottom padding that clears the iPhone home indicator on fixed bottom bars and sheets */
+  .pb-safe-3 {
+    padding-bottom: calc(theme(spacing.3) + env(safe-area-inset-bottom));
+  }
+  .pb-safe-4 {
+    padding-bottom: calc(theme(spacing.4) + env(safe-area-inset-bottom));
+  }
+}
+
+/* While a product page renders the mobile sticky buy bar, pad the page end so the
+   bar never covers the footer's last line. */
+@media (max-width: 767px) {
+  body:has([data-sticky-buy-bar]) {
+    padding-bottom: theme(spacing.20);
+  }
+}
+
 /* Respect the OS "reduce motion" setting: no animated transitions, no smooth scrolling. */
 @media (prefers-reduced-motion: reduce) {
   *,

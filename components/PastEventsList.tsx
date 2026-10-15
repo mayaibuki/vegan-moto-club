@@ -28,7 +28,7 @@ export function PastEventsList({ events }: { events: Event[] }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {paginated.map((event) => (
           <EventCard key={event.id} event={event} muted />
         ))}
@@ -42,10 +42,9 @@ export function PastEventsList({ events }: { events: Event[] }) {
           <span className="sr-only">Page {currentPage} of {totalPages}</span>
           <Button
             variant="ghost"
-            size="sm"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            className="gap-1"
+            className="gap-1 px-4"
             aria-label="Go to previous page"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -53,10 +52,9 @@ export function PastEventsList({ events }: { events: Event[] }) {
           </Button>
           <Button
             variant="ghost"
-            size="sm"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={currentPage >= totalPages}
-            className="gap-1"
+            className="gap-1 px-4"
             aria-label="Go to next page"
           >
             Next

@@ -25,7 +25,7 @@ Compact label for categorization, status, or metadata.
 | Property | Token / Class |
 |----------|---------------|
 | Radius | `rounded-full` (pill) |
-| Padding | `px-3 py-1` |
+| Padding | `px-3 py-1` (`size="default"`), `px-2 py-0.5` (`size="sm"`) |
 | Font | `text-xs`, `font-semibold` |
 | Transition | `transition-colors` |
 | Focus | `ring-2 ring-ring ring-offset-2` |
@@ -35,6 +35,16 @@ Compact label for categorization, status, or metadata.
 | Prop | Type | Default |
 |------|------|---------|
 | `variant` | `"default" \| "secondary" \| "outline" \| "accent" \| "destructive" \| "positive" \| "negative"` | `"default"` |
+| `size` | `"default" \| "sm"` | `"default"` |
+
+### Sizes
+
+| Size | Padding | Use |
+|------|---------|-----|
+| `default` | `px-3 py-1` | Detail pages, filters, overlays |
+| `sm` | `px-2 py-0.5` | Dense rows. Product cards use `size="sm"` plus `sm:px-3 sm:py-1`, so the compact padding applies below 640px only |
+
+Text stays `text-xs` in both sizes; never drop below it (no `text-[11px]`).
 
 ## Variants
 
@@ -51,6 +61,8 @@ Compact label for categorization, status, or metadata.
 ### Protection scale (product card and detail)
 
 Staff Pick is the only solid lime pill (`default`). Most and Highly protective use `positive`, Moderately protective uses `outline`, Slightly protective uses `secondary`, Not protective uses `negative`.
+
+Below 640px the product card shows a short label (Most, High, Moderate, Slight) with `whitespace-nowrap` so the pill never wraps; the full label renders from `sm` up and always in an `sr-only` span.
 
 ## States
 

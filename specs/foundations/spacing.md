@@ -104,6 +104,12 @@ Use `--space-md` through `--space-lg` (16px-24px) for spacing between related gr
 </div>
 ```
 
+### Card Grids and Dense Cards
+
+- Every card grid (products, staff picks, related products, events, past events) uses `gap-4 sm:gap-6`: 16px on phones, 24px from 640px up.
+- Product cards pad their content `p-3` with `space-y-2` below 640px and `sm:p-5 sm:space-y-3` above. A two-column phone grid leaves about 170px per card, so the 20px desktop padding would cost a fifth of the text width.
+- Tap targets on mobile are at least 44px tall (`h-11` / `min-h-11`). Grow the hit area with padding or a taller row rather than enlarging the visual control (filter rows keep a 20px control inside a 44px label).
+
 ### Section Spacing
 
 Use `--space-xl` through `--space-3xl` (32px-64px) for spacing between major page sections.

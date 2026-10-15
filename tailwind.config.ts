@@ -59,6 +59,23 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      maxHeight: {
+        // Bottom sheet height (filters below lg)
+        sheet: "85dvh",
+      },
+      zIndex: {
+        // Stacking tokens from tokens.css (--z-*)
+        sticky: "var(--z-sticky)",
+        overlay: "var(--z-overlay)",
+      },
+      gridTemplateRows: {
+        // Collapse wrapper rows (PromoBanner): animate open -> closed to collapse to zero height
+        open: "1fr",
+        closed: "0fr",
+      },
+      aspectRatio: {
+        "4/3": "4 / 3",
+      },
       transitionTimingFunction: {
         DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
       },

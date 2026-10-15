@@ -17,7 +17,7 @@ Dropdown for choosing a single value from a list. Built on Radix Select.
 
 ```
 [Select]
-  ├─ [SelectTrigger]        — h-10, rounded-full, border
+  ├─ [SelectTrigger]        — h-11, rounded-full, border
   │    ├─ [SelectValue]     — placeholder text
   │    └─ [ChevronDown]     — h-4 w-4, opacity-50
   └─ [SelectContent]        — rounded-xl, border, shadow-md
@@ -31,7 +31,8 @@ Dropdown for choosing a single value from a list. Built on Radix Select.
 
 | Property | Token / Class |
 |----------|---------------|
-| Trigger height | `h-10` (40px) |
+| Trigger height | `h-11` (44px); do not override with `h-9`/`h-10` |
+| Trigger transition | `transition-[border-color,box-shadow] duration-150` |
 | Trigger radius | `rounded-full` |
 | Trigger border | `border border-input` (3:1) |
 | Trigger bg | `bg-card` (white in light mode) |
@@ -41,7 +42,8 @@ Dropdown for choosing a single value from a list. Built on Radix Select.
 | Content text | `text-popover-foreground` |
 | Content z-index | `z-50` |
 | Item radius | `rounded-lg` |
-| Item focus | `bg-accent` |
+| Item focus | `bg-muted text-foreground` (stone, not lime) |
+| Item checked | `data-[state=checked]:font-semibold`, check icon `text-primary-text` |
 | Animation | `animate-in fade-in-0 zoom-in-95 slide-in-from-top-2` |
 
 ## Code Example
@@ -50,7 +52,7 @@ Dropdown for choosing a single value from a list. Built on Radix Select.
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 <Select value="25" onValueChange={setRows}>
-  <SelectTrigger className="w-20 h-9">
+  <SelectTrigger className="w-20">
     <SelectValue />
   </SelectTrigger>
   <SelectContent>
