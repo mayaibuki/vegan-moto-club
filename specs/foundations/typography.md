@@ -5,7 +5,7 @@
 Vegan Moto Club uses two typefaces:
 
 - **DM Sans** for body copy and all UI (cards, h3s, buttons, prices, labels, `.lead`). Loaded with `next/font/google`.
-- **Redaction** for display headings only: every element carrying `.h-hero`, `.h-page` or `.h-section` (page h1s and section h2s). Loaded with `next/font/local` from `webfonts/`. As the visitor scrolls, these headings degrade from the clean cut to progressively pixelated cuts (see Scroll Degradation).
+- **Redaction** for display headings only: every element carrying `.h-hero`, `.h-page` or `.h-section` (page h1s, section h2s and `CardTitle`, which uses `.h-section` with `leading-none`). Loaded with `next/font/local` from `webfonts/`. As the visitor scrolls, these headings degrade from the clean cut to progressively pixelated cuts (see Scroll Degradation).
 
 Both are configured in `app/fonts.ts`; all font variables are applied on `<html>` in `app/layout.tsx`.
 
@@ -17,31 +17,32 @@ Both are configured in `app/fonts.ts`; all font variables are applied on `<html>
 | ------- | ---------------------- | ---------------------- | --------------------------------------------- | -------------- | -------------------------------------- |
 | Body/UI | DM Sans                | `--font-dm-sans`       | `--ds-font-sans` / `--font-family`            | `font-sans`    | `system-ui, -apple-system, sans-serif` |
 | Display | Redaction (clean)      | `--font-redaction`     | `--ds-font-serif` / `--font-family-display`   | `font-serif`   | `Georgia, serif`                       |
-| Display | Redaction 10 / 20 / 35 / 50 | `--font-redaction-10`, `--font-redaction-20`, `--font-redaction-35`, `--font-redaction-50` | (used only by the `data-degrade` rules) | none | `Georgia, serif` |
+| Display | Redaction 10 / 20 / 35 / 50 / 70 | `--font-redaction-10`, `--font-redaction-20`, `--font-redaction-35`, `--font-redaction-50`, `--font-redaction-70` | (used only by the `data-degrade` rules) | none | `Georgia, serif` |
 
-Each Redaction face loads weights 400 and 700 with `display: "swap"` and `adjustFontFallback: "Times New Roman"`. Headings use 700. Italics are not loaded for the degraded cuts; the clean Italic file stays in `webfonts/` but is unused. Cuts above 50 (`_70`, `_100`) were removed.
+Each Redaction face loads weights 400 and 700 with `display: "swap"` and `adjustFontFallback: "Times New Roman"`. Headings use 700. Italics are not loaded for the degraded cuts; the clean Italic file stays in `webfonts/` but is unused. The `_100` cut is not used.
 
 ### Heading Degradation
 
-`components/DegradeOnScroll.tsx` (mounted once in the root layout) sets `data-degrade` (0, 10, 20, 35, 50) on every `.h-hero`, `.h-page` and `.h-section`. The trigger depends on the input type: **cursor proximity on pointer devices, scroll position on touch devices**.
+`components/DegradeOnScroll.tsx` (mounted once in the root layout) sets `data-degrade` (0, 10, 20, 35, 50, 70) on every `.h-hero`, `.h-page` and `.h-section`. The trigger is **cursor proximity on pointer devices only**; touch devices keep the static clean cut.
 
-**Pointer devices** (`(hover: hover) and (pointer: fine)`): level is a function of the distance from the cursor to the nearest edge of the heading's box (0 when the cursor is over it).
+**Pointer devices** (`(hover: hover) and (pointer: fine)`): level is a function of the distance from the cursor to the nearest edge of the heading's box (0 when the cursor is over it, which gives level 70).
 
 | Distance | Level |
 | -------- | ----- |
-| 0 to 40px | 50 |
+| Cursor inside the box | 70 |
+| outside, up to 40px | 50 |
 | 40 to 120px | 35 |
 | 120 to 240px | 20 |
 | 240 to 400px | 10 |
 | beyond 400px | 0 |
 
 - Updates on `pointermove`, rAF-throttled; only headings intersecting the viewport (IntersectionObserver) are measured.
-- Hysteresis of 12px: a heading changes level only once the distance passes a band boundary by more than 12px, so a cursor resting on a boundary does not flicker.
+- The inside-the-box test is exact. Hysteresis of 12px on the outer bands: a heading changes level only once the distance passes a band boundary by more than 12px, so a cursor resting on a boundary does not flicker.
 - Everything resets to 0 when the pointer leaves the document.
 
-**Touch / coarse-pointer devices**: level comes from the heading's top edge as a fraction of viewport height. Lower 60%: 0. The top 40% splits into four equal bands: 0.30 to 0.40 → 10, 0.20 to 0.30 → 20, 0.10 to 0.20 → 35, above 0.10 (including off the top) → 50. It reverses on the way down. Nothing degrades before the first scroll, so headings above the fold paint clean.
+**Touch devices** (anything without `(hover: hover) and (pointer: fine)`): the component does nothing, with no listeners or observers. Headings stay at level 0 (clean cut).
 
-**Both:** under `prefers-reduced-motion: reduce` nothing degrades. The cuts share metrics: line heights are identical and single-line widths differ by a few px at most, so swapping does not change line breaks or layout. `font-synthesis: none` is set on the recipes. Levels above 50 are not used.
+**Reduced motion:** under `prefers-reduced-motion: reduce` nothing degrades (level 0). The cuts share metrics: line heights are identical and single-line widths differ by a few px at most, so swapping does not change line breaks or layout. `font-synthesis: none` is set on the recipes.
 
 ### Italics
 
@@ -114,7 +115,7 @@ Rules:
 
 - **Sizes and weights are unchanged from before the recipes.** What changed is that one role now maps to one style (for example, every h2 section heading is 24px on mobile and 30px from `md`, weight 700).
 - **The recipes set the display family.** `.h-hero`, `.h-page` and `.h-section` include `font-serif` (Redaction) and `font-synthesis: none`. Do not use `font-serif` anywhere else.
-- **Not covered by the recipes:** `CardTitle` (the Suggest forms' h2) stays `text-2xl font-semibold leading-none` without tracking; footer column headings stay `text-base font-bold`; h3s (product card names, event card titles, verification tier headings) are untouched and use `text-lg font-semibold` or their component's own style. The visually hidden "Products" h2s stay `sr-only`.
+- **Not covered by the recipes:** footer column headings stay `text-base font-bold`; h3s (product card names, event card titles, verification tier headings) are untouched and use `text-lg font-semibold` or their component's own style. The visually hidden "Products" h2s stay `sr-only`.
 - **Past Events** adds `text-muted-foreground` on top of `.h-section` to stay secondary to Upcoming Events.
 - Weights in use: 400 body, 500 labels/nav/buttons, 600 card titles, 700 headings and prices.
 

@@ -5,46 +5,30 @@ import { usePathname } from "next/navigation"
 
 const SELECTOR = ".h-hero, .h-page, .h-section"
 
-// Pointer: distance (px) from cursor to heading box. Upper bound of each band,
-// from level 50 down to level 10; beyond the last bound the heading is clean.
-const DIST_BOUNDS = [40, 120, 240, 400] // -> 50, 35, 20, 10
+// Distance (px) from cursor to heading box. Inside the box -> 70. Upper bound of
+// each outer band, from level 50 down to level 10; beyond the last bound: clean.
+const LEVELS = [50, 35, 20, 10]
+const DIST_BOUNDS = [40, 120, 240, 400]
 const HYSTERESIS = 12
 
 function levelForDistance(d: number): number {
-  if (d <= DIST_BOUNDS[0]) return 50
-  if (d <= DIST_BOUNDS[1]) return 35
-  if (d <= DIST_BOUNDS[2]) return 20
-  if (d <= DIST_BOUNDS[3]) return 10
+  for (let i = 0; i < DIST_BOUNDS.length; i++) if (d <= DIST_BOUNDS[i]) return LEVELS[i]
   return 0
 }
 
-// Distance at which the band for `level` ends on the far (cleaner) side.
-function outerBound(level: number): number {
-  return DIST_BOUNDS[[50, 35, 20, 10].indexOf(level)]
-}
-
-// Only change level once the distance has crossed a boundary by more than HYSTERESIS.
-function levelWithHysteresis(d: number, current: number): number {
+// Hysteresis applies to the outer bands only; the inside-the-box test is exact.
+function levelWithHysteresis(d: number, inside: boolean, current: number): number {
+  if (inside) return 70
+  if (current === 70) return levelForDistance(d)
   const raw = levelForDistance(d)
   if (raw === current) return current
   if (raw < current) {
     // moving away: must pass the current band's outer bound by HYSTERESIS
-    return d > outerBound(current) + HYSTERESIS ? levelForDistance(d - HYSTERESIS) : current
+    return d > DIST_BOUNDS[LEVELS.indexOf(current)] + HYSTERESIS ? levelForDistance(d - HYSTERESIS) : current
   }
   // moving closer: must pass the boundary into the new band by HYSTERESIS
-  const inner = current === 0 ? DIST_BOUNDS[3] : DIST_BOUNDS[[50, 35, 20, 10].indexOf(current) - 1]
+  const inner = current === 0 ? DIST_BOUNDS[3] : DIST_BOUNDS[LEVELS.indexOf(current) - 1]
   return d < inner - HYSTERESIS ? levelForDistance(d + HYSTERESIS) : current
-}
-
-// Touch: heading top as a fraction of viewport height. Lower 60% clean; the top
-// 40% splits into four equal bands, 10 -> 20 -> 35 -> 50 toward the top edge.
-function levelForTop(top: number, vh: number): number {
-  const r = top / vh
-  if (r >= 0.4) return 0
-  if (r >= 0.3) return 10
-  if (r >= 0.2) return 20
-  if (r >= 0.1) return 35
-  return 50
 }
 
 function current(el: HTMLElement): number {
@@ -60,9 +44,10 @@ function apply(el: HTMLElement, level: number) {
 }
 
 /**
- * Swaps Redaction heading cuts (clean, _10, _20, _35, _50).
- * Pointer devices: by cursor proximity. Touch devices: by scroll position.
- * Mounted once in the root layout. Does nothing under prefers-reduced-motion.
+ * Swaps Redaction heading cuts (clean, _10, _20, _35, _50, _70) by cursor
+ * proximity. Pointer devices only: touch devices and prefers-reduced-motion
+ * keep the clean cut (no listeners, no observers).
+ * Mounted once in the root layout.
  */
 export function DegradeOnScroll() {
   const pathname = usePathname()
@@ -70,11 +55,12 @@ export function DegradeOnScroll() {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)")
+    if (reduced.matches || !fine.matches) return
+
     let headings: HTMLElement[] = []
     const visible = new Set<HTMLElement>()
     let frame = 0
     let pointer: { x: number; y: number } | null = null
-    let scrolled = window.scrollY > 0
 
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
@@ -82,7 +68,7 @@ export function DegradeOnScroll() {
         if (e.isIntersecting) visible.add(el)
         else {
           visible.delete(el)
-          if (fine.matches) apply(el, 0)
+          apply(el, 0)
         }
       }
       schedule()
@@ -101,21 +87,13 @@ export function DegradeOnScroll() {
 
     const update = () => {
       frame = 0
-      if (reduced.matches) return resetAll()
-      if (fine.matches) {
-        if (!pointer) return resetAll()
-        const { x, y } = pointer
-        for (const el of visible) {
-          const r = el.getBoundingClientRect()
-          const dx = Math.max(r.left - x, 0, x - r.right)
-          const dy = Math.max(r.top - y, 0, y - r.bottom)
-          apply(el, levelWithHysteresis(Math.hypot(dx, dy), current(el)))
-        }
-      } else {
-        const vh = window.innerHeight
-        for (const el of headings) {
-          apply(el, scrolled ? levelForTop(el.getBoundingClientRect().top, vh) : 0)
-        }
+      if (!pointer) return resetAll()
+      const { x, y } = pointer
+      for (const el of visible) {
+        const r = el.getBoundingClientRect()
+        const dx = Math.max(r.left - x, 0, x - r.right)
+        const dy = Math.max(r.top - y, 0, y - r.bottom)
+        apply(el, levelWithHysteresis(Math.hypot(dx, dy), dx === 0 && dy === 0, current(el)))
       }
     }
 
@@ -132,10 +110,6 @@ export function DegradeOnScroll() {
       pointer = null
       schedule()
     }
-    const onScroll = () => {
-      if (window.scrollY > 0) scrolled = true
-      schedule()
-    }
 
     scan()
     schedule()
@@ -149,24 +123,20 @@ export function DegradeOnScroll() {
 
     window.addEventListener("pointermove", onPointerMove, { passive: true })
     document.documentElement.addEventListener("pointerleave", onPointerLeave)
-    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("scroll", schedule, { passive: true })
     window.addEventListener("resize", schedule, { passive: true })
-    reduced.addEventListener("change", schedule)
-    fine.addEventListener("change", schedule)
 
     return () => {
       if (frame) cancelAnimationFrame(frame)
       io.disconnect()
       mo.disconnect()
+      resetAll()
       window.removeEventListener("pointermove", onPointerMove)
       document.documentElement.removeEventListener("pointerleave", onPointerLeave)
-      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("scroll", schedule)
       window.removeEventListener("resize", schedule)
-      reduced.removeEventListener("change", schedule)
-      fine.removeEventListener("change", schedule)
     }
   }, [pathname])
 
   return null
 }
-
