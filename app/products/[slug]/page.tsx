@@ -272,7 +272,7 @@ export default async function ProductDetailPage({
                   href="/verification"
                   role="listitem"
                   aria-label={`${product.veganVerified} — learn how we verify vegan gear`}
-                  className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="focus-ring rounded-full"
                 >
                   <Badge
                     variant={

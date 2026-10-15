@@ -44,7 +44,11 @@ export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
   )
 
   if (href) {
-    return <Link href={href}>{logoElement}</Link>
+    return (
+      <Link href={href} className="focus-ring block w-fit rounded-lg">
+        {logoElement}
+      </Link>
+    )
   }
 
   return logoElement

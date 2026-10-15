@@ -21,17 +21,17 @@ export function Footer() {
             <h2 className="font-bold mb-4 text-base">Navigation</h2>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/products" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors">
+                <Link href="/products" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   Products
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors">
+                <Link href="/events" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   Events
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors">
+                <Link href="/about" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   About
                 </Link>
               </li>
@@ -47,7 +47,7 @@ export function Footer() {
                   href="https://discord.gg/J3vDjQvXPn"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors"
+                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
                   aria-label="Join us on Discord (opens in new tab)"
                 >
                   Discord<span className="sr-only"> (opens in new tab)</span>
@@ -58,7 +58,7 @@ export function Footer() {
                   href="https://www.instagram.com/veganmotoclub"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors"
+                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
                   aria-label="Follow us on Instagram (opens in new tab)"
                 >
                   Instagram<span className="sr-only"> (opens in new tab)</span>

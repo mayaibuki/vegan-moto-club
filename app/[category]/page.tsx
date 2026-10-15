@@ -133,7 +133,7 @@ export default async function CategoryLandingPage({
               <li key={other.slug}>
                 <Link
                   href={`/${other.slug}`}
-                  className="inline-block rounded-full border border-border px-4 py-1.5 text-sm hover:bg-muted"
+                  className="inline-block rounded-full border border-border px-4 py-1.5 text-sm hover:bg-muted focus-ring"
                 >
                   {other.title}
                 </Link>

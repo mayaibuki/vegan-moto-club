@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Moon, Sun, Menu, X } from "lucide-react"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { Button } from "./ui/button"
@@ -8,6 +9,7 @@ import { Logo } from "./Logo"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
+  const pathname = usePathname()
   const [isDark, setIsDark] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -65,7 +67,8 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-lg font-medium hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors"
+              aria-current={pathname === link.href ? "page" : undefined}
+              className="text-lg font-medium hover:underline aria-[current=page]:underline decoration-primary decoration-2 underline-offset-8 transition-colors focus-ring"
             >
               {link.label}
             </Link>
@@ -129,7 +132,8 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus() }}
-                    className="block py-3 text-base font-medium hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors"
+                    aria-current={pathname === link.href ? "page" : undefined}
+                    className="block py-3 text-base font-medium hover:underline aria-[current=page]:underline decoration-primary decoration-2 underline-offset-8 transition-colors focus-ring"
                   >
                     {link.label}
                   </Link>

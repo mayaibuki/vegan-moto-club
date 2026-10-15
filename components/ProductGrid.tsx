@@ -225,7 +225,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           onRemove()
           resetPage()
         }}
-        className="-mr-1 rounded p-1 hover:text-foreground"
+        className="-mr-1 p-1 hover:text-foreground focus-ring"
         aria-label={removeLabel}
         type="button"
       >
@@ -513,7 +513,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                 filterChip(`"${search}"`, () => setSearch(""), `Remove search for "${search}"`)}
               <button
                 onClick={clearAllFilters}
-                className="text-sm text-muted-foreground hover:text-foreground underline"
+                className="text-sm text-muted-foreground hover:text-foreground underline focus-ring"
                 type="button"
               >
                 Clear all
