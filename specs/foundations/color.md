@@ -20,7 +20,7 @@ The token architecture has three layers:
 
 | Token              | HSL Value            | Hex (approx.) | Usage Context             |
 | ------------------ | -------------------- | -------------- | ------------------------- |
-| `--ds-stone-50`    | `0 0% 98%`          | `#fafafa`      | Light foreground, inverse |
+| `--ds-stone-50`    | `0 0% 98%`          | `#fafafa`      | Page background (light), light foreground, inverse |
 | `--ds-stone-100`   | `12 6.5% 97.5%`     | `#f9f8f7`      | Muted backgrounds (light) |
 | `--ds-stone-200`   | `12 6.3% 93.8%`     | `#efedeb`      | Borders, inputs (light)   |
 | `--ds-stone-300`   | `12 5.4% 84%`       | `#d7d4d1`      | Chart fill, subtle UI     |
@@ -58,13 +58,13 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 
 | Role                     | CSS Variable              | Light Mode Value      | Dark Mode Value       |
 | ------------------------ | ------------------------- | --------------------- | --------------------- |
-| **Background**           | `--background`            | White `0 0% 100%`    | Stone-950 `12 8.3% 7.2%` |
+| **Background**           | `--background`            | Stone-50 `0 0% 98%` | Stone-950 `12 8.3% 7.2%` |
 | **Foreground**           | `--foreground`            | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |
 | **Muted BG**             | `--muted`                 | Stone-100 `12 6.5% 97.5%` | Stone-800 `12 6.3% 18.8%` |
-| **Muted Text**           | `--muted-foreground`      | Stone-500 `12 6.5% 51.5%` | Stone-400 `12 4.9% 64%` |
+| **Muted Text**           | `--muted-foreground`      | Stone-600 `12 6.5% 44%` | Stone-400 `12 4.9% 64%` |
 | **Primary**              | `--primary`               | Lime-500 `77.9 54.4% 47.4%` | Lime-400 `79.1 64.5% 57.5%` |
 | **Primary Foreground**   | `--primary-foreground`    | Stone-950 `12 8.3% 7.2%` | Stone-950 `12 8.3% 7.2%` |
-| **Secondary BG**         | `--secondary`             | Stone-100 `12 6.5% 97.5%` | Stone-800 `12 6.3% 18.8%` |
+| **Secondary BG**         | `--secondary`             | Stone-200 `12 6.3% 93.8%` | Stone-800 `12 6.3% 18.8%` |
 | **Secondary Foreground** | `--secondary-foreground`  | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |
 | **Accent**               | `--accent`                | Lime-400 `79.1 64.5% 57.5%` | Lime-500 `77.9 54.4% 47.4%` |
 | **Accent Foreground**    | `--accent-foreground`     | Stone-950 `12 8.3% 7.2%` | Stone-950 `12 8.3% 7.2%` |
@@ -158,18 +158,9 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
   - **Large text** (>= 18px bold or >= 24px): 3:1 contrast ratio
   - **UI components and graphics**: 3:1 contrast ratio
 
-### Known Issue: `muted-foreground`
+### Muted text contrast
 
-The `--muted-foreground` token (Stone-500 in light mode, Stone-400 in dark mode) is **near the WCAG AA threshold** for normal-sized text on default backgrounds.
-
-- Light mode: Stone-500 (`#8b8380`) on White (`#ffffff`) = approximately 3.9:1 -- **below 4.5:1 for normal text**.
-- Dark mode: Stone-400 (`#a5a09c`) on Stone-950 (`#141311`) = approximately 5.7:1 -- passes AA.
-
-**Recommendations:**
-
-- Use `text-muted-foreground` only for **large text** (18px+ bold or 24px+) or **non-essential** secondary information.
-- For smaller helper text that must be accessible, prefer `text-foreground` or a custom intermediate shade.
-- This is tracked as a remaining TODO in the project audit log.
+`--muted-foreground` is Stone-600 in light mode (`12 6.5% 44%`, 4.87:1 on the Stone-50 page, 5.08:1 on white cards) and Stone-400 in dark mode (about 5.7:1 on Stone-950). Both pass AA for normal text. Stone-500 (3.9:1 on white) must not be used for text.
 
 ### Focus Indicators
 

@@ -9,7 +9,7 @@
 @layer base {
   :root {
     /* Maia Theme - Stone base + Lime accent - Light Mode */
-    --background: 0 0% 100%;              /* White */
+    --background: 0 0% 98%;                   /* stone-50 */
     --foreground: 12 8.7% 11.8%;          /* stone-900 */
     --card: 0 0% 100%;                    /* White */
     --card-foreground: 12 8.7% 11.8%;     /* stone-900 */
@@ -23,7 +23,7 @@
     --primary-foreground: 12 8.3% 7.2%;   /* stone-950 (dark text on lime) */
 
     /* Secondary: Stone grey */
-    --secondary: 12 6.5% 97.5%;           /* stone-100 */
+    --secondary: 12 6.3% 93.8%;           /* stone-200 */
     --secondary-foreground: 12 8.7% 11.8%;/* stone-900 */
 
     /* Accent: Lime green */

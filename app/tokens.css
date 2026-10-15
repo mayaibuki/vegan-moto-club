@@ -134,7 +134,7 @@
 
 :root {
   /* ---- Semantic Colors ---- */
-  --color-bg:              var(--ds-white, 0 0% 100%);
+  --color-bg:              var(--ds-stone-50, 0 0% 98%);
   --color-bg-subtle:       var(--ds-stone-100, 12 6.5% 97.5%);
   --color-bg-muted:        var(--ds-stone-100, 12 6.5% 97.5%);
   --color-bg-inverse:      var(--ds-stone-950, 12 8.3% 7.2%);
