@@ -59,6 +59,10 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      maxHeight: {
+        // Bottom sheet height (filters below lg)
+        sheet: "85dvh",
+      },
       zIndex: {
         // Stacking tokens from tokens.css (--z-*)
         sticky: "var(--z-sticky)",

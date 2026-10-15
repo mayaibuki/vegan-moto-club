@@ -44,7 +44,7 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 
 | Element              | Token / Class                | Purpose               |
 |----------------------|------------------------------|-----------------------|
-| Sidebar bg (mobile)  | `bg-card`                    | Raised panel          |
+| Bottom sheet (< lg)  | `bg-card rounded-t-2xl border-t border-border shadow-lg max-h-sheet` (85dvh), backdrop `bg-foreground/40`, `z-overlay` | Raised surface over the grid |
 | Filter labels        | `text-foreground`            | Primary text          |
 | Filter option rows   | `<Label>` wrapping the control: `flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium leading-snug`, no vertical spacing between rows | 44px tap target per option; control stays 20px |
 | Muted text           | `text-muted-foreground`      | Counts, descriptions  |
@@ -81,7 +81,7 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 
 | Breakpoint | Behavior                                       |
 |------------|-------------------------------------------------|
-| < lg       | Filters hidden (toggle button visible), 2-col grid |
+| < lg       | Filters open as a bottom sheet from the Filters button (see below), 2-col grid |
 | md         | 3-column product grid                          |
 | lg+        | Sidebar visible (w-64, sticky), 4-column grid  |
 
@@ -129,3 +129,12 @@ Category landing pages (`app/[category]/page.tsx`) render, above the grid:
 
 - A category switcher `<nav aria-label="Gear categories">`: every category as a 44px chip (`inline-flex h-11 rounded-full border border-border bg-card px-4 text-sm hover:bg-muted`). The current page has `aria-current="page"` and fills `bg-primary text-primary-foreground`. Below md the row scrolls sideways (`no-scrollbar overflow-x-auto snap-x`, bleeding to the screen edge with `-mx-4 px-4 sm:-mx-6 sm:px-6`); from md it wraps.
 - `CategoryProductList` (client): the product count, a "More filters" outline button to `/products?category=…`, the Sort by select (client-side, not saved to the URL) and the card grid (`gap-4 sm:gap-6`).
+
+## Filter bottom sheet (below lg)
+
+The Filters button opens a Radix Dialog rendered as a bottom sheet; lg+ keeps the sticky sidebar. Filter state and logic are shared: the same `filterFields` render in the sidebar or the sheet, never both (ids stay unique).
+
+- Header: "Filters" title and a 44px close button. Body scrolls on its own (`overflow-y-auto overscroll-contain`); at md the fields sit in two columns.
+- Footer: full-width "Show N products" button (live count) that closes the sheet; bottom padding `pb-safe-3` clears the home indicator.
+- Radix provides the focus trap, Escape and backdrop tap to close, and page scroll lock. Opening focuses the sheet itself (not the search field, so phones do not open the keyboard); closing returns focus to the Filters button.
+- No slide animation yet; the sheet appears in place. Motion is added with the motion work.
