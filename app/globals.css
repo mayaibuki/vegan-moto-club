@@ -68,6 +68,14 @@
   }
 }
 
+@layer base {
+  /* tailwindcss-animate sets no timing function; use the single motion curve. */
+  .animate-in,
+  .animate-out {
+    animation-timing-function: var(--ease);
+  }
+}
+
 @layer components {
   .page-container {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
@@ -101,6 +109,10 @@
 }
 
 @layer utilities {
+  /* tailwindcss-animate enter/exit at the slow (300ms) step. Extra specificity beats the plugin's data-[state] animate-in/out (150ms). */
+  .animate-slow.animate-slow[data-state] {
+    animation-duration: var(--duration-slow);
+  }
   /* Horizontal scrollers (category chip row) without a visible scrollbar */
   .no-scrollbar {
     -ms-overflow-style: none;

@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import animate from 'tailwindcss-animate'
 
 const config: Config = {
   future: { hoverOnlyWhenSupported: true },
@@ -73,6 +74,10 @@ const config: Config = {
         open: "1fr",
         closed: "0fr",
       },
+      scale: {
+        // Press feedback on cards (motion.md)
+        98: "0.98",
+      },
       aspectRatio: {
         "4/3": "4 / 3",
       },
@@ -86,6 +91,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [animate],
 }
 export default config
