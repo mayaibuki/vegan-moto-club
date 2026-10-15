@@ -21,6 +21,7 @@
     /* Primary: Lime green */
     --primary: 77.9 54.4% 47.4%;          /* lime-500 */
     --primary-foreground: 12 8.3% 7.2%;   /* stone-950 (dark text on lime) */
+    --primary-text: 77 67% 28%;           /* lime-700 (text on tinted lime, 5.1:1 on white) */
 
     /* Secondary: Stone grey */
     --secondary: 12 6.3% 93.8%;           /* stone-200 */
@@ -33,6 +34,7 @@
     /* UI Colors */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --destructive-text: 0 72% 45%;        /* red-600 (text on tinted red) */
     --success: 142 71% 45%;               /* green-600 */
     --success-foreground: 0 0% 100%;
     --border: 12 6.3% 93.8%;              /* stone-200 */
@@ -67,6 +69,7 @@
     /* Primary: Lime green */
     --primary: 79.1 64.5% 57.5%;          /* lime-400 */
     --primary-foreground: 12 8.3% 7.2%;   /* stone-950 */
+    --primary-text: 79.1 64.5% 57.5%;     /* lime-400 */
 
     /* Secondary: Stone grey */
     --secondary: 12 6.3% 18.8%;           /* stone-800 */
@@ -79,6 +82,7 @@
     /* UI Colors */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --destructive-text: 0 91% 71%;        /* red-400 (text on tinted red) */
     --success: 142 69% 58%;               /* green-400 */
     --success-foreground: 0 0% 100%;
     --border: 12 5% 24%;                  /* stone-700 */
