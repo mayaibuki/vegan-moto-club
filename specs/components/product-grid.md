@@ -138,3 +138,10 @@ The Filters button opens a Radix Dialog rendered as a bottom sheet; lg+ keeps th
 - Footer: full-width "Show N products" button (live count) that closes the sheet; bottom padding `pb-safe-3` clears the home indicator.
 - Radix provides the focus trap, Escape and backdrop tap to close, and page scroll lock. Opening focuses the sheet itself (not the search field, so phones do not open the keyboard); closing returns focus to the Filters button.
 - No slide animation yet; the sheet appears in place. Motion is added with the motion work.
+
+## Motion
+
+- **Filter sheet:** the overlay fades (`fade-in-0` / `fade-out-0`) and the sheet slides from the bottom (`slide-in-from-bottom` / `slide-out-to-bottom`) over 300ms (`animate-slow`), easing `--ease`. Radix keeps the content mounted until the exit animation ends. Instant under `prefers-reduced-motion`.
+- **Cards:** see [product-card](./product-card.md#motion).
+
+See [motion](../foundations/motion.md#implemented-motion).

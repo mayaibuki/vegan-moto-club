@@ -175,3 +175,27 @@ The design system includes opacity primitives for disabled and muted states:
    ```
 5. **No decorative animations.** Motion is purely functional -- providing feedback for user interactions. Avoid loading animations, bouncing elements, or continuous motion.
 6. **One easing curve.** Use the default `cubic-bezier(0.4, 0, 0.2, 1)` for all transitions. The curve is registered as Tailwind's default `transitionTimingFunction` in `tailwind.config.ts`, so no `ease-[...]` class is needed (the audit warns on it). Do not introduce custom easing curves without design review.
+
+---
+
+## Implemented Motion
+
+Every motion in the product, with its trigger and reduced-motion behaviour. Only `transform` and `opacity` animate, except the collapse (`grid-template-rows`), shadow and underline-colour cases. Easing is always the single curve (`--ease`, Tailwind default). Under `prefers-reduced-motion: reduce` the global rule in `app/globals.css` sets `transition-duration` and `animation-duration` to 0.01ms, so each change below becomes an instant state change.
+
+| Element | Trigger | Properties | Duration | Easing | Reduced motion |
+| --- | --- | --- | --- | --- | --- |
+| ProductCard, EventCard | Hover (pointer devices) | `transform` (`-translate-y-0.5`), `box-shadow` (`shadow-sm` to `shadow-md`) | 200ms | `--ease` | Lift and shadow apply instantly |
+| ProductCard | Press (`:active` on the link) | `transform` (`scale-98`) | 200ms | `--ease` | Scale applies instantly |
+| Select dropdown | Open / close | `opacity`, `transform` (`zoom-95`) via tailwindcss-animate | 150ms (plugin default) | `--ease` | Appears and disappears instantly |
+| Filter sheet overlay | Open / close | `opacity` (`fade-in-0` / `fade-out-0`) | 300ms | `--ease` | Instant |
+| Filter sheet | Open / close | `transform` (`slide-in-from-bottom` / `slide-out-to-bottom`) | 300ms | `--ease` | Instant; Radix unmounts after the near-zero exit animation |
+| Promo banner | Dismiss | `grid-template-rows` 1fr to 0fr, `opacity` | 300ms | `--ease` | Computed duration is 0, so the banner is removed immediately without waiting for `transitionend` |
+| Theme toggle icon | Click | `opacity`, `transform` (rotate + scale); both icons cross-fade | 150ms | `--ease` | Instant swap; no page-wide transition |
+| Nav link underline | Hover / current page | `text-decoration-color` (transparent to `decoration-primary`) | 150ms | `--ease` | Instant; no layout change |
+
+### Implementation notes
+
+- **tailwindcss-animate** (1.0.7) is registered in `tailwind.config.ts`. It sets no timing function and a 150ms duration, so `app/globals.css` applies `--ease` to `.animate-in` / `.animate-out` and provides `.animate-slow` to lift the sheet and overlay to 300ms (`--duration-slow`).
+- **Card press** uses the `scale-98` entry in `theme.extend.scale` (0.98) instead of an arbitrary value.
+- **JS paths:** the only JS-driven motion is the promo banner. It reads `getComputedStyle(...).transitionDuration` at dismiss time and unmounts at once when it is 0; otherwise it unmounts on `transitionend` for `grid-template-rows`.
+- Not used: grid stagger, hero reveal, framer-motion.

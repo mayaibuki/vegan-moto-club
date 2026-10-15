@@ -55,7 +55,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
 
   return (
     <article className="h-full">
-      <Card className="flex h-full flex-col gap-4 p-4">
+      <Card className="flex h-full flex-col gap-4 p-4 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md">
         {event.poster ? (
           /* Poster with overlays: 4:3 on phones, square from sm up */
           <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl bg-muted sm:aspect-square">

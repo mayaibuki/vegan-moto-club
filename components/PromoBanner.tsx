@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Tag, X } from "lucide-react"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { Button } from "./ui/button"
 
 const STORAGE_KEY = "promo-bellissimoto-dismissed"
@@ -18,6 +18,8 @@ const PRE_PAINT_SCRIPT = `try{if(localStorage.getItem("${STORAGE_KEY}")==="true"
 
 export function PromoBanner() {
   const [dismissed, setDismissed] = useState(false)
+  const [closing, setClosing] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     try {
@@ -29,18 +31,35 @@ export function PromoBanner() {
     try {
       localStorage.setItem(STORAGE_KEY, "true")
     } catch {}
-    setDismissed(true)
+    const el = wrapperRef.current
+    // Collapse first, unmount on transitionend. With no transition (reduced
+    // motion sets the duration to ~0, or the element is not rendered) remove at once.
+    const duration = el ? parseFloat(getComputedStyle(el).transitionDuration) : 0
+    if (!el || !(duration > 0.001)) {
+      setDismissed(true)
+      return
+    }
+    setClosing(true)
+  }, [])
+
+  const handleTransitionEnd = useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget && e.propertyName === "grid-template-rows") setDismissed(true)
   }, [])
 
   if (dismissed) return null
 
   return (
-    // Collapse wrapper: a one-row grid whose row can animate from 1fr to 0fr.
-    // This PR removes the banner instantly on dismiss; the collapse motion
-    // (grid-rows-closed + opacity, unmount on transitionend) lands with the
-    // motion work.
-    <div id={WRAPPER_ID} data-state="open" suppressHydrationWarning className="grid grid-rows-open">
-      <div className="min-h-0 overflow-hidden">
+    // Collapse wrapper: a one-row grid whose row animates from 1fr to 0fr (300ms),
+    // then the banner unmounts on transitionend.
+    <div
+      ref={wrapperRef}
+      id={WRAPPER_ID}
+      data-state={closing ? "closed" : "open"}
+      suppressHydrationWarning
+      onTransitionEnd={handleTransitionEnd}
+      className={`grid transition-[grid-template-rows] duration-300 ${closing ? "grid-rows-closed" : "grid-rows-open"}`}
+    >
+      <div className={`min-h-0 overflow-hidden transition-opacity duration-300 ${closing ? "opacity-0" : "opacity-100"}`}>
         <div
           role="region"
           aria-label="Promotion"
@@ -63,6 +82,7 @@ export function PromoBanner() {
             variant="ghost"
             size="icon"
             onClick={handleDismiss}
+            disabled={closing}
             aria-label="Dismiss promotion"
             className="absolute top-0 right-0 sm:top-1/2 sm:right-2 sm:-translate-y-1/2"
           >

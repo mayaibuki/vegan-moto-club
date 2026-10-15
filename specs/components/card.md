@@ -79,3 +79,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 - [EventCard](./event-card.md) — Specialized card for events
 - [Badge](./badge.md) — Often used inside cards
 - [Button](./button.md) — CTA buttons in card footer
+
+## Motion
+
+`interactive` cards lift on hover: `hover:-translate-y-0.5` with the `shadow-sm` to `shadow-md` step, `transition-[transform,box-shadow,border-color] duration-200`. Instant under reduced motion. See [motion](../foundations/motion.md#implemented-motion).

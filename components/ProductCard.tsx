@@ -40,7 +40,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
         aria-label={`${product.name} by ${product.brand}, ${formatPrice(product.price)}${product.levelOfProtection ? `, ${product.levelOfProtection}` : ""}${product.staffFavorite ? ", Staff pick" : ""}`}
         className="group block h-full focus-ring rounded-2xl"
       >
-        <Card interactive className="h-full cursor-pointer overflow-hidden transition-[box-shadow,border-color,transform] motion-safe:group-active:scale-[0.98]">
+        <Card interactive className="h-full cursor-pointer overflow-hidden group-active:scale-98">
           <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border flex items-center justify-center">
             {product.photos.length > 0 ? (
               <ProductCardImage

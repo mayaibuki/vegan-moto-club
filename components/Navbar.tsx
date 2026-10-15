@@ -8,6 +8,17 @@ import { Button } from "./ui/button"
 import { Logo } from "./Logo"
 import { cn } from "@/lib/utils"
 
+// Both icons stay mounted and cross-fade (opacity + a small turn/scale), 150ms.
+function ThemeIcon({ isDark }: { isDark: boolean }) {
+  const base = "absolute inset-0 m-auto h-5 w-5 transition-[opacity,transform] duration-150"
+  return (
+    <span className="relative block h-5 w-5">
+      <Sun className={cn(base, isDark ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-75 opacity-0")} aria-hidden="true" />
+      <Moon className={cn(base, isDark ? "rotate-90 scale-75 opacity-0" : "rotate-0 scale-100 opacity-100")} aria-hidden="true" />
+    </span>
+  )
+}
+
 export function Navbar() {
   const pathname = usePathname()
   const [isDark, setIsDark] = useState(false)
@@ -68,7 +79,7 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               aria-current={pathname === link.href ? "page" : undefined}
-              className="text-lg font-medium hover:underline aria-[current=page]:underline decoration-primary decoration-2 underline-offset-8 transition-colors focus-ring"
+              className="text-lg font-medium underline decoration-transparent hover:decoration-primary aria-[current=page]:decoration-primary decoration-2 underline-offset-8 transition-[text-decoration-color] duration-150 focus-ring"
             >
               {link.label}
             </Link>
@@ -82,7 +93,7 @@ export function Navbar() {
               aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
               className="rounded-full"
             >
-              {isDark ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+              <ThemeIcon isDark={isDark} />
             </Button>
           )}
         </div>
@@ -97,7 +108,7 @@ export function Navbar() {
               aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
               className="rounded-full"
             >
-              {isDark ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+              <ThemeIcon isDark={isDark} />
             </Button>
           )}
           <Button
@@ -133,7 +144,7 @@ export function Navbar() {
                     href={link.href}
                     onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus() }}
                     aria-current={pathname === link.href ? "page" : undefined}
-                    className="block py-3 text-base font-medium hover:underline aria-[current=page]:underline decoration-primary decoration-2 underline-offset-8 transition-colors focus-ring"
+                    className="block py-3 text-base font-medium underline decoration-transparent hover:decoration-primary aria-[current=page]:decoration-primary decoration-2 underline-offset-8 transition-[text-decoration-color] duration-150 focus-ring"
                   >
                     {link.label}
                   </Link>
