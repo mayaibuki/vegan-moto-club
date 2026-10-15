@@ -27,8 +27,8 @@ Toggle control for multi-select options. Built on Radix Checkbox.
 |----------|---------------|
 | Size | `h-5 w-5` (20px) |
 | Radius | `rounded-md` (6px) |
-| Border | `border-2 border-input` |
-| Background | `bg-background` |
+| Border | `border-2 border-input` (3:1, `--input` = stone-500) |
+| Background | `bg-card` (white in light mode) |
 | Checked bg | `bg-primary` |
 | Checked border | `border-primary` |
 | Checked text | `text-primary-foreground` |
@@ -40,7 +40,7 @@ Toggle control for multi-select options. Built on Radix Checkbox.
 
 | State | Appearance |
 |-------|------------|
-| **Unchecked** | `border-input bg-background` |
+| **Unchecked** | `border-input bg-card` |
 | **Checked** | `bg-primary border-primary text-primary-foreground` + check icon |
 | **Focus** | `ring-2 ring-ring ring-offset-2` |
 | **Disabled** | `cursor-not-allowed opacity-50` |

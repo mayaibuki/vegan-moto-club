@@ -25,8 +25,8 @@ Single-line text input for forms and search.
 |----------|---------------|
 | Height | `h-11` (44px) |
 | Radius | `rounded-xl` (12px) |
-| Border | `border-2 border-input` |
-| Background | `bg-background` |
+| Border | `border border-input` (3:1, `--input` = stone-500) |
+| Background | `bg-card` (white in light mode) |
 | Padding | `px-4 py-2.5` |
 | Font | `text-sm` |
 | Focus border | `border-primary` |
@@ -42,7 +42,7 @@ Standard HTML `<input>` props. Forwarded ref.
 
 | State | Appearance |
 |-------|------------|
-| **Default** | `border-input bg-background` |
+| **Default** | `border-input bg-card` |
 | **Focus** | `border-primary ring-2 ring-ring ring-offset-2` |
 | **Disabled** | `cursor-not-allowed opacity-50` |
 | **With icon** | Add `pl-9` and position icon `absolute left-3` |

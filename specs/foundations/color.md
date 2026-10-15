@@ -71,7 +71,7 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | **Destructive**          | `--destructive`           | Red `0 84.2% 60.2%`  | Red (dark) `0 62.8% 30.6%` |
 | **Destructive FG**       | `--destructive-foreground`| `0 0% 98%`           | `0 0% 98%`           |
 | **Border**               | `--border`                | Stone-200 `12 6.3% 93.8%` | Stone-800 `12 6.3% 18.8%` |
-| **Input**                | `--input`                 | Stone-200 `12 6.3% 93.8%` | Stone-800 `12 6.3% 18.8%` |
+| **Input**                | `--input`                 | Stone-500 `12 6.5% 51.5%` | Stone-500 `12 6.5% 51.5%` |
 | **Ring**                 | `--ring`                  | Lime-500 `77.9 54.4% 47.4%` | Lime-400 `79.1 64.5% 57.5%` |
 | **Card BG**              | `--card`                  | White `0 0% 100%`    | Stone-900 `12 8.7% 11.8%` |
 | **Card Foreground**      | `--card-foreground`       | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |

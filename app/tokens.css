@@ -150,7 +150,7 @@
 
   --color-border:          var(--ds-stone-200, 12 6.3% 93.8%);
   --color-border-muted:    var(--ds-stone-200, 12 6.3% 93.8%);
-  --color-input:           var(--ds-stone-200, 12 6.3% 93.8%);
+  --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
   --color-ring:            var(--ds-lime-500, 77.9 54.4% 47.4%);
 
   --color-card-bg:         var(--ds-white, 0 0% 100%);
@@ -264,7 +264,7 @@
 
   --color-border:          var(--ds-stone-800, 12 6.3% 18.8%);
   --color-border-muted:    var(--ds-stone-800, 12 6.3% 18.8%);
-  --color-input:           var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
   --color-ring:            var(--ds-lime-400, 79.1 64.5% 57.5%);
 
   --color-card-bg:         var(--ds-stone-900, 12 8.7% 11.8%);
