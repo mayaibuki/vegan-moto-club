@@ -14,7 +14,7 @@ Site-wide footer with brand info, navigation links, and social links.
 ## Anatomy
 
 ```
-[footer]                           — border-t, bg-secondary/10, mt-12
+[footer]                           — border-t, bg-card, mt-12
   └─ [container]                   — max-w-7xl, px-6 py-10
        ├─ [3-column grid]          — md:grid-cols-3, gap-10, mb-10
        │    ├─ [Brand]             — Logo (sm), name, tagline
@@ -28,7 +28,7 @@ Site-wide footer with brand info, navigation links, and social links.
 | Property | Token / Class |
 |----------|---------------|
 | Top border | `border-t border-border` |
-| Background | `bg-secondary/10` |
+| Background | `bg-card` |
 | Top margin | `mt-12` |
 | Padding | `px-6 py-10` |
 | Grid gap | `gap-10` |

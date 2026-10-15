@@ -28,7 +28,8 @@ Single-select option group. Built on Radix RadioGroup.
 |----------|---------------|
 | Size | `h-5 w-5` (20px) |
 | Radius | `rounded-full` |
-| Border | `border-2 border-input` |
+| Border | `border-2 border-input` (3:1, `--input` = stone-500) |
+| Background | `bg-card` (white in light mode) |
 | Checked border | `border-primary` |
 | Indicator | `h-2.5 w-2.5 rounded-full bg-primary` |
 | Focus ring | `ring-2 ring-ring ring-offset-2` |

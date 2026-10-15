@@ -42,7 +42,7 @@ export function Navbar() {
   ]
 
   return (
-    <header className="border-b border-border/50 bg-muted/80 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
       <nav aria-label="Main navigation" className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Logo size="md" href="/" />
 
@@ -102,12 +102,12 @@ export function Navbar() {
       {/* Mobile Navigation Menu */}
       <div
         id="mobile-nav-menu"
-        className={`md:hidden grid transition-[grid-template-rows] duration-200 ease-[cubic-bezier(0.2,0,0,1)] ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+        className={`md:hidden grid transition-[grid-template-rows] duration-200 ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
         role="navigation"
         aria-label="Mobile navigation"
       >
         <div ref={mobileMenuRef} className="overflow-hidden min-h-0">
-          <div className="border-t border-border/50 bg-background">
+          <div className="border-t border-border/50 bg-card">
             <ul className="px-6 py-4 space-y-1 list-none">
               {navLinks.map((link) => (
                 <li key={link.href}>

@@ -238,11 +238,12 @@ export default async function ProductDetailPage({
                   variant={
                     product.levelOfProtection === "Most protective" ||
                     product.levelOfProtection === "Highly protective"
-                      ? "default"
-                      : product.levelOfProtection === "Moderately protective" ||
-                        product.levelOfProtection === "Slightly protective"
+                      ? "positive"
+                      : product.levelOfProtection === "Moderately protective"
                       ? "outline"
-                      : "destructive"
+                      : product.levelOfProtection === "Slightly protective"
+                      ? "secondary"
+                      : "negative"
                   }
                 >
                   {product.levelOfProtection}

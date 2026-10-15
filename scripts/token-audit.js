@@ -160,6 +160,26 @@ const ARBITRARY_TW_VALUES = [
     suggestion: (match) => `Consider replacing ${match} with a scale value or var(--size-*) token`,
     level: "warning",
   },
+  // Alpha borders make the edge disappear on tinted/dark surfaces
+  { pattern: /\bborder-(?:border|input)\/\d+\b/g,
+    suggestion: (match) => `Use solid ${match.replace(/\/\d+$/, "")} (alpha borders vanish on some surfaces)`,
+    level: "warning",
+  },
+  // Alpha resting surfaces render almost the same as the page; glass (backdrop-blur) is allowed
+  { pattern: /\bbg-(?:muted|secondary)\/\d+\b(?![^"'`\n]*backdrop-blur)/g,
+    suggestion: (match) => `Use a solid surface token instead of ${match} (alpha resting surfaces are nearly invisible); glass with backdrop-blur is allowed`,
+    level: "warning",
+  },
+  // transition-all animates properties nobody intended
+  { pattern: /\btransition-all\b/g,
+    suggestion: () => "List the properties: transition-[a,b], transition-colors, transition-shadow or transition-transform",
+    level: "warning",
+  },
+  // Custom easing: the default curve is registered in tailwind.config.ts
+  { pattern: /\bease-\[[^\]]+\]/g,
+    suggestion: (match) => `Remove ${match}; the single easing curve is the Tailwind default (tailwind.config.ts)`,
+    level: "warning",
+  },
   // Arbitrary border-radius
   { pattern: /\brounded-\[\d+px\]/g,
     suggestion: (match) => `Replace ${match} with rounded-sm/md/lg/xl/2xl or var(--radius-*) token`,
@@ -280,6 +300,27 @@ function auditFile(filePath) {
   return violations;
 }
 
+// globals.css is skipped by the generic rules (it only bridges variables), but it
+// must not declare raw HSL triplets: values live in tokens.css and are aliased here.
+function auditGlobalsBridge() {
+  const file = path.join(ROOT, "app", "globals.css");
+  if (!fs.existsSync(file)) return [];
+  const content = fs.readFileSync(file, "utf-8");
+  const violations = [];
+  const hsl = /--[\w-]+\s*:\s*(?!var\()\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%/g;
+  let match;
+  while ((match = hsl.exec(content)) !== null) {
+    violations.push({
+      file: "app/globals.css",
+      line: getLineNumber(content, match.index),
+      level: "error",
+      violation: match[0].trim(),
+      suggestion: "Declare the value in tokens.css and point this bridge variable at it with var(--color-*) or var(--ds-*)",
+    });
+  }
+  return violations;
+}
+
 // ─── Reporter ─────────────────────────────────────────────────────────────────
 
 function report(violations) {
@@ -390,6 +431,8 @@ function main() {
     const violations = auditFile(file);
     allViolations.push(...violations);
   }
+
+  allViolations.push(...auditGlobalsBridge());
 
   const exitCode = report(allViolations);
   process.exit(exitCode);

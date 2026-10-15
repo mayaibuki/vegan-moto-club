@@ -33,8 +33,8 @@ Dropdown for choosing a single value from a list. Built on Radix Select.
 |----------|---------------|
 | Trigger height | `h-10` (40px) |
 | Trigger radius | `rounded-full` |
-| Trigger border | `border border-input` |
-| Trigger bg | `bg-background` |
+| Trigger border | `border border-input` (3:1) |
+| Trigger bg | `bg-card` (white in light mode) |
 | Content radius | `rounded-xl` |
 | Content shadow | `shadow-md` |
 | Content bg | `bg-popover` |

@@ -30,7 +30,7 @@ Container component for grouping related content. Provides visual boundary and e
 |----------|---------------|
 | Background | `bg-card` → `hsl(var(--card))` |
 | Text | `text-card-foreground` |
-| Border | `border-border/50` |
+| Border | `border-border` |
 | Radius | `rounded-2xl` (16px) |
 | Shadow | `shadow-sm` → hover: `shadow-md` |
 | Transition | `transition-shadow` |
@@ -42,7 +42,7 @@ All sub-components accept standard HTML `div` props plus `className`.
 
 | Sub-component | Default classes |
 |---------------|-----------------|
-| `Card` | `rounded-2xl border border-border/50 bg-card text-card-foreground shadow-sm` |
+| `Card` | `rounded-2xl border border-border bg-card text-card-foreground shadow-sm` |
 | `CardHeader` | `flex flex-col space-y-2 p-7` |
 | `CardTitle` | `text-2xl font-semibold leading-none tracking-tight` |
 | `CardDescription` | `text-sm text-muted-foreground` |
@@ -53,8 +53,8 @@ All sub-components accept standard HTML `div` props plus `className`.
 
 | State | Appearance |
 |-------|------------|
-| **Default** | `shadow-sm`, `border-border/50` |
-| **Hover** | `shadow-md` (when interactive, e.g., product card) |
+| **Default** | `shadow-sm`, `border-border` |
+| **Hover** | `shadow-md` (the base Card applies it to every card; ProductCard overrides with `shadow-lg`) |
 
 ## Code Example
 

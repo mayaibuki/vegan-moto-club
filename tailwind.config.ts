@@ -25,6 +25,7 @@ const config: Config = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          text: "hsl(var(--primary-text))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -33,6 +34,7 @@ const config: Config = {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+          text: "hsl(var(--destructive-text))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
@@ -54,6 +56,9 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+      },
+      transitionTimingFunction: {
+        DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
       borderRadius: {
         lg: "var(--radius)",

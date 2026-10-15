@@ -43,7 +43,7 @@ shadcn/ui components use a single `--radius` CSS variable as the base, with `cal
 
 ```css
 :root {
-  --radius: 0.75rem; /* 12px */
+  --radius: var(--radius-lg); /* 12px, alias of --ds-radius-lg in tokens.css */
 }
 ```
 
@@ -72,9 +72,10 @@ Note: The shadcn `rounded-sm` (8px via calc) differs from the primitive `--ds-ra
 | Component            | Recommended Radius   | Tailwind Class   |
 | -------------------- | -------------------- | ---------------- |
 | Badge                | 4px                  | `rounded-sm` (primitive) or `rounded-full` for pills |
-| Input / Select       | 10px (shadcn md)     | `rounded-md`     |
-| Button (default)     | 10px (shadcn md)     | `rounded-md`     |
-| Card                 | 12px (shadcn lg)     | `rounded-lg`     |
+| Input                | 12px                 | `rounded-xl` (shipped; Tailwind `xl` is 12px here) |
+| Select trigger / content | see `components/ui/select.tsx` | `rounded-md` trigger, `rounded-xl` content |
+| Button (default)     | pill                 | `rounded-full`   |
+| Card                 | 16px                 | `rounded-2xl` (shipped; Tailwind `2xl` is 16px) |
 | Dialog / Sheet       | 12px (shadcn lg)     | `rounded-lg`     |
 | Dropdown / Popover   | 10px (shadcn md)     | `rounded-md`     |
 | Avatar               | pill                 | `rounded-full`   |

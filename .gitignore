@@ -55,3 +55,6 @@ Scheduled audit/*.html
 Scheduled audit/*.md
 Scheduled audit/link_check/runs/
 Scheduled audit/link_check/__pycache__/
+
+# Licensed font files (never commit)
+webfonts/Michelangelus Fonts/

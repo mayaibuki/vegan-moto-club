@@ -25,7 +25,10 @@
   --ds-stone-400: 12 4.9% 64%;
   --ds-stone-500: 12 6.5% 51.5%;
   --ds-stone-600: 12 6.5% 44%; /* darkest "muted" that clears WCAG AA (4.9:1 on white, 4.65:1 on stone-100) */
+  --ds-stone-700: 12 5% 24%;   /* dark-mode border (1.48:1 vs dark card) */
   --ds-stone-800: 12 6.3% 18.8%;
+  --ds-stone-850: 12 6.5% 17%;  /* dark-mode popover (1.32:1 vs page) */
+  --ds-stone-875: 12 7.5% 14%;  /* dark-mode card (1.19:1 vs page) */
   --ds-stone-900: 12 8.7% 11.8%;
   --ds-stone-950: 12 8.3% 7.2%;
   --ds-white:     0 0% 100%;
@@ -36,10 +39,13 @@
   --ds-lime-400: 79.1 64.5% 57.5%;
   --ds-lime-500: 77.9 54.4% 47.4%;
   --ds-lime-600: 77.2 61.3% 38.5%;
+  --ds-lime-700: 77 67% 28%;     /* text on tinted lime (badge positive) */
 
   /* ---- Color Primitives (Status) ---- */
   --ds-red-light:    0 84.2% 60.2%;
   --ds-red-dark:     0 62.8% 30.6%;
+  --ds-red-400:      0 91% 71%;     /* text on tinted red, dark mode */
+  --ds-red-600:      0 72% 45%;     /* text on tinted red, light mode */
   --ds-green-600:    142 71% 45%;
   --ds-green-400:    142 69% 58%;
 
@@ -134,7 +140,7 @@
 
 :root {
   /* ---- Semantic Colors ---- */
-  --color-bg:              var(--ds-white, 0 0% 100%);
+  --color-bg:              var(--ds-stone-50, 0 0% 98%);
   --color-bg-subtle:       var(--ds-stone-100, 12 6.5% 97.5%);
   --color-bg-muted:        var(--ds-stone-100, 12 6.5% 97.5%);
   --color-bg-inverse:      var(--ds-stone-950, 12 8.3% 7.2%);
@@ -146,21 +152,29 @@
 
   --color-primary:         var(--ds-lime-500, 77.9 54.4% 47.4%);
   --color-primary-hover:   var(--ds-lime-400, 79.1 64.5% 57.5%);
+  --color-primary-text:    var(--ds-lime-700, 77 67% 28%);   /* text on tinted lime (badge positive) */
   --color-accent:          var(--ds-lime-400, 79.1 64.5% 57.5%);
 
   --color-border:          var(--ds-stone-200, 12 6.3% 93.8%);
   --color-border-muted:    var(--ds-stone-200, 12 6.3% 93.8%);
-  --color-input:           var(--ds-stone-200, 12 6.3% 93.8%);
+  --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
   --color-ring:            var(--ds-lime-500, 77.9 54.4% 47.4%);
 
   --color-card-bg:         var(--ds-white, 0 0% 100%);
   --color-card-text:       var(--ds-stone-900, 12 8.7% 11.8%);
+  --color-popover-bg:      var(--ds-white, 0 0% 100%);
+  --color-popover-text:    var(--ds-stone-900, 12 8.7% 11.8%);
+
+  --color-secondary:       var(--ds-stone-200, 12 6.3% 93.8%);
+  --color-secondary-text:  var(--ds-stone-900, 12 8.7% 11.8%);
 
   --color-destructive:     var(--ds-red-light, 0 84.2% 60.2%);
   --color-destructive-text: 0 0% 98%;
+  --color-negative-text:   var(--ds-red-600, 0 72% 45%);      /* text on tinted red (badge negative) */
 
   --color-success:         var(--ds-green-600, 142 71% 45%);
   --color-success-text:    var(--ds-green-600, 142 71% 45%);
+  --color-success-foreground: var(--ds-white, 0 0% 100%);
 
   /* ---- Semantic Spacing ---- */
   --space-xs:    var(--ds-space-1, 0.25rem);       /*  4px — tight inner spacing */
@@ -260,19 +274,27 @@
 
   --color-primary:         var(--ds-lime-400, 79.1 64.5% 57.5%);
   --color-primary-hover:   var(--ds-lime-500, 77.9 54.4% 47.4%);
+  --color-primary-text:    var(--ds-lime-400, 79.1 64.5% 57.5%);
   --color-accent:          var(--ds-lime-500, 77.9 54.4% 47.4%);
 
-  --color-border:          var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-border:          var(--ds-stone-700, 12 5% 24%);
   --color-border-muted:    var(--ds-stone-800, 12 6.3% 18.8%);
-  --color-input:           var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
   --color-ring:            var(--ds-lime-400, 79.1 64.5% 57.5%);
 
-  --color-card-bg:         var(--ds-stone-900, 12 8.7% 11.8%);
+  --color-card-bg:         var(--ds-stone-875, 12 7.5% 14%);
+  --color-popover-bg:      var(--ds-stone-850, 12 6.5% 17%);
   --color-card-text:       0 0% 98%;
+  --color-popover-text:    0 0% 98%;
+
+  --color-secondary:       var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-secondary-text:  0 0% 98%;
 
   --color-destructive:     var(--ds-red-dark, 0 62.8% 30.6%);
   --color-destructive-text: 0 0% 98%;
+  --color-negative-text:   var(--ds-red-400, 0 91% 71%);
 
   --color-success:         var(--ds-green-400, 142 69% 58%);
   --color-success-text:    var(--ds-green-400, 142 69% 58%);
+  --color-success-foreground: var(--ds-white, 0 0% 100%);
 }

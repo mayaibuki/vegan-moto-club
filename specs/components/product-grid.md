@@ -44,13 +44,13 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 
 | Element              | Token / Class                | Purpose               |
 |----------------------|------------------------------|-----------------------|
-| Sidebar bg (mobile)  | `bg-background`              | Base background       |
+| Sidebar bg (mobile)  | `bg-card`                    | Raised panel          |
 | Filter labels        | `text-foreground`            | Primary text          |
 | Filter option labels | `text-sm font-medium`        | Form labels           |
 | Muted text           | `text-muted-foreground`      | Counts, descriptions  |
 | Dividers             | `border-border`              | Section separators    |
 | Sidebar border       | `border-border` (mobile)     | Panel outline         |
-| Empty state bg       | `bg-muted/30`                | Subtle background     |
+| Empty state bg       | `bg-card border border-dashed border-border` | Raised, dashed outline |
 | Grid gaps            | `gap-6`                      | Card spacing          |
 | Sidebar gap          | `gap-8`                      | Section spacing       |
 | Pagination border    | `border-border`              | Top divider           |
