@@ -59,6 +59,11 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      gridTemplateRows: {
+        // Collapse wrapper rows (PromoBanner): animate open -> closed to collapse to zero height
+        open: "1fr",
+        closed: "0fr",
+      },
       aspectRatio: {
         "4/3": "4 / 3",
       },
