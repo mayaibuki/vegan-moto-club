@@ -50,12 +50,12 @@ export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-10">
       <div className="space-y-4">
-        <h1 className="text-3xl md:text-4xl font-bold">About Vegan Moto Club</h1>
-        <p className="text-lg text-muted-foreground leading-relaxed">
+        <h1 className="h-page">About Vegan Moto Club</h1>
+        <p className="lead">
           The Vegan Moto Club is a community that started in the San Francisco Bay Area,
           with a focus on animal liberation and having fun.
         </p>
-        <p className="text-lg text-muted-foreground leading-relaxed">
+        <p className="lead">
           Whether you are an experienced motorcyclist or you just like how motorcycles look,
           this is your place to find friends that don't eat other friends, and find vegan
           motorcycle gear.
@@ -66,8 +66,8 @@ export default function AboutPage() {
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <h2 className="text-2xl md:text-3xl font-semibold">Our Mission</h2>
-          <p className="text-muted-foreground leading-relaxed">
+          <h2 className="h-section">Our Mission</h2>
+          <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
             The Vegan Moto Club is dedicated to providing riders with comprehensive information
             about cruelty-free motorcycle gear. We believe that you don't have to compromise on
             performance or style to make ethical choices.
@@ -75,8 +75,8 @@ export default function AboutPage() {
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-2xl md:text-3xl font-semibold">Why Vegan Gear?</h2>
-          <p className="text-muted-foreground leading-relaxed">
+          <h2 className="h-section">Why Vegan Gear?</h2>
+          <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
             Traditional motorcycle gear often relies on leather and other animal-derived materials.
             Modern synthetic alternatives offer equal or superior performance while eliminating the
             need for animal exploitation. By choosing vegan gear, riders can protect themselves and
@@ -85,8 +85,8 @@ export default function AboutPage() {
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-2xl md:text-3xl font-semibold">Our Community</h2>
-          <p className="text-muted-foreground leading-relaxed">
+          <h2 className="h-section">Our Community</h2>
+          <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
             We're building a community of compassionate riders who believe that performance and
             ethics go hand in hand. Join us on{" "}
             <a
@@ -115,12 +115,12 @@ export default function AboutPage() {
 
       <div className="space-y-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-semibold">We are intersectional</h2>
+          <h2 className="h-section">We are intersectional</h2>
           <h3 className="text-base md:text-lg font-medium text-muted-foreground mt-1">
             The animal liberation movement is by animals, for animals.
           </h3>
         </div>
-        <p className="text-muted-foreground leading-relaxed">
+        <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
           And as allies of animals, we fight with them against speciesism, but we also
           fight against Ableism, Adultism, Ageism, Anthropocentrism, Antisemitism,
           Authoritarianism, Binarism, Biphobia, Biological Classism, Capitalism, Casteism,
@@ -136,8 +136,8 @@ export default function AboutPage() {
 
       <div className="space-y-5">
         <div>
-          <h2 className="text-2xl md:text-3xl font-semibold">Special thanks to</h2>
-          <p className="text-muted-foreground mt-1">
+          <h2 className="h-section">Special thanks to</h2>
+          <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty mt-1">
             The organizations that are fighting to end oppression and/or have inspired
             this project:
           </p>
@@ -161,8 +161,8 @@ export default function AboutPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl md:text-3xl font-semibold">Get Involved</h2>
-        <ul className="text-muted-foreground leading-relaxed space-y-2">
+        <h2 className="h-section">Get Involved</h2>
+        <ul className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty space-y-2">
           <li>
             <span className="font-semibold text-foreground">Found a great vegan brand?</span> Submit
             it through our product suggestion form below.

@@ -44,7 +44,7 @@ All sub-components accept standard HTML `div` props plus `className`.
 |---------------|-----------------|
 | `Card` | `rounded-2xl border border-border bg-card text-card-foreground shadow-sm` |
 | `CardHeader` | `flex flex-col space-y-2 p-7` |
-| `CardTitle` | `text-2xl font-semibold leading-none tracking-tight` |
+| `CardTitle` | `text-2xl font-semibold leading-none` (not a heading recipe; no tracking) |
 | `CardDescription` | `text-sm text-muted-foreground` |
 | `CardContent` | `p-7 pt-0` |
 | `CardFooter` | `flex items-center p-7 pt-0` |

@@ -38,7 +38,7 @@ export function RelatedProducts({
     <section aria-labelledby="related-products-heading">
       <h2
         id="related-products-heading"
-        className="text-2xl font-bold tracking-tight mb-6"
+        className="h-section mb-6"
       >
         Related Products
       </h2>

@@ -18,7 +18,7 @@ export function PastEventsList({ events }: { events: Event[] }) {
   return (
     <>
       <div className="flex items-center justify-between">
-        <h2 id="past-heading" className="text-2xl font-semibold text-muted-foreground">Past Events</h2>
+        <h2 id="past-heading" className="h-section text-muted-foreground">Past Events</h2>
         <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
           Showing{" "}
           <span className="font-semibold text-foreground">

@@ -17,7 +17,7 @@ export default function Error({
   return (
     <div className="py-24 text-center space-y-6">
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold">Something went wrong</h1>
+        <h1 className="h-page">Something went wrong</h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
           An unexpected error occurred while loading this page. It&apos;s usually
           temporary.
