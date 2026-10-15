@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { AgentationWrapper } from "@/components/AgentationWrapper"
 import { DegradeOnScroll } from "@/components/DegradeOnScroll"
+import ShaderBackground from "@/components/ShaderBackground"
 import { dmSans, fontVariables } from "./fonts"
 import "./globals.css"
 import { SITE_URL } from "@/lib/constants"
@@ -128,7 +129,8 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <div className="min-h-screen flex flex-col bg-background">
+        <ShaderBackground />
+        <div className="min-h-screen flex flex-col">
           <Navbar />
           <main id="main-content" className="page-container flex-1 py-8" tabIndex={-1}>
             {children}

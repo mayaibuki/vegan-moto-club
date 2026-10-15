@@ -192,12 +192,13 @@ Every motion in the product, with its trigger and reduced-motion behaviour. Only
 | Promo banner | Dismiss | `grid-template-rows` 1fr to 0fr, `opacity` | 300ms | `--ease` | Computed duration is 0, so the banner is removed immediately without waiting for `transitionend` |
 | Theme toggle icon | Click | `opacity`, `transform` (rotate + scale); both icons cross-fade | 150ms | `--ease` | Instant swap; no page-wide transition |
 | Nav link underline | Hover / current page | `text-decoration-color` (transparent to `decoration-primary`) | 150ms | `--ease` | Instant; no layout change |
+| Page background (ShaderBackground) | Continuous | WebGL grain gradient (Paper Shaders), see `specs/components/shader-background.md` | Shader `speed={1}` | n/a | Shader `speed={0}`: a static gradient |
 
 ### Implementation notes
 
 - **tailwindcss-animate** (1.0.7) is registered in `tailwind.config.ts`. It sets no timing function and a 150ms duration, so `app/globals.css` applies `--ease` to `.animate-in` / `.animate-out` and provides `.animate-slow` to lift the sheet and overlay to 300ms (`--duration-slow`).
 - **Card press** uses the `scale-98` entry in `theme.extend.scale` (0.98) instead of an arbitrary value.
-- **JS paths:** the only JS-driven motion is the promo banner. It reads `getComputedStyle(...).transitionDuration` at dismiss time and unmounts at once when it is 0; otherwise it unmounts on `transitionend` for `grid-template-rows`.
+- **JS paths:** apart from the WebGL page background, the only JS-driven motion is the promo banner. It reads `getComputedStyle(...).transitionDuration` at dismiss time and unmounts at once when it is 0; otherwise it unmounts on `transitionend` for `grid-template-rows`.
 - Not used: grid stagger, hero reveal, framer-motion.
 
 
