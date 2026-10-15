@@ -47,13 +47,13 @@ Displays a single product as a linked card with image, brand, name, price, and a
 | Content padding     | `p-3 space-y-2` below 640px, `sm:p-5 sm:space-y-3` | Compact mobile card |
 | Image padding       | `p-3 sm:p-4`               | Photo inset        |
 | Badges              | `size="sm"` + `sm:px-3 sm:py-1` | Compact below 640px, default padding from sm up |
-| Card hover          | `hover:shadow-lg` + `transition-[box-shadow,transform] duration-200` (hover-capable devices only) | Elevation feedback |
+| Card hover          | `<Card interactive>`: `hover:shadow-md hover:border-foreground/25`, `transition-[box-shadow,border-color,transform] duration-200` (hover-capable devices only) | Elevation feedback |
 | Card press          | `motion-safe:group-active:scale-[0.98]` (`group` is on the Link) | Touch/press feedback |
 | Keyboard focus      | `.focus-ring rounded-2xl` on the Link | Ring follows the 16px card radius |
 | Image hover         | `group-hover:scale-105`    | Zoom effect        |
 | Transition          | `duration-300`             | Standard motion    |
 | No-image text       | `text-muted-foreground`    | Placeholder        |
-| Border              | `border-border/30`         | Subtle divider     |
+| Image divider       | `border-b border-border`   | Solid hairline     |
 
 ## Props
 
@@ -68,7 +68,7 @@ Displays a single product as a linked card with image, brand, name, price, and a
 | With image     | Shows product photo with object-contain + padding |
 | Without image  | Shows "No Image" centered placeholder             |
 | Staff favorite | Overlays ⭐ Staff Pick badge on image top-left    |
-| Hover          | Card shadow increases, image scales up 5%         |
+| Hover          | Card shadow to `shadow-md`, border darkens, image scales up 5% |
 
 ## Mobile (below 640px)
 

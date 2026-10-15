@@ -59,6 +59,9 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      aspectRatio: {
+        "4/3": "4 / 3",
+      },
       transitionTimingFunction: {
         DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
       },

@@ -3,12 +3,17 @@ import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & {
+    /** Hover elevation for cards that are themselves a link or button. Static cards do not react to hover. */
+    interactive?: boolean
+  }
+>(({ className, interactive = false, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-2xl border border-border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md",
+      "rounded-2xl border border-border bg-card text-card-foreground shadow-sm",
+      interactive &&
+        "transition-[box-shadow,border-color] duration-200 hover:border-foreground/25 hover:shadow-md",
       className
     )}
     {...props}

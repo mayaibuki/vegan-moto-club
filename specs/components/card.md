@@ -32,13 +32,14 @@ Container component for grouping related content. Provides visual boundary and e
 | Text | `text-card-foreground` |
 | Border | `border-border` |
 | Radius | `rounded-2xl` (16px) |
-| Shadow | `shadow-sm` → hover: `shadow-md` |
-| Transition | `transition-shadow` |
+| Shadow | `shadow-sm`; hover `shadow-md` only with `interactive` |
+| Transition | `transition-[box-shadow,border-color] duration-200` (only with `interactive`) |
+| Hover border | `hover:border-foreground/25` (only with `interactive`) |
 | Padding | `p-7` (28px) for header/content/footer |
 
 ## Props / API
 
-All sub-components accept standard HTML `div` props plus `className`.
+All sub-components accept standard HTML `div` props plus `className`. `Card` also takes `interactive?: boolean` (default `false`): set it only when the whole card is a link or button (ProductCard). Static cards (events, empty states, forms) do not react to hover.
 
 | Sub-component | Default classes |
 |---------------|-----------------|
@@ -54,7 +55,7 @@ All sub-components accept standard HTML `div` props plus `className`.
 | State | Appearance |
 |-------|------------|
 | **Default** | `shadow-sm`, `border-border` |
-| **Hover** | `shadow-md` (the base Card applies it to every card; ProductCard overrides with `shadow-lg`) |
+| **Hover** | `interactive` cards only: `shadow-md` and `border-foreground/25`. Static cards have no hover |
 
 ## Code Example
 
