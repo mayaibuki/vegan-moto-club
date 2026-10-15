@@ -8,8 +8,8 @@ export const dmSans = DM_Sans({
 })
 
 // Redaction (open licence) for display headings. The clean cut is the default;
-// the _10/_20/_35 cuts are progressively pixelated and are swapped in by
-// DegradeOnScroll as a heading rises toward the top of the viewport.
+// the _10/_20/_35/_50 cuts are progressively pixelated and are swapped in by
+// DegradeOnScroll (cursor proximity on pointer devices, scroll on touch).
 export const redaction = localFont({
   src: [
     { path: "../webfonts/Redaction-Regular.woff2", weight: "400", style: "normal" },
@@ -50,10 +50,21 @@ export const redaction35 = localFont({
   adjustFontFallback: "Times New Roman",
 })
 
+export const redaction50 = localFont({
+  src: [
+    { path: "../webfonts/Redaction_50-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../webfonts/Redaction_50-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-redaction-50",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+})
+
 export const fontVariables = [
   dmSans.variable,
   redaction.variable,
   redaction10.variable,
   redaction20.variable,
   redaction35.variable,
+  redaction50.variable,
 ].join(" ")

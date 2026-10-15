@@ -114,6 +114,9 @@
   :is(.h-hero, .h-page, .h-section)[data-degrade="35"] {
     font-family: var(--font-redaction-35), Georgia, serif;
   }
+  :is(.h-hero, .h-page, .h-section)[data-degrade="50"] {
+    font-family: var(--font-redaction-50), Georgia, serif;
+  }
 
   /* Lead paragraph: the intro under a page h1. Paragraphs that follow it use
      text-base text-muted-foreground leading-relaxed max-w-prose text-pretty. */
