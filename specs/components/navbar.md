@@ -37,7 +37,7 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
 | Position | `sticky top-0` |
 | Z-index | `z-50` (z-sticky) |
 | Border | `border-b border-border/50` |
-| Background | `bg-muted/80 backdrop-blur-sm` |
+| Background | `bg-card/80 backdrop-blur-sm` |
 | Max width | `max-w-7xl` |
 | Padding | `px-6 py-4` |
 | Link gap | `gap-8` |
@@ -45,7 +45,7 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
 | Link hover | `hover:text-primary` |
 | Transition | `transition-colors` |
 | Icon size | `h-5 w-5` |
-| Mobile bg | `bg-background` |
+| Mobile bg | `bg-card` |
 | Mobile border | `border-t border-border/50` |
 
 ## Behavior

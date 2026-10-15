@@ -26,13 +26,17 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 
 | Token | HSL Value | Usage |
 |-------|-----------|-------|
-| `--ds-stone-50` | `0 0% 98%` | Lightest neutral, text-inverse |
+| `--ds-stone-50` | `0 0% 98%` | Page background (light), text-inverse |
 | `--ds-stone-100` | `12 6.5% 97.5%` | Muted/secondary backgrounds (light) |
-| `--ds-stone-200` | `12 6.3% 93.8%` | Borders, inputs (light) |
+| `--ds-stone-200` | `12 6.3% 93.8%` | Borders, secondary bg (light) |
 | `--ds-stone-300` | `12 5.4% 84%` | Chart accents |
 | `--ds-stone-400` | `12 4.9% 64%` | Muted text (dark mode) |
-| `--ds-stone-500` | `12 6.5% 51.5%` | Muted text (light mode) |
-| `--ds-stone-800` | `12 6.3% 18.8%` | Dark backgrounds, borders (dark) |
+| `--ds-stone-500` | `12 6.5% 51.5%` | Form control border (`--input`), not for text |
+| `--ds-stone-600` | `12 6.5% 44%` | Muted text (light mode) |
+| `--ds-stone-700` | `12 5% 24%` | Border (dark) |
+| `--ds-stone-800` | `12 6.3% 18.8%` | Muted/secondary bg (dark) |
+| `--ds-stone-850` | `12 6.5% 17%` | Popover bg (dark) |
+| `--ds-stone-875` | `12 7.5% 14%` | Card bg (dark) |
 | `--ds-stone-900` | `12 8.7% 11.8%` | Foreground text (light) |
 | `--ds-stone-950` | `12 8.3% 7.2%` | Darkest, bg in dark mode |
 | `--ds-white` | `0 0% 100%` | Pure white |
@@ -41,63 +45,74 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 | `--ds-lime-400` | `79.1 64.5% 57.5%` | Accent (light), primary (dark) |
 | `--ds-lime-500` | `77.9 54.4% 47.4%` | Primary (light), accent (dark) |
 | `--ds-lime-600` | `77.2 61.3% 38.5%` | Chart accent (dark) |
+| `--ds-lime-700` | `77 67% 28%` | Text on tinted lime (light) |
 | `--ds-green-600` | `142 71% 45%` | Success (light) |
 | `--ds-green-400` | `142 69% 58%` | Success (dark) |
 | `--ds-red-light` | `0 84.2% 60.2%` | Destructive (light) |
 | `--ds-red-dark` | `0 62.8% 30.6%` | Destructive (dark) |
+| `--ds-red-400` | `0 91% 71%` | Text on tinted red (dark) |
+| `--ds-red-600` | `0 72% 45%` | Text on tinted red (light) |
 
 ### Semantic Aliases (Layer 2)
 
 | Token | Light | Dark | Tailwind | When to use |
 |-------|-------|------|----------|-------------|
-| `--color-bg` | white | stone-950 | `bg-background` | Page background |
+| `--color-bg` | stone-50 | stone-950 | `bg-background` | Page background |
 | `--color-bg-subtle` | stone-100 | stone-800 | `bg-muted` | Subtle section bg |
 | `--color-bg-muted` | stone-100 | stone-800 | `bg-muted` | Muted backgrounds |
 | `--color-bg-inverse` | stone-950 | white | — | Inverted sections |
 | `--color-text` | stone-900 | stone-50 | `text-foreground` | Primary text |
-| `--color-text-muted` | stone-500 | stone-400 | `text-muted-foreground` | Secondary text |
+| `--color-text-muted` | stone-600 | stone-400 | `text-muted-foreground` | Secondary text |
 | `--color-text-inverse` | stone-50 | stone-900 | — | Text on inverse bg |
 | `--color-text-on-primary` | stone-950 | stone-950 | `text-primary-foreground` | Text on primary bg |
 | `--color-primary` | lime-500 | lime-400 | `bg-primary`, `text-primary` | Brand/CTA |
 | `--color-primary-hover` | lime-400 | lime-500 | `hover:bg-primary/90` | Primary hover |
 | `--color-accent` | lime-400 | lime-500 | `bg-accent` | Accent highlight |
-| `--color-border` | stone-200 | stone-800 | `border-border` | Default borders |
+| `--color-border` | stone-200 | stone-700 | `border-border` | Default borders |
 | `--color-border-muted` | stone-200 | stone-800 | `border-border/50` | Subtle borders |
-| `--color-input` | stone-200 | stone-800 | `border-input` | Input borders |
+| `--color-input` | stone-500 | stone-500 | `border-input` | Form control borders (3:1) |
 | `--color-ring` | lime-500 | lime-400 | `ring-ring` | Focus rings |
-| `--color-card-bg` | white | stone-900 | `bg-card` | Card backgrounds |
+| `--color-card-bg` | white | stone-875 | `bg-card` | Card backgrounds |
 | `--color-card-text` | stone-900 | stone-50 | `text-card-foreground` | Card text |
 | `--color-destructive` | red-light | red-dark | `text-destructive`, `bg-destructive` | Errors, danger |
 | `--color-destructive-text` | stone-50 | stone-50 | `text-destructive-foreground` | Text on destructive bg |
+| `--color-popover-bg` | white | stone-850 | `bg-popover` | Popovers, dropdowns |
+| `--color-secondary` | stone-200 | stone-800 | `bg-secondary` | Secondary surfaces |
+| `--color-primary-text` | lime-700 | lime-400 | `text-primary-text` | Text on tinted lime (badge positive) |
+| `--color-negative-text` | red-600 | red-400 | `text-destructive-text` | Text on tinted red (badge negative) |
 | `--color-success` | green-600 | green-400 | `text-success`, `bg-success` | Success states |
 | `--color-success-text` | green-600 | green-400 | `text-success` | Success text |
 
 ### shadcn/ui Bridge Variables (globals.css)
 
-| CSS Variable | Light | Dark | Tailwind Class |
-|---|---|---|---|
-| `--background` | `0 0% 100%` | `12 8.3% 7.2%` | `bg-background` |
-| `--foreground` | `12 8.7% 11.8%` | `0 0% 98%` | `text-foreground` |
-| `--card` | `0 0% 100%` | `12 8.7% 11.8%` | `bg-card` |
-| `--card-foreground` | `12 8.7% 11.8%` | `0 0% 98%` | `text-card-foreground` |
-| `--popover` | `0 0% 100%` | `12 8.7% 11.8%` | `bg-popover` |
-| `--popover-foreground` | `12 8.7% 11.8%` | `0 0% 98%` | `text-popover-foreground` |
-| `--primary` | `77.9 54.4% 47.4%` | `79.1 64.5% 57.5%` | `bg-primary`, `text-primary` |
-| `--primary-foreground` | `12 8.3% 7.2%` | `12 8.3% 7.2%` | `text-primary-foreground` |
-| `--secondary` | `12 6.5% 97.5%` | `12 6.3% 18.8%` | `bg-secondary` |
-| `--secondary-foreground` | `12 8.7% 11.8%` | `0 0% 98%` | `text-secondary-foreground` |
-| `--accent` | `79.1 64.5% 57.5%` | `77.9 54.4% 47.4%` | `bg-accent` |
-| `--accent-foreground` | `12 8.3% 7.2%` | `12 8.3% 7.2%` | `text-accent-foreground` |
-| `--muted` | `12 6.5% 97.5%` | `12 6.3% 18.8%` | `bg-muted` |
-| `--muted-foreground` | `12 6.5% 51.5%` | `12 4.9% 64%` | `text-muted-foreground` |
-| `--destructive` | `0 84.2% 60.2%` | `0 62.8% 30.6%` | `bg-destructive`, `text-destructive` |
-| `--destructive-foreground` | `0 0% 98%` | `0 0% 98%` | `text-destructive-foreground` |
-| `--success` | `142 71% 45%` | `142 69% 58%` | `bg-success`, `text-success` |
-| `--success-foreground` | `0 0% 100%` | `0 0% 100%` | `text-success-foreground` |
-| `--border` | `12 6.3% 93.8%` | `12 6.3% 18.8%` | `border-border` |
-| `--input` | `12 6.3% 93.8%` | `12 6.3% 18.8%` | `border-input` |
-| `--ring` | `77.9 54.4% 47.4%` | `79.1 64.5% 57.5%` | `ring-ring` |
-| `--radius` | `0.75rem` | — | `rounded-lg`, `rounded-md`, `rounded-sm` |
+`globals.css` holds no raw HSL values. Each bridge variable points at a Layer 2 alias in `tokens.css`, so light and dark values are set only there.
+
+| CSS Variable | Resolves to | Tailwind Class |
+|---|---|---|
+| `--background` | `var(--color-bg)` | `bg-background` |
+| `--foreground` | `var(--color-text)` | `text-foreground` |
+| `--card` | `var(--color-card-bg)` | `bg-card` |
+| `--card-foreground` | `var(--color-card-text)` | `text-card-foreground` |
+| `--popover` | `var(--color-popover-bg)` | `bg-popover` |
+| `--popover-foreground` | `var(--color-popover-text)` | `text-popover-foreground` |
+| `--primary` | `var(--color-primary)` | `bg-primary`, `text-primary` |
+| `--primary-foreground` | `var(--color-text-on-primary)` | `text-primary-foreground` |
+| `--primary-text` | `var(--color-primary-text)` | `text-primary-text` |
+| `--secondary` | `var(--color-secondary)` | `bg-secondary` |
+| `--secondary-foreground` | `var(--color-secondary-text)` | `text-secondary-foreground` |
+| `--accent` | `var(--color-accent)` | `bg-accent` |
+| `--accent-foreground` | `var(--color-text-on-primary)` | `text-accent-foreground` |
+| `--muted` | `var(--color-bg-muted)` | `bg-muted` |
+| `--muted-foreground` | `var(--color-text-muted)` | `text-muted-foreground` |
+| `--destructive` | `var(--color-destructive)` | `bg-destructive`, `text-destructive` |
+| `--destructive-foreground` | `var(--color-destructive-text)` | `text-destructive-foreground` |
+| `--destructive-text` | `var(--color-negative-text)` | `text-destructive-text` |
+| `--success` | `var(--color-success)` | `bg-success`, `text-success` |
+| `--success-foreground` | `var(--color-success-foreground)` | `text-success-foreground` |
+| `--border` | `var(--color-border)` | `border-border` |
+| `--input` | `var(--color-input)` | `border-input` |
+| `--ring` | `var(--color-ring)` | `ring-ring` |
+| `--radius` | `var(--radius-lg)` (0.75rem) | `rounded-lg`, `rounded-md`, `rounded-sm` |
 
 ---
 

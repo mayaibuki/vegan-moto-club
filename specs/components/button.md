@@ -26,8 +26,8 @@ Primary interactive element for user actions. Uses Radix `Slot` for `asChild` co
 |----------|---------------|
 | Background (default) | `bg-primary` |
 | Text (default) | `text-primary-foreground` |
-| Background (outline) | `bg-background`, hover: `bg-accent` |
-| Border (outline) | `border-2 border-input`, hover: `border-accent` |
+| Background (outline) | `bg-card`, hover: `bg-accent` |
+| Border (outline) | `border border-border`, hover: `border-accent` |
 | Background (ghost) | hover: `bg-accent/50` |
 | Shadow | `shadow-sm`, hover: `shadow-md` |
 | Radius | `rounded-full` (pill shape) |

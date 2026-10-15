@@ -34,7 +34,7 @@ Compact label for categorization, status, or metadata.
 
 | Prop | Type | Default |
 |------|------|---------|
-| `variant` | `"default" \| "secondary" \| "outline" \| "accent" \| "destructive"` | `"default"` |
+| `variant` | `"default" \| "secondary" \| "outline" \| "accent" \| "destructive" \| "positive" \| "negative"` | `"default"` |
 
 ## Variants
 
@@ -42,9 +42,15 @@ Compact label for categorization, status, or metadata.
 |---------|------------|------|-------|
 | `default` | `bg-primary` | `text-primary-foreground` | `bg-primary/80` |
 | `secondary` | `bg-secondary` | `text-secondary-foreground` | `bg-secondary/80` |
-| `outline` | transparent, `border-input` | `text-foreground` | — |
-| `accent` | `bg-accent/20` | `text-accent-foreground` | `bg-accent/30` |
+| `outline` | transparent, `border-border` | `text-foreground` | — |
+| `accent` | `bg-primary/15` | `text-primary-text` | — |
 | `destructive` | `bg-destructive` | `text-destructive-foreground` | `bg-destructive/80` |
+| `positive` | `bg-primary/15`, `border-primary/30` | `text-primary-text` | — |
+| `negative` | `bg-destructive/10`, `border-destructive/30` | `text-destructive-text` | — |
+
+### Protection scale (product card and detail)
+
+Staff Pick is the only solid lime pill (`default`). Most and Highly protective use `positive`, Moderately protective uses `outline`, Slightly protective uses `secondary`, Not protective uses `negative`.
 
 ## States
 
