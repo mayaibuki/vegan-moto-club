@@ -170,7 +170,9 @@ export function ProductGrid({ products }: ProductGridProps) {
 
   const goToPage = (page: number) => {
     setCurrentPage(page)
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    resultsRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })
+    resultsRef.current?.focus({ preventScroll: true })
   }
 
   const clearAllFilters = () => {
@@ -437,10 +439,10 @@ export function ProductGrid({ products }: ProductGridProps) {
           </div>
         </aside>
 
-        <section className="flex-1" aria-label="Product results" ref={resultsRef}>
+        <section className="flex-1 scroll-mt-24 focus:outline-none" aria-label="Product results" ref={resultsRef} tabIndex={-1}>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
-              Showing <span className="font-semibold text-foreground">
+              Showing <span className="font-semibold text-foreground tabular-nums">
                 {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + rowsPerPage, filteredProducts.length)}
               </span> of {filteredProducts.length} products
             </p>
