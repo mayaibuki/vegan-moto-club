@@ -39,7 +39,7 @@
   --ds-lime-400: 79.1 64.5% 57.5%;
   --ds-lime-500: 77.9 54.4% 47.4%;
   --ds-lime-600: 77.2 61.3% 38.5%;
-  --ds-lime-700: 77 67% 28%;     /* text on tinted lime (badge positive) */
+  --ds-lime-700: 77 67% 26%;     /* text on tinted lime (badge positive) */
 
   /* ---- Color Primitives (Status) ---- */
   --ds-red-light:    0 84.2% 60.2%;
@@ -153,13 +153,13 @@
 
   --color-primary:         var(--ds-lime-500, 77.9 54.4% 47.4%);
   --color-primary-hover:   var(--ds-lime-400, 79.1 64.5% 57.5%);
-  --color-primary-text:    var(--ds-lime-700, 77 67% 28%);   /* text on tinted lime (badge positive) */
+  --color-primary-text:    var(--ds-lime-700, 77 67% 26%);   /* text on tinted lime (badge positive) */
   --color-accent:          var(--ds-lime-400, 79.1 64.5% 57.5%);
 
   --color-border:          var(--ds-stone-200, 12 6.3% 93.8%);
   --color-border-muted:    var(--ds-stone-200, 12 6.3% 93.8%);
   --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
-  --color-ring:            var(--ds-lime-700, 77 67% 28%);   /* >=3:1 on page and card; dark mode keeps lime-400 */
+  --color-ring:            var(--ds-lime-700, 77 67% 26%);   /* >=3:1 on page and card; dark mode keeps lime-400 */
 
   --color-card-bg:         var(--ds-white, 0 0% 100%);
   --color-card-text:       var(--ds-stone-900, 12 8.7% 11.8%);
