@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { formatPrice, notionImageUrl, splitCategories } from "@/lib/utils"
+import { formatPrice, notionImageUrl, splitCategories, veganVerifiedVariant, waterproofVariant } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
@@ -237,7 +237,7 @@ export default async function ProductDetailPage({
             <dd>
             <ul className="flex flex-wrap gap-2 list-none" role="list" aria-label="Product specifications">
               {product.levelOfProtection && (
-                <li><Badge
+                <li className="flex items-center"><Badge
                   variant={
                     product.levelOfProtection === "Most protective" ||
                     product.levelOfProtection === "Highly protective"
@@ -253,41 +253,23 @@ export default async function ProductDetailPage({
                 </Badge></li>
               )}
               {product.season.map((s) => (
-                <li key={s}><Badge variant="outline">
+                <li key={s} className="flex items-center"><Badge variant="outline">
                   <span aria-hidden="true">{seasonEmojis[s] || ""}</span> {s}
                 </Badge></li>
               ))}
               {product.waterproofLevel && (
-                <li><Badge
-                  variant={
-                    product.waterproofLevel === "Water resistant" ||
-                    product.waterproofLevel === "Not waterproof"
-                      ? "destructive"
-                      : "outline"
-                  }
-                >
+                <li className="flex items-center"><Badge variant={waterproofVariant(product.waterproofLevel)}>
                   {product.waterproofLevel}
                 </Badge></li>
               )}
               {product.veganVerified && (
-                <li><Link
+                <li className="flex items-center"><Link
                   href="/verification"
                   aria-label={`${product.veganVerified}, learn how we verify vegan gear`}
                   className="focus-ring rounded-full"
                 >
-                  <Badge
-                    variant={
-                      // Notion value is lowercase "us" — matching "Us" made
-                      // our own strongest tier render as a red warning badge
-                      product.veganVerified === "Verified Vegan by us" ||
-                      product.veganVerified === "Confirmed Vegan by maker"
-                        ? "default"
-                        : product.veganVerified === "Verified Vegan by AI"
-                        ? "outline"
-                        : "destructive"
-                    }
-                  >
-                    <span aria-hidden="true">✓</span> {product.veganVerified}
+                  <Badge variant={veganVerifiedVariant(product.veganVerified)}>
+                    {product.veganVerified}
                   </Badge>
                 </Link></li>
               )}

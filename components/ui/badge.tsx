@@ -12,7 +12,7 @@ function Badge({ className, variant = "default", size = "default", ...props }: B
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-full text-xs font-semibold transition-colors",
+        "inline-flex items-center rounded-full text-xs leading-4 font-semibold transition-colors",
         size === "default" && "px-3 py-1",
         size === "sm" && "px-2 py-0.5",
         variant === "default" &&
