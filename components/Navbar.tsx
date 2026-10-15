@@ -85,7 +85,7 @@ export function Navbar() {
             </Link>
           ))}
 
-          {mounted && (
+          {mounted ? (
             <Button
               variant="ghost"
               size="icon"
@@ -95,12 +95,15 @@ export function Navbar() {
             >
               <ThemeIcon isDark={isDark} />
             </Button>
+          ) : (
+            // Same footprint as the toggle so the navbar does not grow on hydration (CLS).
+            <span className="h-11 w-11" aria-hidden="true" />
           )}
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-2">
-          {mounted && (
+          {mounted ? (
             <Button
               variant="ghost"
               size="icon"
@@ -110,6 +113,9 @@ export function Navbar() {
             >
               <ThemeIcon isDark={isDark} />
             </Button>
+          ) : (
+            // Same footprint as the toggle so the navbar does not grow on hydration (CLS).
+            <span className="h-11 w-11" aria-hidden="true" />
           )}
           <Button
             ref={menuButtonRef}
