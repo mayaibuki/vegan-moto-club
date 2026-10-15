@@ -428,7 +428,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 
         <Dialog.Root open={sheetOpen} onOpenChange={setShowFilters}>
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-overlay bg-foreground/40 lg:hidden" />
+            <Dialog.Overlay className="fixed inset-0 z-overlay bg-foreground/40 animate-slow data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 lg:hidden" />
             <Dialog.Content
               id="product-filters"
               aria-describedby={undefined}
@@ -441,7 +441,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                 e.preventDefault()
                 filtersButtonRef.current?.focus()
               }}
-              className="fixed inset-x-0 bottom-0 z-overlay flex max-h-sheet flex-col rounded-t-2xl border-t border-border bg-card text-card-foreground shadow-lg focus:outline-none lg:hidden"
+              className="fixed inset-x-0 bottom-0 z-overlay flex max-h-sheet flex-col rounded-t-2xl border-t border-border bg-card text-card-foreground shadow-lg animate-slow focus:outline-none data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom lg:hidden"
             >
               <div className="flex items-center justify-between border-b border-border py-1 pl-4 pr-1">
                 <Dialog.Title className="text-lg font-semibold">Filters</Dialog.Title>
