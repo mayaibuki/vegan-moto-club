@@ -158,7 +158,7 @@
   --color-border:          var(--ds-stone-200, 12 6.3% 93.8%);
   --color-border-muted:    var(--ds-stone-200, 12 6.3% 93.8%);
   --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
-  --color-ring:            var(--ds-lime-500, 77.9 54.4% 47.4%);
+  --color-ring:            var(--ds-lime-700, 77 67% 28%);   /* >=3:1 on page and card; dark mode keeps lime-400 */
 
   --color-card-bg:         var(--ds-white, 0 0% 100%);
   --color-card-text:       var(--ds-stone-900, 12 8.7% 11.8%);

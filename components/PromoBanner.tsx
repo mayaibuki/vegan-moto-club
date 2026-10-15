@@ -30,7 +30,7 @@ export function PromoBanner() {
       className="relative rounded-lg border border-border border-l-4 border-l-primary bg-card text-card-foreground p-4 sm:p-5 pr-14 sm:pr-16 shadow-sm"
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-        <Tag className="h-5 w-5 text-primary flex-shrink-0 hidden sm:block" aria-hidden="true" />
+        <Tag className="h-5 w-5 text-primary-text flex-shrink-0 hidden sm:block" aria-hidden="true" />
         <p className="text-sm sm:text-base text-foreground">
           Members get 15% off Virus Power via Bellissimoto.com. Promo Code: VEGANMC
         </p>

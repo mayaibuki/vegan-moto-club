@@ -65,7 +65,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-lg font-medium hover:text-primary transition-colors"
+              className="text-lg font-medium hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors"
             >
               {link.label}
             </Link>
@@ -129,7 +129,7 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus() }}
-                    className="block py-3 text-base font-medium hover:text-primary transition-colors"
+                    className="block py-3 text-base font-medium hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors"
                   >
                     {link.label}
                   </Link>
