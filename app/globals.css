@@ -89,36 +89,16 @@
   }
 
   /* Heading recipes. Page h1s and section h2s take one of these; do not restyle them inline.
-     They are set in Redaction (font-serif); DegradeOnScroll swaps in the pixelated
-     cuts through data-degrade (rules below). */
+     They set size, weight and tracking only (no font-family), so a display family
+     can be added later in one place. */
   .h-hero {
-    font-synthesis: none;
-    @apply font-serif text-4xl md:text-6xl font-bold tracking-tight text-balance;
+    @apply text-4xl md:text-6xl font-bold tracking-tight text-balance;
   }
   .h-page {
-    font-synthesis: none;
-    @apply font-serif text-3xl md:text-4xl font-bold tracking-tight text-balance;
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-balance;
   }
   .h-section {
-    font-synthesis: none;
-    @apply font-serif text-2xl md:text-3xl font-bold tracking-tight text-balance;
-  }
-
-  /* Cursor degradation: same metrics, progressively pixelated cuts. */
-  :is(.h-hero, .h-page, .h-section)[data-degrade="10"] {
-    font-family: var(--font-redaction-10), Georgia, serif;
-  }
-  :is(.h-hero, .h-page, .h-section)[data-degrade="20"] {
-    font-family: var(--font-redaction-20), Georgia, serif;
-  }
-  :is(.h-hero, .h-page, .h-section)[data-degrade="35"] {
-    font-family: var(--font-redaction-35), Georgia, serif;
-  }
-  :is(.h-hero, .h-page, .h-section)[data-degrade="50"] {
-    font-family: var(--font-redaction-50), Georgia, serif;
-  }
-  :is(.h-hero, .h-page, .h-section)[data-degrade="70"] {
-    font-family: var(--font-redaction-70), Georgia, serif;
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-balance;
   }
 
   /* Lead paragraph: the intro under a page h1. Paragraphs that follow it use

@@ -4,9 +4,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { AgentationWrapper } from "@/components/AgentationWrapper"
-import { DegradeOnScroll } from "@/components/DegradeOnScroll"
 import ShaderBackground from "@/components/ShaderBackground"
-import { dmSans, fontVariables } from "./fonts"
+import { dmSans } from "./fonts"
 import "./globals.css"
 import { SITE_URL } from "@/lib/constants"
 
@@ -92,7 +91,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={fontVariables}>
+    <html lang="en" suppressHydrationWarning className={dmSans.variable}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -137,7 +136,6 @@ export default function RootLayout({
           </main>
           <Footer />
         </div>
-        <DegradeOnScroll />
         <AgentationWrapper />
         <Analytics />
         <SpeedInsights />

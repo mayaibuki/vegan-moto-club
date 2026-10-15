@@ -203,7 +203,6 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 | Token | Value |
 |-------|-------|
 | `--font-family` | DM Sans, system-ui, -apple-system, sans-serif |
-| `--font-family-display` | Redaction (`--ds-font-serif`: `var(--font-redaction), Georgia, serif`); Tailwind `font-serif`; heading recipes only |
 
 ---
 
