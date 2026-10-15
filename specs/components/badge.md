@@ -40,11 +40,11 @@ Compact label for categorization, status, or metadata.
 
 | Variant | Background | Text | Hover |
 |---------|------------|------|-------|
-| `default` | `bg-primary` | `text-primary-foreground` | `bg-primary/80` |
-| `secondary` | `bg-secondary` | `text-secondary-foreground` | `bg-secondary/80` |
+| `default` | `bg-primary` | `text-primary-foreground` | — |
+| `secondary` | `bg-secondary` | `text-secondary-foreground` | — |
 | `outline` | transparent, `border-border` | `text-foreground` | — |
 | `accent` | `bg-primary/15` | `text-primary-text` | — |
-| `destructive` | `bg-destructive` | `text-destructive-foreground` | `bg-destructive/80` |
+| `destructive` | `bg-destructive` | `text-destructive-foreground` | — |
 | `positive` | `bg-primary/15`, `border-primary/30` | `text-primary-text` | — |
 | `negative` | `bg-destructive/10`, `border-destructive/30` | `text-destructive-text` | — |
 
@@ -57,7 +57,7 @@ Staff Pick is the only solid lime pill (`default`). Most and Highly protective u
 | State | Appearance |
 |-------|------------|
 | **Default** | Per variant |
-| **Hover** | Opacity shift (see variants) |
+| **Hover / focus** | None. Badges are static labels; wrap them in a link (with `.focus-ring`) when they need to be interactive |
 | **Focus** | `ring-2 ring-ring ring-offset-2` |
 
 ## Code Example

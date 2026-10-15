@@ -44,17 +44,18 @@ The token architecture has three layers:
 | `--ds-lime-400`    | `79.1 64.5% 57.5%`  | `#acd94d`      | Accent (light), Primary (dark) |
 | `--ds-lime-500`    | `77.9 54.4% 47.4%`  | `#93bb37`      | Primary (light), Accent (dark) |
 | `--ds-lime-600`    | `77.2 61.3% 38.5%`  | `#7c9e26`      | Chart dark variant         |
-| `--ds-lime-700`    | `77 67% 28%`        | `#5c7718`      | Text on tinted lime (light) |
+| `--ds-lime-700`    | `77 67% 26%`        | `#566f16`      | Light-mode text, icons, focus ring |
 
 ### Status Colors
 
 | Token              | HSL Value            | Hex (approx.) | Usage Context           |
 | ------------------ | -------------------- | -------------- | ----------------------- |
-| `--ds-red-light`   | `0 84.2% 60.2%`     | `#ef4444`      | Destructive (light)     |
+| `--ds-red-light`   | `0 84.2% 60.2%`     | `#ef4444`      | Unused by semantics     |
 | `--ds-red-dark`    | `0 62.8% 30.6%`     | `#7f1d1d`      | Destructive (dark)      |
 | `--ds-red-400`     | `0 91% 71%`         | `#f87272`      | Text on tinted red (dark) |
-| `--ds-red-600`     | `0 72% 45%`         | `#c52020`      | Text on tinted red (light) |
-| `--ds-green-600`   | `142 71% 45%`       | `#21c45d`      | Success (light)         |
+| `--ds-red-600`     | `0 72% 45%`         | `#c52020`      | Destructive fill and status text (light) |
+| `--ds-green-600`   | `142 71% 45%`       | `#21c45d`      | Unused by semantics     |
+| `--ds-green-700`   | `142 72% 29%`       | `#157f3c`      | Success fill and text (light) |
 | `--ds-green-400`   | `142 69% 58%`       | `#4ade80`      | Success (dark)          |
 
 ---
@@ -75,11 +76,11 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | **Secondary Foreground** | `--secondary-foreground`  | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |
 | **Accent**               | `--accent`                | Lime-400 `79.1 64.5% 57.5%` | Lime-500 `77.9 54.4% 47.4%` |
 | **Accent Foreground**    | `--accent-foreground`     | Stone-950 `12 8.3% 7.2%` | Stone-950 `12 8.3% 7.2%` |
-| **Destructive**          | `--destructive`           | Red `0 84.2% 60.2%`  | Red (dark) `0 62.8% 30.6%` |
+| **Destructive**          | `--destructive`           | Red-600 `0 72% 45%`  | Red (dark) `0 62.8% 30.6%` |
 | **Destructive FG**       | `--destructive-foreground`| `0 0% 98%`           | `0 0% 98%`           |
 | **Border**               | `--border`                | Stone-200 `12 6.3% 93.8%` | Stone-700 `12 5% 24%` |
 | **Input**                | `--input`                 | Stone-500 `12 6.5% 51.5%` | Stone-500 `12 6.5% 51.5%` |
-| **Ring**                 | `--ring`                  | Lime-500 `77.9 54.4% 47.4%` | Lime-400 `79.1 64.5% 57.5%` |
+| **Ring**                 | `--ring`                  | Lime-700 `77 67% 26%` | Lime-400 `79.1 64.5% 57.5%` |
 | **Card BG**              | `--card`                  | White `0 0% 100%`    | Stone-875 `12 7.5% 14%` |
 | **Card Foreground**      | `--card-foreground`       | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |
 | **Popover BG**           | `--popover`               | White `0 0% 100%`    | Stone-850 `12 6.5% 17%` |
@@ -89,7 +90,8 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 
 | Role                  | CSS Variable             | Light Mode         | Dark Mode          |
 | --------------------- | ------------------------ | ------------------ | ------------------ |
-| **Success**           | `--color-success`        | Green-600          | Green-400          |
+| **Success**           | `--color-success`        | Green-700          | Green-400          |
+| **Success Text**      | `--color-success-text`   | Green-700          | Green-400          |
 | **BG Subtle**         | `--color-bg-subtle`      | Stone-100          | Stone-800          |
 | **BG Inverse**        | `--color-bg-inverse`     | Stone-950          | White              |
 | **Text Inverse**      | `--color-text-inverse`   | Stone-50           | Stone-900          |
@@ -98,9 +100,9 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | **Popover BG / Text** | `--color-popover-bg`, `--color-popover-text` | White / Stone-900 | Stone-850 / Stone-50 |
 | **Secondary BG / Text** | `--color-secondary`, `--color-secondary-text` | Stone-200 / Stone-900 | Stone-800 / Stone-50 |
 | **Success Foreground** | `--color-success-foreground` | White          | White              |
-| **Destructive Text**  | `--color-destructive-text` | Stone-50 (text on destructive fill) | Stone-50 |
-| **Primary Text**      | `--color-primary-text`   | Lime-700 (text on tinted lime) | Lime-400 |
-| **Negative Text**     | `--color-negative-text`  | Red-600 (text on tinted red)   | Red-400  |
+| **Destructive Foreground** | `--color-destructive-foreground` | Stone-50 (text on destructive fill) | Stone-50 |
+| **Primary Text**      | `--color-primary-text`   | Lime-700 (lime text and icons) | Lime-400 |
+| **Negative Text**     | `--color-negative-text`  | Red-600 (error text, red badge text) | Red-400  |
 
 ---
 
@@ -111,7 +113,10 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | `bg-background`      | `hsl(var(--background))`     | Off-white (Stone-50) | Near-black  |
 | `text-foreground`    | `hsl(var(--foreground))`     | Dark stone       | Near-white      |
 | `bg-primary`         | `hsl(var(--primary))`        | Lime-500 green   | Lime-400 green  |
-| `text-primary`       | `hsl(var(--primary))`        | Lime-500 green   | Lime-400 green  |
+| `text-primary`       | `hsl(var(--primary))`        | Lime-500 green (fills only, 2.2:1 on white) | Lime-400 green  |
+| `text-primary-text`  | `hsl(var(--primary-text))`   | Lime-700 olive   | Lime-400 green  |
+| `text-destructive-text` | `hsl(var(--destructive-text))` | Red-600       | Red-400         |
+| `text-success-text`  | `hsl(var(--success-text))`   | Green-700        | Green-400       |
 | `bg-secondary`       | `hsl(var(--secondary))`      | Light stone      | Dark stone      |
 | `bg-muted`           | `hsl(var(--muted))`          | Off-white stone  | Dark stone      |
 | `text-muted-foreground` | `hsl(var(--muted-foreground))` | Medium stone | Light stone  |
@@ -119,7 +124,7 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | `bg-destructive`     | `hsl(var(--destructive))`    | Bright red       | Dark red        |
 | `border-border`      | `hsl(var(--border))`         | Light stone      | Dark stone      |
 | `bg-card`            | `hsl(var(--card))`           | White            | Dark stone      |
-| `ring-ring`          | `hsl(var(--ring))`           | Lime-500         | Lime-400        |
+| `ring-ring`          | `hsl(var(--ring))`           | Lime-700         | Lime-400        |
 
 ### Opacity Modifier Example
 
@@ -152,7 +157,9 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | Form input borders               | `--input`              | `border-input`              |
 | Focus rings                      | `--ring`               | `ring-ring`                 |
 | Error states, delete actions     | `--destructive`        | `bg-destructive text-destructive-foreground` |
-| Success indicators               | `--color-success`      | Use `hsl(var(--color-success))` inline |
+| Success text                     | `--success-text`       | `text-success-text`         |
+| Error text                       | `--destructive-text`   | `text-destructive-text`     |
+| Lime text and icons              | `--primary-text`       | `text-primary-text`         |
 
 ### Rules
 
@@ -182,5 +189,7 @@ Stone-500 (`#8b7f7b`) is only about 3.9:1 on white, so do not use it for text. I
 
 ### Focus Indicators
 
-- All interactive elements use `ring-ring` (Lime-500/400) as the focus indicator color.
-- Focus rings provide sufficient contrast against both light and dark backgrounds.
+- All interactive elements use `ring-ring` as the focus indicator color: Lime-700 in light mode (at least 3:1 on the page and on cards), Lime-400 in dark mode.
+- Links, cards and chip buttons share the `.focus-ring` utility in `globals.css`: a 2px ring offset by `ring-offset-background`. Add a `rounded-*` utility so the ring follows the element's corners.
+- Lime-500 (`--primary`) is 2.2:1 on white, so it is only used for fills. Lime text and icons use `text-primary-text`; error and success text use `text-destructive-text` and `text-success-text`.
+- `prefers-reduced-motion: reduce` shortens animation and transition durations to 0.01ms and turns off smooth scrolling (global rule in `globals.css`).

@@ -49,9 +49,10 @@ Renders the Vegan Moto Club logo at one of three predefined sizes. Optionally wr
 
 ## Accessibility
 
-- Image has `alt="Vegan Moto Club"` — serves as the site identity
+- Image has `alt=""` when the name is shown next to it (avoids reading the name twice) and `alt="Vegan Moto Club"` when `showName` is false
+- The link uses `.focus-ring`
 - `priority` attribute on Image ensures above-fold loading
-- When wrapped in Link, the link text is derived from the image alt
+- When wrapped in Link, the link text is the visible name (or the image alt when the name is hidden)
 
 ## Code Example
 

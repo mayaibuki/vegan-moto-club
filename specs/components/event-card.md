@@ -21,7 +21,7 @@ Displays a single event as a card with a poster image, an overlaid date block, a
 ## Anatomy
 
 ```
-<article>                                  ← semantic wrapper (muted via opacity-60 for past events)
+<article>                                  ← semantic wrapper
   <Card p-4 gap-4>                         ← rounded-2xl shell, padded
     <div aspect-square rounded-xl>         ← poster container
       <Image fill object-cover />          ← Next.js poster
@@ -65,7 +65,7 @@ No hex or arbitrary values — all classes resolve to semantic tokens defined in
 | Prop    | Type     | Required | Default | Description                                  |
 |---------|----------|----------|---------|----------------------------------------------|
 | `event` | `Event`  | Yes      | —       | Full event object from Notion API            |
-| `muted` | `boolean`| No       | `false` | Renders the card at 60% opacity (past events)|
+| `muted` | `boolean`| No       | `false` | Past event: greyscale, dimmed poster plus a "Past" pill (text stays full contrast) |
 
 ## States
 
@@ -73,7 +73,7 @@ No hex or arbitrary values — all classes resolve to semantic tokens defined in
 |-------------|------------------------------------------------------|
 | Default     | `shadow-sm`, full opacity                            |
 | Hover       | `shadow-md` (from Card base)                         |
-| Muted       | `opacity-60` on the outer `<article>`                |
+| Muted       | `opacity-60 grayscale` on the poster image only; `Past` pill (`bg-card text-muted-foreground text-xs font-semibold rounded-full`) beside the date block |
 | No poster   | Centered `No poster` placeholder inside `bg-muted`   |
 | Single-day  | Single `DateBlock` overlay                           |
 | Multi-day   | Two `DateBlock`s with `ArrowRight` between           |

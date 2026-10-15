@@ -30,8 +30,8 @@ A URL submission form that lets visitors suggest vegan motorcycle products for r
             <Button type="submit" />     ← submit with loading spinner
           </div>
         </div>
-        <p>                              ← success message (conditional)
-        <p>                              ← error message (conditional)
+        <div role="status" aria-live="polite">  ← success message (always mounted)
+        <div role="alert">               ← error message (always mounted, <p id="…-error">)
       </form>
     </CardContent>
   </Card>
@@ -42,8 +42,8 @@ A URL submission form that lets visitors suggest vegan motorcycle products for r
 
 | Element            | Token / Class             | Purpose              |
 |--------------------|---------------------------|----------------------|
-| Success message    | `text-success`            | Positive feedback    |
-| Error message      | `text-destructive`        | Error feedback       |
+| Success message    | `text-success-text`       | Positive feedback    |
+| Error message      | `text-destructive-text`   | Error feedback (4.5:1+ in both modes) |
 | Card description   | `text-base` (inherited)   | Helper text          |
 | Spinner opacity    | `opacity-25`, `opacity-75`| Loading indicator    |
 | Spinner animation  | `animate-spin`            | Rotation             |
@@ -77,7 +77,9 @@ A URL submission form that lets visitors suggest vegan motorcycle products for r
 - Label associated with input via `htmlFor`/`id` pairing
 - Honeypot field has `aria-hidden="true"` and `tabIndex={-1}`
 - Submit button has visible loading state text for screen readers
-- Error and success messages are in the DOM flow (announced on render)
+- Success and error messages sit in always-mounted live regions (`role="status"` / `role="alert"`), so they are announced without moving focus
+- Input is `required`; on error it gets `aria-invalid` and `aria-describedby` pointing at the error message; the form has `noValidate` (the site shows its own messages) and `aria-busy` while submitting
+- Spinner svg is `aria-hidden`
 
 ## Code Example
 
