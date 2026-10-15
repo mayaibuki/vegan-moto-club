@@ -105,31 +105,21 @@ export default async function Home() {
       <section className="overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-stretch">
           {/* Left Column — Text Content */}
-          <div className="flex-1 p-10 md:p-16 text-center lg:text-left space-y-8">
-            {/* Last Updated Badge — hidden when product data is unavailable */}
-            {lastUpdated && (
-              <div className="flex items-center gap-2 justify-center lg:justify-start">
-                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground">
-                  <span className="h-2 w-2 rounded-full bg-primary" />
-                  Last updated: <span className="font-semibold text-foreground">{formatRelativeDate(lastUpdated)}</span>
-                </span>
-              </div>
-            )}
-
+          <div className="flex-1 px-4 py-8 sm:p-10 md:p-16 text-center lg:text-left space-y-6 sm:space-y-8">
             <h1 className="h-hero">
               Ride motorcycles, love animals
             </h1>
 
-            <ul className="space-y-3 text-lg text-muted-foreground mx-auto lg:mx-0 max-w-2xl">
-              <li className="flex items-center gap-3 justify-center lg:justify-start">
+            <ul className="space-y-3 text-base sm:text-lg text-muted-foreground mx-auto w-fit text-left lg:mx-0 max-w-2xl">
+              <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary-text flex-shrink-0" />
                 Find vegan motorcycle gear
               </li>
-              <li className="flex items-center gap-3 justify-center lg:justify-start">
+              <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary-text flex-shrink-0" />
                 Discover bike events
               </li>
-              <li className="flex items-center gap-3 justify-center lg:justify-start">
+              <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary-text flex-shrink-0" />
                 Connect with other riders
               </li>
@@ -145,10 +135,22 @@ export default async function Home() {
                 </a>
               </Button>
             </div>
+
+            {/* Last Updated Badge (below the CTAs so they stay in the first mobile viewport);
+                hidden when product data is unavailable */}
+            {lastUpdated && (
+              <div className="flex items-center gap-2 justify-center lg:justify-start">
+                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs sm:px-4 sm:py-1.5 sm:text-sm text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full bg-primary" />
+                  Last updated: <span className="font-semibold text-foreground">{formatRelativeDate(lastUpdated)}</span>
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Right Column — Hero Image edge-to-edge (hidden on mobile) */}
-          <div className="hidden lg:block flex-1 relative min-h-96">
+          {/* Right Column — Hero Image (hidden on mobile). Rounded like the cards; the hero
+              itself has no border or card background (owner decision, VMC-22). */}
+          <div className="hidden lg:block flex-1 relative min-h-96 overflow-hidden rounded-2xl">
             <Image
               src="/images/hero.jpg"
               alt="Vegan Moto Club riders on a Ducati motorcycle with a Protect Animals sign at an animal rights rally"
