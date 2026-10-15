@@ -41,7 +41,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
         className="group block h-full focus-ring rounded-2xl"
       >
         <Card className="h-full hover:shadow-lg transition-[box-shadow,transform] duration-200 cursor-pointer overflow-hidden motion-safe:group-active:scale-[0.98]">
-          <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border/30 flex items-center justify-center">
+          <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border flex items-center justify-center">
             {product.photos.length > 0 ? (
               <ProductCardImage
                 src={product.photos[0]}

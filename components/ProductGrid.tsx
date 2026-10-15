@@ -273,7 +273,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       setSearch("")
                       resetPage()
                     }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:text-foreground"
                     aria-label="Clear search"
                     type="button"
                   >
@@ -444,7 +444,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                     resetPage()
                   }}
                 >
-                  <SelectTrigger id="sort-products" className="h-9 w-44">
+                  <SelectTrigger id="sort-products" className="w-44">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -523,7 +523,7 @@ export function ProductGrid({ products }: ProductGridProps) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -539,7 +539,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       resetPage()
                     }}
                   >
-                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`Products per page, currently ${rowsPerPage}`}>
+                    <SelectTrigger id="rows-per-page" className="w-20" aria-label={`Products per page, currently ${rowsPerPage}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

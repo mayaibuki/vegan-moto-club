@@ -182,7 +182,7 @@ export default async function Home() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {staffPicks.map((product, index) => (
               <div key={product.id} className={index >= 6 ? "hidden lg:block" : undefined}>
                 <ProductCard product={product} />
@@ -205,7 +205,7 @@ export default async function Home() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {upcomingEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}

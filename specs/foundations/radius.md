@@ -115,3 +115,17 @@ Note: The shadcn `rounded-sm` (8px via calc) differs from the primitive `--ds-ra
 2. **Match hierarchy.** Larger containers use larger radii. A card (`rounded-lg`) should have a visually larger radius than its inner badge (`rounded-sm` or `rounded-full`).
 3. **Nested rounding.** When nesting rounded elements, the inner element should have a smaller radius than the outer. A card at `rounded-lg` (12px) with `p-4` (16px) padding should have inner elements at `rounded-md` (10px) or smaller.
 4. **Consistency within component families.** All buttons use the same radius. All cards use the same radius. Do not vary radius for visual interest within a component type.
+
+---
+
+## Radius Ladder (shipped)
+
+| Level | Class |
+| --- | --- |
+| Cards, banners, panels, sheets | `rounded-2xl` (16px) |
+| Inner media (product and event images inside a card) | `rounded-xl` (12px) |
+| Thumbnails | `rounded-lg` |
+| Chips, inner blocks (event date block, icon buttons inside inputs) | `rounded-md` |
+| Pills, buttons, selects, badges | `rounded-full` |
+
+Strokes: edges use solid `border-border` (no `/NN` alpha); form controls use `border-input` (3:1). Control heights: 44px (`h-11`) by default, including the select trigger.

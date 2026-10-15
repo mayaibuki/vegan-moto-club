@@ -182,7 +182,7 @@ export default async function ProductDetailPage({
                   {product.photos.slice(1).map((photo, idx) => (
                     <div
                       key={idx}
-                      className="relative aspect-square bg-muted rounded overflow-hidden"
+                      className="relative aspect-square bg-muted rounded-lg overflow-hidden"
                     >
                       <Image
                         src={notionImageUrl(photo, 256)}
