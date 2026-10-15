@@ -47,6 +47,7 @@
   --ds-red-400:      0 91% 71%;     /* text on tinted red, dark mode */
   --ds-red-600:      0 72% 45%;     /* text on tinted red, light mode */
   --ds-green-600:    142 71% 45%;
+  --ds-green-700:    142 72% 29%;   /* success text and fill on light surfaces (white text 5.6:1) */
   --ds-green-400:    142 69% 58%;
 
   /* ---- Spacing Primitives (4px base unit) ---- */
@@ -168,12 +169,12 @@
   --color-secondary:       var(--ds-stone-200, 12 6.3% 93.8%);
   --color-secondary-text:  var(--ds-stone-900, 12 8.7% 11.8%);
 
-  --color-destructive:     var(--ds-red-light, 0 84.2% 60.2%);
-  --color-destructive-text: 0 0% 98%;
+  --color-destructive:     var(--ds-red-600, 0 72% 45%);     /* white text on this fill is 5.56:1 */
+  --color-destructive-foreground: 0 0% 98%;
   --color-negative-text:   var(--ds-red-600, 0 72% 45%);      /* text on tinted red (badge negative) */
 
-  --color-success:         var(--ds-green-600, 142 71% 45%);
-  --color-success-text:    var(--ds-green-600, 142 71% 45%);
+  --color-success:         var(--ds-green-700, 142 72% 29%);
+  --color-success-text:    var(--ds-green-700, 142 72% 29%);
   --color-success-foreground: var(--ds-white, 0 0% 100%);
 
   /* ---- Semantic Spacing ---- */
@@ -291,7 +292,7 @@
   --color-secondary-text:  0 0% 98%;
 
   --color-destructive:     var(--ds-red-dark, 0 62.8% 30.6%);
-  --color-destructive-text: 0 0% 98%;
+  --color-destructive-foreground: 0 0% 98%;
   --color-negative-text:   var(--ds-red-400, 0 91% 71%);
 
   --color-success:         var(--ds-green-400, 142 69% 58%);

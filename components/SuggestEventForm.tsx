@@ -31,6 +31,7 @@ export function SuggestEventForm({ id }: SuggestEventFormProps) {
   const headingId = id ? `suggest-event-heading-${id}` : "suggest-event-heading"
   const descId = id ? `event-description-${id}` : "event-description"
   const urlId = id ? `event-url-${id}` : "event-url"
+  const errorId = `${urlId}-error`
 
   function clearErrors() {
     if (status === "error") setStatus("idle")
@@ -119,7 +120,7 @@ export function SuggestEventForm({ id }: SuggestEventFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-busy={status === "submitting"}>
             {/* Honeypot field — hidden from humans, filled by bots */}
             <div className="absolute opacity-0 h-0 w-0 overflow-hidden" aria-hidden="true">
               <label htmlFor={id ? `website-event-${id}` : "website-event"}>Website</label>
@@ -138,6 +139,9 @@ export function SuggestEventForm({ id }: SuggestEventFormProps) {
               <Label htmlFor={descId}>Description</Label>
               <Textarea
                 id={descId}
+                required
+                aria-invalid={status === "error" ? true : undefined}
+                aria-describedby={status === "error" && errorMessage ? errorId : undefined}
                 placeholder="Tell us about the event — what, where, when…"
                 value={description}
                 onChange={(e) => { setDescription(e.target.value); clearErrors() }}
@@ -151,6 +155,9 @@ export function SuggestEventForm({ id }: SuggestEventFormProps) {
               <Label htmlFor={urlId}>Event URL</Label>
               <Input
                 id={urlId}
+                required
+                aria-invalid={status === "error" ? true : undefined}
+                aria-describedby={status === "error" && errorMessage ? errorId : undefined}
                 type="url"
                 placeholder="https://example.com/event"
                 value={url}
@@ -174,17 +181,21 @@ export function SuggestEventForm({ id }: SuggestEventFormProps) {
               )}
             </Button>
 
-            {status === "success" && (
-              <p className="text-sm text-success font-medium">
-                Thanks! Your event suggestion has been submitted.
-              </p>
-            )}
+            <div role="status" aria-live="polite">
+              {status === "success" && (
+                <p className="text-sm text-success-text font-medium">
+                  Thanks! Your event suggestion has been submitted.
+                </p>
+              )}
+            </div>
 
-            {status === "error" && errorMessage && (
-              <p className="text-sm text-destructive font-medium">
-                {errorMessage}
-              </p>
-            )}
+            <div role="alert">
+              {status === "error" && errorMessage && (
+                <p id={errorId} className="text-sm text-destructive-text font-medium">
+                  {errorMessage}
+                </p>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>

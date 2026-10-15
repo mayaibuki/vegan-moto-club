@@ -28,6 +28,7 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
 
   const headingId = id ? `suggest-product-heading-${id}` : "suggest-product-heading"
   const inputId = id ? `product-url-${id}` : "product-url"
+  const errorId = `${inputId}-error`
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -103,7 +104,7 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-busy={status === "submitting"}>
             {/* Honeypot field — hidden from humans, filled by bots */}
             <div className="absolute opacity-0 h-0 w-0 overflow-hidden" aria-hidden="true">
               <label htmlFor={id ? `website-${id}` : "website"}>Website</label>
@@ -123,6 +124,9 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Input
                   id={inputId}
+                  required
+                  aria-invalid={status === "error" ? true : undefined}
+                  aria-describedby={status === "error" && errorMessage ? errorId : undefined}
                   type="url"
                   placeholder="https://example.com/product"
                   value={url}
@@ -150,17 +154,21 @@ export function SuggestProductForm({ id }: SuggestProductFormProps) {
               </div>
             </div>
 
-            {status === "success" && (
-              <p className="text-sm text-success font-medium">
-                Thanks! Your suggestion has been submitted.
-              </p>
-            )}
+            <div role="status" aria-live="polite">
+              {status === "success" && (
+                <p className="text-sm text-success-text font-medium">
+                  Thanks! Your suggestion has been submitted.
+                </p>
+              )}
+            </div>
 
-            {status === "error" && errorMessage && (
-              <p className="text-sm text-destructive font-medium">
-                {errorMessage}
-              </p>
-            )}
+            <div role="alert">
+              {status === "error" && errorMessage && (
+                <p id={errorId} className="text-sm text-destructive-text font-medium">
+                  {errorMessage}
+                </p>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>

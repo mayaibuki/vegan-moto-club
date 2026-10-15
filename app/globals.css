@@ -31,9 +31,10 @@
     --accent-foreground: var(--color-text-on-primary);
 
     --destructive: var(--color-destructive);
-    --destructive-foreground: var(--color-destructive-text);
+    --destructive-foreground: var(--color-destructive-foreground);
     --destructive-text: var(--color-negative-text);
     --success: var(--color-success);
+    --success-text: var(--color-success-text);
     --success-foreground: var(--color-success-foreground);
     --border: var(--color-border);
     --input: var(--color-input);
