@@ -61,3 +61,9 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
 - [Logo](./logo.md) — Rendered inside navbar
 - [Button](./button.md) — Ghost buttons for theme/menu toggles
 - [Footer](./footer.md) — Paired navigation element
+
+## Motion
+
+- **Theme toggle:** the sun and moon icons stay mounted and cross-fade with a small rotate and scale (`transition-[opacity,transform] duration-150`). No page-wide transition on theme change.
+- **Link underline:** links are always underlined with a transparent `decoration-transparent`; hover and the current page switch to `decoration-primary` via `transition-[text-decoration-color] duration-150`. No layout change.
+- Both are instant under `prefers-reduced-motion`. See [motion](../foundations/motion.md#implemented-motion).

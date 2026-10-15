@@ -103,3 +103,7 @@ import { ProductCard } from "@/components/ProductCard"
 - **ProductGrid**: `specs/components/product-grid.md` — parent container
 - **Tokens**: `specs/tokens/token-reference.md`
 - **Color**: `specs/foundations/color.md`
+
+## Motion
+
+Hover lifts the card 2px (`-translate-y-0.5`) with the shadow step `shadow-sm` to `shadow-md` (200ms, from the interactive `Card`). Pressing the link scales the card to `scale-98`. Both are instant under `prefers-reduced-motion`. The focus ring is unchanged. See [motion](../foundations/motion.md#implemented-motion).

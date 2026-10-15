@@ -111,3 +111,7 @@ import { EventCard } from "@/components/EventCard"
 - **Button**: `specs/components/button.md` — "Learn More" CTA
 - **Tokens**: `specs/tokens/token-reference.md`
 - **Color**: `specs/foundations/color.md`
+
+## Motion
+
+The card lifts on hover (`hover:-translate-y-0.5`, `shadow-sm` to `shadow-md`, `transition-[transform,box-shadow] duration-200`). The card itself is not a link, so there is no press scale; its button keeps its own feedback. Instant under `prefers-reduced-motion`. See [motion](../foundations/motion.md#implemented-motion).

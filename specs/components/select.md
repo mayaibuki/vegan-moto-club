@@ -67,3 +67,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 - [RadioGroup](./radio-group.md) — Visible single-select alternative
 - [Input](./input.md) — Text entry counterpart
+
+## Motion
+
+`SelectContent` animates with tailwindcss-animate: `data-[state=open]:animate-in fade-in-0 zoom-in-95` and the matching `animate-out fade-out-0 zoom-out-95` on close. Duration is the plugin default (150ms), easing `--ease`. Under `prefers-reduced-motion` the popover appears and closes instantly. See [motion](../foundations/motion.md#implemented-motion).
