@@ -109,7 +109,7 @@ export default async function Home() {
             {/* Last Updated Badge — hidden when product data is unavailable */}
             {lastUpdated && (
               <div className="flex items-center gap-2 justify-center lg:justify-start">
-                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-4 py-1.5 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground">
                   <span className="h-2 w-2 rounded-full bg-primary" />
                   Last updated: <span className="font-semibold text-foreground">{formatRelativeDate(lastUpdated)}</span>
                 </span>

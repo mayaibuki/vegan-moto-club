@@ -244,7 +244,7 @@ export function ProductGrid({ products }: ProductGridProps) {
             showFilters ? "block" : "hidden lg:block"
           }`}
         >
-          <div className="space-y-6 sticky top-24 bg-background lg:bg-transparent p-4 lg:p-0 rounded-xl lg:rounded-none border lg:border-0 border-border max-h-[calc(100vh-7rem)] overflow-y-auto">
+          <div className="space-y-6 sticky top-24 bg-card lg:bg-transparent p-4 lg:p-0 rounded-xl lg:rounded-none border lg:border-0 border-border max-h-[calc(100vh-7rem)] overflow-y-auto">
             <div role="search">
               <label htmlFor="product-search" className="text-sm font-semibold text-foreground mb-3 block">Search</label>
               <div className="relative">
@@ -522,7 +522,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           )}
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-16 bg-muted/30 rounded-2xl">
+            <div className="text-center py-16 bg-card border border-dashed border-border rounded-2xl">
               <p className="text-lg text-muted-foreground mb-2">No products match your search and filters.</p>
               <p className="text-sm text-muted-foreground mb-4">
                 Try removing a filter or search term, or browse all categories.
