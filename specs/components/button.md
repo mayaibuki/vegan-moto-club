@@ -27,13 +27,13 @@ Primary interactive element for user actions. Uses Radix `Slot` for `asChild` co
 | Background (default) | `bg-primary` |
 | Text (default) | `text-primary-foreground` |
 | Background (outline) | `bg-background`, hover: `bg-accent` |
-| Border (outline) | `border-input`, hover: `border-accent` |
+| Border (outline) | `border-2 border-input`, hover: `border-accent` |
 | Background (ghost) | hover: `bg-accent/50` |
 | Shadow | `shadow-sm`, hover: `shadow-md` |
 | Radius | `rounded-full` (pill shape) |
 | Ring | `ring-ring`, `ring-offset-background` |
 | Font | `text-sm`, `font-medium` |
-| Transition | `transition-all`, `duration-200` |
+| Transition | `transition-[background-color,box-shadow,transform]`, `duration-200` |
 | Disabled opacity | `opacity-50` |
 
 ## Props / API
@@ -62,7 +62,7 @@ Primary interactive element for user actions. Uses Radix `Slot` for `asChild` co
 | **Hover** | `bg-primary/90 shadow-md` |
 | **Focus** | `ring-2 ring-ring ring-offset-2` |
 | **Disabled** | `opacity-50 pointer-events-none` |
-| **Active/Pressed** | Inherits hover appearance |
+| **Active/Pressed** | `active:scale-[0.96]` on top of the hover appearance |
 
 ## Code Example
 

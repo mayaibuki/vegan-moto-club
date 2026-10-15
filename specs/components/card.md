@@ -54,7 +54,7 @@ All sub-components accept standard HTML `div` props plus `className`.
 | State | Appearance |
 |-------|------------|
 | **Default** | `shadow-sm`, `border-border` |
-| **Hover** | `shadow-md` (when interactive, e.g., product card) |
+| **Hover** | `shadow-md` (the base Card applies it to every card; ProductCard overrides with `shadow-lg`) |
 
 ## Code Example
 

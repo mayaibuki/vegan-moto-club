@@ -6,95 +6,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* shadcn/ui bridge: every value points at a tokens.css alias.
+   Light/dark switching happens in tokens.css (.dark redefines the --color-* aliases),
+   so this block holds no raw HSL values. */
 @layer base {
   :root {
-    /* Maia Theme - Stone base + Lime accent - Light Mode */
-    --background: 0 0% 98%;                   /* stone-50 */
-    --foreground: 12 8.7% 11.8%;          /* stone-900 */
-    --card: 0 0% 100%;                    /* White */
-    --card-foreground: 12 8.7% 11.8%;     /* stone-900 */
-    --popover: 0 0% 100%;                 /* White */
-    --popover-foreground: 12 8.7% 11.8%;  /* stone-900 */
-    --muted: 12 6.5% 97.5%;               /* stone-100 */
-    --muted-foreground: 12 6.5% 44%;      /* stone-600 — stone-500 fails WCAG AA on white (3.9:1) */
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --card: var(--color-card-bg);
+    --card-foreground: var(--color-card-text);
+    --popover: var(--color-popover-bg);
+    --popover-foreground: var(--color-popover-text);
+    --muted: var(--color-bg-muted);
+    --muted-foreground: var(--color-text-muted);
 
-    /* Primary: Lime green */
-    --primary: 77.9 54.4% 47.4%;          /* lime-500 */
-    --primary-foreground: 12 8.3% 7.2%;   /* stone-950 (dark text on lime) */
-    --primary-text: 77 67% 28%;           /* lime-700 (text on tinted lime, 5.1:1 on white) */
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-text-on-primary);
+    --primary-text: var(--color-primary-text);
 
-    /* Secondary: Stone grey */
-    --secondary: 12 6.3% 93.8%;           /* stone-200 */
-    --secondary-foreground: 12 8.7% 11.8%;/* stone-900 */
+    --secondary: var(--color-secondary);
+    --secondary-foreground: var(--color-secondary-text);
 
-    /* Accent: Lime green */
-    --accent: 79.1 64.5% 57.5%;           /* lime-400 */
-    --accent-foreground: 12 8.3% 7.2%;    /* stone-950 */
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-text-on-primary);
 
-    /* UI Colors */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --destructive-text: 0 72% 45%;        /* red-600 (text on tinted red) */
-    --success: 142 71% 45%;               /* green-600 */
-    --success-foreground: 0 0% 100%;
-    --border: 12 6.3% 93.8%;              /* stone-200 */
-    --input: 12 6.5% 51.5%;               /* stone-500 */
-    --ring: 77.9 54.4% 47.4%;             /* lime-500 */
-    --radius: 0.75rem;                    /* Maia: soft rounded corners */
+    --destructive: var(--color-destructive);
+    --destructive-foreground: var(--color-destructive-text);
+    --destructive-text: var(--color-negative-text);
+    --success: var(--color-success);
+    --success-foreground: var(--color-success-foreground);
+    --border: var(--color-border);
+    --input: var(--color-input);
+    --ring: var(--color-ring);
+    --radius: var(--radius-lg);
 
-    /* Maia spacing scale */
-    --spacing-sm: 0.75rem;
-    --spacing-md: 1.25rem;
-    --spacing-lg: 2rem;
+    --spacing-sm: var(--ds-space-3);
+    --spacing-md: var(--ds-space-5);
+    --spacing-lg: var(--ds-space-8);
 
-    /* Chart colors */
-    --chart-1: 77.9 54.4% 47.4%;          /* lime-500 */
-    --chart-2: 79.7 77.9% 69.7%;          /* lime-300 */
-    --chart-3: 12 6.5% 51.5%;             /* stone-500 */
-    --chart-4: 12 5.4% 84%;               /* stone-300 */
-    --chart-5: 79.9 84.6% 80.2%;          /* lime-200 */
+    --chart-1: var(--color-primary);
+    --chart-2: var(--ds-lime-300);
+    --chart-3: var(--ds-stone-500);
+    --chart-4: var(--ds-stone-300);
+    --chart-5: var(--ds-lime-200);
   }
 
   .dark {
-    /* Maia Theme - Stone base + Lime accent - Dark Mode */
-    --background: 12 8.3% 7.2%;           /* stone-950 */
-    --foreground: 0 0% 98%;               /* stone-50 */
-    --card: 12 7.5% 14%;                  /* stone-875 */
-    --card-foreground: 0 0% 98%;          /* stone-50 */
-    --popover: 12 6.5% 17%;               /* stone-850 */
-    --popover-foreground: 0 0% 98%;       /* stone-50 */
-    --muted: 12 6.3% 18.8%;               /* stone-800 */
-    --muted-foreground: 12 4.9% 64%;      /* stone-400 */
-
-    /* Primary: Lime green */
-    --primary: 79.1 64.5% 57.5%;          /* lime-400 */
-    --primary-foreground: 12 8.3% 7.2%;   /* stone-950 */
-    --primary-text: 79.1 64.5% 57.5%;     /* lime-400 */
-
-    /* Secondary: Stone grey */
-    --secondary: 12 6.3% 18.8%;           /* stone-800 */
-    --secondary-foreground: 0 0% 98%;     /* stone-50 */
-
-    /* Accent: Lime green */
-    --accent: 77.9 54.4% 47.4%;           /* lime-500 */
-    --accent-foreground: 12 8.3% 7.2%;    /* stone-950 */
-
-    /* UI Colors */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --destructive-text: 0 91% 71%;        /* red-400 (text on tinted red) */
-    --success: 142 69% 58%;               /* green-400 */
-    --success-foreground: 0 0% 100%;
-    --border: 12 5% 24%;                  /* stone-700 */
-    --input: 12 6.5% 51.5%;               /* stone-500 */
-    --ring: 79.1 64.5% 57.5%;             /* lime-400 */
-
-    /* Chart colors */
-    --chart-1: 79.1 64.5% 57.5%;          /* lime-400 */
-    --chart-2: 77.9 54.4% 47.4%;          /* lime-500 */
-    --chart-3: 12 4.9% 64%;               /* stone-400 */
-    --chart-4: 12 5.4% 84%;               /* stone-300 */
-    --chart-5: 77.2 61.3% 38.5%;          /* lime-600 */
+    --chart-2: var(--ds-lime-500);
+    --chart-3: var(--ds-stone-400);
+    --chart-5: var(--ds-lime-600);
   }
 }
 

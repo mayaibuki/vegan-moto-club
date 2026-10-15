@@ -86,7 +86,7 @@ Use for changes that involve size, position, or spatial movement. These need mor
 
 ```html
 <!-- Accordion expand -->
-<div class="transition-all duration-300">
+<div class="transition-[grid-template-rows] duration-300">
   Expandable content
 </div>
 
@@ -96,12 +96,12 @@ Use for changes that involve size, position, or spatial movement. These need mor
 </nav>
 
 <!-- Width change -->
-<div class="transition-all duration-300 w-64 hover:w-72">
+<div class="transition-[width] duration-300 w-64 hover:w-72">
   Expanding panel
 </div>
 ```
 
-**Tailwind mapping:** `transition-all` applies `transition-property: all`. Use `transition-transform` when only transform changes to avoid animating unintended properties.
+**Tailwind mapping:** name the exact properties (`transition-[width]`, `transition-[grid-template-rows]`, `transition-transform`). Do not use `transition-all`; it animates properties you did not intend.
 
 ### Opacity Transitions (fast)
 
@@ -130,13 +130,13 @@ Use for fade-in/fade-out effects on tooltips, overlays, and notifications.
 | `transition-opacity`  | `opacity`                                                                | Fade effects               |
 | `transition-shadow`   | `box-shadow`                                                             | Elevation changes          |
 | `transition-transform`| `transform`                                                              | Position/scale changes     |
-| `transition-all`      | All properties                                                           | Multiple property changes  |
+| `transition-[a,b]`    | Explicit property list                                                   | Multiple property changes  |
 
 | Duration Utility | Value  | Pairing                        |
 | ---------------- | ------ | ------------------------------ |
 | `duration-150`   | 150ms  | `transition-colors`, `transition-opacity` |
 | `duration-200`   | 200ms  | `transition-colors`, `transition-shadow`  |
-| `duration-300`   | 300ms  | `transition-all`, `transition-transform`  |
+| `duration-300`   | 300ms  | `transition-[...]`, `transition-transform`  |
 
 ---
 
@@ -164,7 +164,7 @@ The design system includes opacity primitives for disabled and muted states:
 
 1. **Always animate transitions.** Never change visual state (color, shadow, opacity) without a transition. Abrupt changes feel broken.
 2. **Match duration to scope.** Color and opacity changes use fast/normal (150-200ms). Layout and position changes use slow (300ms). Mixing these durations looks inconsistent.
-3. **Use specific transition properties.** Prefer `transition-colors` or `transition-shadow` over `transition-all` when possible. `transition-all` can cause unexpected animations on properties like `height` or `padding`.
+3. **Use specific transition properties.** Use `transition-colors`, `transition-shadow` or an explicit `transition-[...]` list. The audit warns on `transition-all`, which can cause unexpected animations on properties like `height` or `padding`.
 4. **Respect `prefers-reduced-motion`.** Consider adding reduced motion support for users who prefer it:
    ```css
    @media (prefers-reduced-motion: reduce) {
@@ -174,4 +174,4 @@ The design system includes opacity primitives for disabled and muted states:
    }
    ```
 5. **No decorative animations.** Motion is purely functional -- providing feedback for user interactions. Avoid loading animations, bouncing elements, or continuous motion.
-6. **One easing curve.** Use the default `cubic-bezier(0.4, 0, 0.2, 1)` for all transitions. Do not introduce custom easing curves without design review.
+6. **One easing curve.** Use the default `cubic-bezier(0.4, 0, 0.2, 1)` for all transitions. The curve is registered as Tailwind's default `transitionTimingFunction` in `tailwind.config.ts`, so no `ease-[...]` class is needed (the audit warns on it). Do not introduce custom easing curves without design review.

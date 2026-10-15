@@ -44,7 +44,7 @@ Displays a single product as a linked card with image, brand, name, price, and a
 | Product name        | `text-foreground` (inherit)| Primary text       |
 | Price               | `text-foreground`          | High emphasis      |
 | Category text       | `text-muted-foreground`    | De-emphasized      |
-| Card hover          | `hover:shadow-lg`          | Elevation feedback |
+| Card hover          | `hover:shadow-lg` + `transition-shadow duration-300` | Elevation feedback |
 | Image hover         | `group-hover:scale-105`    | Zoom effect        |
 | Transition          | `duration-300`             | Standard motion    |
 | No-image text       | `text-muted-foreground`    | Placeholder        |

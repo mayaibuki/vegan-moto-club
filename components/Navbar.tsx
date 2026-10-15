@@ -102,7 +102,7 @@ export function Navbar() {
       {/* Mobile Navigation Menu */}
       <div
         id="mobile-nav-menu"
-        className={`md:hidden grid transition-[grid-template-rows] duration-200 ease-[cubic-bezier(0.2,0,0,1)] ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+        className={`md:hidden grid transition-[grid-template-rows] duration-200 ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
         role="navigation"
         aria-label="Mobile navigation"
       >

@@ -42,7 +42,7 @@ Compact label for categorization, status, or metadata.
 |---------|------------|------|-------|
 | `default` | `bg-primary` | `text-primary-foreground` | `bg-primary/80` |
 | `secondary` | `bg-secondary` | `text-secondary-foreground` | `bg-secondary/80` |
-| `outline` | transparent | `text-foreground` | — |
+| `outline` | transparent, `border-input` | `text-foreground` | — |
 | `accent` | `bg-accent/20` | `text-accent-foreground` | `bg-accent/30` |
 | `destructive` | `bg-destructive` | `text-destructive-foreground` | `bg-destructive/80` |
 

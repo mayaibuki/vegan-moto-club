@@ -57,6 +57,9 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      transitionTimingFunction: {
+        DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
