@@ -64,6 +64,10 @@ Staff Pick is the only solid lime pill (`default`). Most and Highly protective u
 
 Below 640px the product card shows a short label (Most, High, Moderate, Slight) with `whitespace-nowrap` so the pill never wraps; the full label renders from `sm` up and always in an `sr-only` span.
 
+### Vegan verification and waterproof
+
+Same quiet scale, never solid red or lime. Verified Vegan by us / Confirmed Vegan by maker use `positive`, Verified Vegan by AI uses `outline`, Waiting for confirmation uses `secondary`. Waterproof uses `positive`, Water resistant `outline`, Not waterproof `secondary`. Verification badges carry no icon or emoji. Helpers: `veganVerifiedVariant`, `waterproofVariant` in `lib/utils.ts`. Base class includes `leading-4` so emoji badges (seasons) match the height of text-only badges.
+
 ## States
 
 | State | Appearance |
@@ -79,8 +83,8 @@ import { Badge } from "@/components/ui/badge"
 
 <Badge>Staff Pick</Badge>
 <Badge variant="outline">☀️ Summer</Badge>
-<Badge variant="destructive">Not waterproof</Badge>
-<Badge variant="accent">Verified Vegan</Badge>
+<Badge variant="secondary">Not waterproof</Badge>
+<Badge variant="positive">Verified Vegan by us</Badge>
 ```
 
 ## Cross-References

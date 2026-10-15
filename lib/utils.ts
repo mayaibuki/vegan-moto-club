@@ -206,3 +206,19 @@ export function getUniqueBrands(products: Product[]): string[] {
   const brands = new Set(products.map((p) => p.brand).filter(Boolean))
   return Array.from(brands).sort()
 }
+
+type BadgeTone = "positive" | "outline" | "secondary"
+
+/** Quiet badge tones for the vegan verification tiers (no solid fills, mirrors the protection scale). */
+export function veganVerifiedVariant(label: string): BadgeTone {
+  if (label === "Verified Vegan by us" || label === "Confirmed Vegan by maker") return "positive"
+  if (label === "Verified Vegan by AI") return "outline"
+  return "secondary"
+}
+
+/** Quiet badge tones for waterproof levels; "Not waterproof" is informational, not a warning. */
+export function waterproofVariant(label: string): BadgeTone {
+  if (label === "Not waterproof") return "secondary"
+  if (label === "Water resistant") return "outline"
+  return "positive"
+}

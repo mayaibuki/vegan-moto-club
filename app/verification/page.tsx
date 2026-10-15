@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 const TIERS = [
   {
     label: "Verified Vegan by us",
-    badgeVariant: "default" as const,
+    badgeVariant: "positive" as const,
     heading: "Verified by us",
     body: "We checked the product ourselves: materials lists, manufacturer documentation, and where possible the physical product. This is our strongest tier. If we got something wrong, we want to know.",
   },
   {
     label: "Confirmed Vegan by maker",
-    badgeVariant: "default" as const,
+    badgeVariant: "positive" as const,
     heading: "Confirmed by the maker",
     body: "The manufacturer has stated, in their product documentation or directly to us, that the product contains no animal-derived materials. We record the source and revisit if the product is revised.",
   },
@@ -40,7 +40,7 @@ const TIERS = [
   },
   {
     label: "Waiting for confirmation as Vegan",
-    badgeVariant: "destructive" as const,
+    badgeVariant: "secondary" as const,
     heading: "Waiting for confirmation",
     body: "The product appears to be free of animal materials, but we're still waiting on the maker or our own review to confirm details like adhesives, liners, and trims. Check the materials on the product page and with the retailer before buying if this matters to you.",
   },
@@ -76,7 +76,7 @@ export default function VerificationPage() {
               <CardContent className="pt-6 space-y-2">
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge variant={tier.badgeVariant}>
-                    <span aria-hidden="true">✓</span> {tier.label}
+                    {tier.label}
                   </Badge>
                   <h3 className="text-lg font-semibold">{tier.heading}</h3>
                 </div>
