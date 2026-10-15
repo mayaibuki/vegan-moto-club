@@ -5,6 +5,7 @@ import { Moon, Sun, Menu, X } from "lucide-react"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { Button } from "./ui/button"
 import { Logo } from "./Logo"
+import { cn } from "@/lib/utils"
 
 export function Navbar() {
   const [isDark, setIsDark] = useState(false)
@@ -24,6 +25,18 @@ export function Navbar() {
       const firstLink = mobileMenuRef.current.querySelector('a')
       firstLink?.focus()
     }
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
   }, [mobileMenuOpen])
 
   const toggleTheme = useCallback(() => {
@@ -100,13 +113,15 @@ export function Navbar() {
       </nav>
 
       {/* Mobile Navigation Menu */}
-      <div
+      <nav
         id="mobile-nav-menu"
+        // React 18 types only allow boolean for inert, but React 18 needs the "" string form to render the attribute
+        {...(!mobileMenuOpen ? ({ inert: "" } as object) : {})}
+        aria-hidden={!mobileMenuOpen}
         className={`md:hidden grid transition-[grid-template-rows] duration-200 ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-        role="navigation"
         aria-label="Mobile navigation"
       >
-        <div ref={mobileMenuRef} className="overflow-hidden min-h-0">
+        <div ref={mobileMenuRef} className={cn("overflow-hidden min-h-0", !mobileMenuOpen && "invisible transition-[visibility] duration-200")}>
           <div className="border-t border-border/50 bg-card">
             <ul className="px-6 py-4 space-y-1 list-none">
               {navLinks.map((link) => (
@@ -123,7 +138,7 @@ export function Navbar() {
             </ul>
           </div>
         </div>
-      </div>
+      </nav>
     </header>
   )
 }
