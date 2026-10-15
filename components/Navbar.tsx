@@ -1,12 +1,15 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Moon, Sun, Menu, X } from "lucide-react"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { Button } from "./ui/button"
 import { Logo } from "./Logo"
+import { cn } from "@/lib/utils"
 
 export function Navbar() {
+  const pathname = usePathname()
   const [isDark, setIsDark] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -26,6 +29,18 @@ export function Navbar() {
     }
   }, [mobileMenuOpen])
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [mobileMenuOpen])
+
   const toggleTheme = useCallback(() => {
     if (!mounted) return
     const html = document.documentElement
@@ -43,7 +58,7 @@ export function Navbar() {
 
   return (
     <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-      <nav aria-label="Main navigation" className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <nav aria-label="Main navigation" className="page-container py-4 flex items-center justify-between">
         <Logo size="md" href="/" />
 
         {/* Desktop Navigation */}
@@ -52,7 +67,8 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-lg font-medium hover:text-primary transition-colors"
+              aria-current={pathname === link.href ? "page" : undefined}
+              className="text-lg font-medium hover:underline aria-[current=page]:underline decoration-primary decoration-2 underline-offset-8 transition-colors focus-ring"
             >
               {link.label}
             </Link>
@@ -100,21 +116,24 @@ export function Navbar() {
       </nav>
 
       {/* Mobile Navigation Menu */}
-      <div
+      <nav
         id="mobile-nav-menu"
+        // React 18 types only allow boolean for inert, but React 18 needs the "" string form to render the attribute
+        {...(!mobileMenuOpen ? ({ inert: "" } as object) : {})}
+        aria-hidden={!mobileMenuOpen}
         className={`md:hidden grid transition-[grid-template-rows] duration-200 ${mobileMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-        role="navigation"
         aria-label="Mobile navigation"
       >
-        <div ref={mobileMenuRef} className="overflow-hidden min-h-0">
+        <div ref={mobileMenuRef} className={cn("overflow-hidden min-h-0", !mobileMenuOpen && "invisible transition-[visibility] duration-200")}>
           <div className="border-t border-border/50 bg-card">
-            <ul className="px-6 py-4 space-y-1 list-none">
+            <ul className="page-container py-4 space-y-1 list-none">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus() }}
-                    className="block py-3 text-base font-medium hover:text-primary transition-colors"
+                    aria-current={pathname === link.href ? "page" : undefined}
+                    className="block py-3 text-base font-medium hover:underline aria-[current=page]:underline decoration-primary decoration-2 underline-offset-8 transition-colors focus-ring"
                   >
                     {link.label}
                   </Link>
@@ -123,7 +142,7 @@ export function Navbar() {
             </ul>
           </div>
         </div>
-      </div>
+      </nav>
     </header>
   )
 }

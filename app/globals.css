@@ -31,9 +31,10 @@
     --accent-foreground: var(--color-text-on-primary);
 
     --destructive: var(--color-destructive);
-    --destructive-foreground: var(--color-destructive-text);
+    --destructive-foreground: var(--color-destructive-foreground);
     --destructive-text: var(--color-negative-text);
     --success: var(--color-success);
+    --success-text: var(--color-success-text);
     --success-foreground: var(--color-success-foreground);
     --border: var(--color-border);
     --input: var(--color-input);
@@ -64,5 +65,30 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+  }
+
+  /* One keyboard focus treatment for links, cards and chip buttons: a 2px token
+     ring offset by the page colour. Radius defaults to rounded-sm; add a rounded-*
+     utility (e.g. rounded-2xl on cards) so the ring follows the element's corners. */
+  .focus-ring {
+    @apply rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+/* Respect the OS "reduce motion" setting: no animated transitions, no smooth scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

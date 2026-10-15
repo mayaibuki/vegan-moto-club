@@ -30,7 +30,7 @@ export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
     <div className="flex items-center gap-3">
       <Image
         src="/images/logo.png"
-        alt="Vegan Moto Club"
+        alt={showName ? "" : "Vegan Moto Club"}
         width={sizes[size].width}
         height={sizes[size].height}
         className={sizeClass[size]}
@@ -44,7 +44,11 @@ export function Logo({ size = "md", href = "/", showName = true }: LogoProps) {
   )
 
   if (href) {
-    return <Link href={href}>{logoElement}</Link>
+    return (
+      <Link href={href} className="focus-ring block w-fit rounded-lg">
+        {logoElement}
+      </Link>
+    )
   }
 
   return logoElement

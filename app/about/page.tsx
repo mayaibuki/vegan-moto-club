@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { InstagramGallery } from "@/components/InstagramGallery"
+import { ExternalLink } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "About",
@@ -95,6 +96,7 @@ export default function AboutPage() {
               className="text-foreground hover:underline font-medium"
             >
               Discord
+              <span className="sr-only"> (opens in new tab)</span>
             </a>
             {" "}or follow us on{" "}
             <a
@@ -104,6 +106,7 @@ export default function AboutPage() {
               className="text-foreground hover:underline font-medium"
             >
               Instagram
+              <span className="sr-only"> (opens in new tab)</span>
             </a>
             {" "}to connect with other vegan riders worldwide.
           </p>
@@ -149,6 +152,8 @@ export default function AboutPage() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {org.name}
+                <ExternalLink className="ml-1 inline h-3 w-3" aria-hidden="true" />
+                <span className="sr-only">(opens in new tab)</span>
               </a>
             </li>
           ))}

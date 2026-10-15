@@ -15,7 +15,7 @@ Site-wide footer with brand info, navigation links, and social links.
 
 ```
 [footer]                           — border-t, bg-card, mt-12
-  └─ [container]                   — max-w-7xl, px-6 py-10
+  └─ [container]                   — `.page-container` (max-w-7xl, px-4 sm:px-6), py-10
        ├─ [3-column grid]          — md:grid-cols-3, gap-10, mb-10
        │    ├─ [Brand]             — Logo (sm), name, tagline
        │    ├─ [Nav]               — Products, Events, About
@@ -30,11 +30,12 @@ Site-wide footer with brand info, navigation links, and social links.
 | Top border | `border-t border-border` |
 | Background | `bg-card` |
 | Top margin | `mt-12` |
-| Padding | `px-6 py-10` |
+| Padding | `.page-container py-10` (aligned with `<main>`) |
 | Grid gap | `gap-10` |
 | Section heading | `font-bold mb-4 text-base` |
 | Link list | `space-y-3 text-sm` |
-| Link hover | `hover:text-primary transition-colors` |
+| Link hover | `hover:underline decoration-primary decoration-2 underline-offset-4` (text stays foreground) |
+| Link focus | `.focus-ring` |
 | Copyright | `text-sm text-muted-foreground` |
 | Divider | `border-t border-border pt-8` |
 | Max width | `max-w-7xl` |

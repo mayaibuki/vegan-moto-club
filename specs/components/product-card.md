@@ -44,7 +44,9 @@ Displays a single product as a linked card with image, brand, name, price, and a
 | Product name        | `text-foreground` (inherit)| Primary text       |
 | Price               | `text-foreground`          | High emphasis      |
 | Category text       | `text-muted-foreground`    | De-emphasized      |
-| Card hover          | `hover:shadow-lg` + `transition-shadow duration-300` | Elevation feedback |
+| Card hover          | `hover:shadow-lg` + `transition-[box-shadow,transform] duration-200` (hover-capable devices only) | Elevation feedback |
+| Card press          | `motion-safe:group-active:scale-[0.98]` (`group` is on the Link) | Touch/press feedback |
+| Keyboard focus      | `.focus-ring rounded-2xl` on the Link | Ring follows the 16px card radius |
 | Image hover         | `group-hover:scale-105`    | Zoom effect        |
 | Transition          | `duration-300`             | Standard motion    |
 | No-image text       | `text-muted-foreground`    | Placeholder        |
@@ -68,9 +70,9 @@ Displays a single product as a linked card with image, brand, name, price, and a
 ## Accessibility
 
 - `<article>` wraps each card for semantic grouping
-- `<Link>` has `aria-label` with product name, brand, and price
+- `<Link>` has `aria-label` with product name, brand, price, protection level and "Staff pick" when set
 - Decorative emojis use `aria-hidden="true"`
-- Badge row has `aria-label="Product attributes"`
+- Badge row is a `<ul role="list" aria-label="Product attributes">` with one `<li>` per badge
 - Image `alt` includes product name, brand, and category
 
 ## Code Example

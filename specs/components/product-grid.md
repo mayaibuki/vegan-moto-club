@@ -90,6 +90,9 @@ The main product listing interface. Combines a sidebar filter panel (search, cat
 - Search input has `role="search"`, associated label, `aria-describedby`
 - Filter groups use `<fieldset>` and `<legend>`
 - Results count uses `aria-live="polite"` and `aria-atomic="true"`
+- Results section has a visually hidden `<h2>Products</h2>` so card titles (h3) sit under an h2
+- Page changes scroll the results section into view (`auto` when the user prefers reduced motion) and move focus to it (`tabIndex={-1}`, `scroll-mt-24` to clear the sticky header)
+- Chip remove buttons and "Clear all" use `.focus-ring`
 - Active filters region has `role="region"` and `aria-label`
 - Remove-filter buttons have descriptive `aria-label`
 - Pagination nav has `aria-label="Product pagination"`

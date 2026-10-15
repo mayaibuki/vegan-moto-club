@@ -4,7 +4,7 @@ import { Logo } from "./Logo"
 export function Footer() {
   return (
     <footer className="border-t border-border bg-card mt-12" role="contentinfo">
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="page-container py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Brand Section */}
           <div className="text-center md:text-left">
@@ -21,17 +21,17 @@ export function Footer() {
             <h2 className="font-bold mb-4 text-base">Navigation</h2>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/products" className="hover:text-primary transition-colors">
+                <Link href="/products" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   Products
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="hover:text-primary transition-colors">
+                <Link href="/events" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   Events
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-primary transition-colors">
+                <Link href="/about" className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
                   About
                 </Link>
               </li>
@@ -47,7 +47,7 @@ export function Footer() {
                   href="https://discord.gg/J3vDjQvXPn"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors"
+                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
                   aria-label="Join us on Discord (opens in new tab)"
                 >
                   Discord<span className="sr-only"> (opens in new tab)</span>
@@ -58,7 +58,7 @@ export function Footer() {
                   href="https://www.instagram.com/veganmotoclub"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors"
+                  className="hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring"
                   aria-label="Follow us on Instagram (opens in new tab)"
                 >
                   Instagram<span className="sr-only"> (opens in new tab)</span>

@@ -17,7 +17,7 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
 
 ```
 [header]                          — sticky top-0, z-50, border-b
-  ├─ [nav]                        — max-w-7xl, px-6 py-4
+  ├─ [nav]                        — `.page-container` (max-w-7xl, px-4 sm:px-6), py-4
   │    ├─ [Logo]                  — size="md"
   │    ├─ [Desktop nav]           — hidden md:flex, gap-8
   │    │    ├─ [Link] × 4         — text-lg font-medium
@@ -26,7 +26,7 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
   │         ├─ [ThemeToggle]
   │         └─ [MenuToggle]       — Button ghost, icon
   └─ [Mobile menu]                — md:hidden, conditional
-       └─ [ul]                    — px-6 py-4, space-y-1
+       └─ [ul]                    — `.page-container`, py-4, space-y-1
             └─ [Link] × 4        — py-3, text-base font-medium
 ```
 
@@ -39,10 +39,12 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
 | Border | `border-b border-border/50` |
 | Background | `bg-card/80 backdrop-blur-sm` |
 | Max width | `max-w-7xl` |
-| Padding | `px-6 py-4` |
+| Padding | `.page-container py-4` (16px gutter on mobile, 24px from `sm`), aligned with `<main>` |
 | Link gap | `gap-8` |
 | Link style | `text-lg font-medium` |
-| Link hover | `hover:text-primary` |
+| Link hover | `hover:underline decoration-primary decoration-2 underline-offset-8` (text stays foreground) |
+| Current page | `aria-current="page"` with `aria-[current=page]:underline` (same lime underline) |
+| Focus | `.focus-ring` |
 | Transition | `transition-colors` |
 | Icon size | `h-5 w-5` |
 | Mobile bg | `bg-card` |
@@ -51,7 +53,7 @@ Sticky top navigation with logo, desktop nav links, theme toggle, and mobile men
 ## Behavior
 
 - **Theme toggle:** Adds/removes `.dark` on `<html>`, persists to localStorage
-- **Mobile menu:** Toggle shows/hides nav list; first link auto-focused on open; focus returns to toggle on close
+- **Mobile menu:** Toggle shows/hides nav list; first link auto-focused on open; focus returns to toggle on close. When closed the menu is `inert` and `aria-hidden` (and `invisible` after the close transition) so Tab and screen readers skip it. Escape closes it and returns focus to the toggle. It is a labelled `<nav aria-label="Mobile navigation">`
 - **Hydration safe:** Theme button only renders after `mounted` state
 
 ## Cross-References

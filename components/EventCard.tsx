@@ -26,19 +26,21 @@ export function EventCard({ event, muted = false }: EventCardProps) {
   const multiDay = !isSameEventDay(event.startDate, event.endDate)
 
   return (
-    <article className={cn("h-full", muted && "opacity-60")}>
+    <article className="h-full">
       <Card className="flex h-full flex-col gap-4 p-4">
         {/* Poster with overlays */}
         <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted">
           {event.poster ? (
-            <Image
-              src={notionImageUrl(event.poster, 600)}
-              alt={`${event.name} event poster`}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              className="object-cover ring-1 ring-border/10"
-              unoptimized={event.poster.startsWith("/api/notion-image")}
-            />
+            <div className={cn("absolute inset-0", muted && "opacity-60 grayscale")}>
+              <Image
+                src={notionImageUrl(event.poster, 600)}
+                alt={`${event.name} event poster`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                className="object-cover ring-1 ring-border/10"
+                unoptimized={event.poster.startsWith("/api/notion-image")}
+              />
+            </div>
           ) : (
             <div
               className="absolute inset-0 flex items-center justify-center text-muted-foreground"
@@ -57,6 +59,11 @@ export function EventCard({ event, muted = false }: EventCardProps) {
                   <ArrowRight className="size-6 text-foreground" aria-hidden="true" />
                   <DateBlock date={event.endDate} />
                 </>
+              )}
+              {muted && (
+                <span className="rounded-full bg-card px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+                  Past
+                </span>
               )}
               <span className="sr-only">
                 {multiDay

@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  future: { hoverOnlyWhenSupported: true },
   darkMode: ["class"],
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -39,6 +40,7 @@ const config: Config = {
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
+          text: "hsl(var(--success-text))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",

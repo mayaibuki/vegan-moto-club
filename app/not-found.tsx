@@ -1,12 +1,15 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CATEGORY_PAGES } from "@/lib/constants"
+
+export const metadata: Metadata = { title: "Page not found" }
 
 export default function NotFound() {
   return (
     <div className="py-24 text-center space-y-8">
       <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-wide text-primary">404</p>
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary-text">404</p>
         <h1 className="text-3xl md:text-4xl font-bold">This page took a wrong turn</h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
           The page you&apos;re looking for doesn&apos;t exist or may have moved.

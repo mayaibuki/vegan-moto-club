@@ -122,15 +122,15 @@ export default async function Home() {
 
             <ul className="space-y-3 text-lg text-muted-foreground mx-auto lg:mx-0 max-w-2xl">
               <li className="flex items-center gap-3 justify-center lg:justify-start">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <Check className="h-5 w-5 text-primary-text flex-shrink-0" />
                 Find vegan motorcycle gear
               </li>
               <li className="flex items-center gap-3 justify-center lg:justify-start">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <Check className="h-5 w-5 text-primary-text flex-shrink-0" />
                 Discover bike events
               </li>
               <li className="flex items-center gap-3 justify-center lg:justify-start">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <Check className="h-5 w-5 text-primary-text flex-shrink-0" />
                 Connect with other riders
               </li>
             </ul>

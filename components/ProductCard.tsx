@@ -16,10 +16,10 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
     <article className="h-full">
       <Link
         href={`/products/${product.slug}`}
-        aria-label={`View ${product.name} by ${product.brand} - ${formatPrice(product.price)}`}
-        className="block h-full"
+        aria-label={`${product.name} by ${product.brand}, ${formatPrice(product.price)}${product.levelOfProtection ? `, ${product.levelOfProtection}` : ""}${product.staffFavorite ? ", Staff pick" : ""}`}
+        className="group block h-full focus-ring rounded-2xl"
       >
-        <Card className="h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden group">
+        <Card className="h-full hover:shadow-lg transition-[box-shadow,transform] duration-200 cursor-pointer overflow-hidden motion-safe:group-active:scale-[0.98]">
           <div className="relative aspect-square w-full bg-card overflow-hidden border-b border-border/30 flex items-center justify-center">
             {product.photos.length > 0 ? (
               <ProductCardImage
@@ -51,9 +51,9 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
               {formatPrice(product.price)}
             </p>
 
-            <div className="flex flex-wrap gap-1.5 pt-1" aria-label="Product attributes">
+            <ul role="list" className="flex flex-wrap gap-1.5 pt-1 list-none" aria-label="Product attributes">
               {product.levelOfProtection && (
-                <Badge
+                <li><Badge
                   variant={
                     product.levelOfProtection === "Most protective" ||
                     product.levelOfProtection === "Highly protective"
@@ -66,19 +66,19 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
                   }
                 >
                   {product.levelOfProtection}
-                </Badge>
+                </Badge></li>
               )}
               {product.season.map((s) => (
-                <Badge key={s} variant="outline">
+                <li key={s}><Badge variant="outline">
                   <span aria-hidden="true">{seasonEmojis[s] || ""}</span> {s}
-                </Badge>
+                </Badge></li>
               ))}
               {product.gender && (
-                <Badge variant="outline">
+                <li><Badge variant="outline">
                   {product.gender}
-                </Badge>
+                </Badge></li>
               )}
-            </div>
+            </ul>
 
           </CardContent>
         </Card>

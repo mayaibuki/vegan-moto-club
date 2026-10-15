@@ -119,11 +119,14 @@ export default async function CategoryLandingPage({
             .
           </p>
         ) : (
+          <>
+          <h2 className="sr-only">Products</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+          </>
         )}
 
         <nav aria-label="Other categories" className="border-t border-border pt-8">
@@ -133,7 +136,7 @@ export default async function CategoryLandingPage({
               <li key={other.slug}>
                 <Link
                   href={`/${other.slug}`}
-                  className="inline-block rounded-full border border-border px-4 py-1.5 text-sm hover:bg-muted"
+                  className="inline-block rounded-full border border-border px-4 py-1.5 text-sm hover:bg-muted focus-ring"
                 >
                   {other.title}
                 </Link>

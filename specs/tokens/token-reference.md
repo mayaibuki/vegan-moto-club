@@ -45,13 +45,14 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 | `--ds-lime-400` | `79.1 64.5% 57.5%` | Accent (light), primary (dark) |
 | `--ds-lime-500` | `77.9 54.4% 47.4%` | Primary (light), accent (dark) |
 | `--ds-lime-600` | `77.2 61.3% 38.5%` | Chart accent (dark) |
-| `--ds-lime-700` | `77 67% 28%` | Text on tinted lime (light) |
-| `--ds-green-600` | `142 71% 45%` | Success (light) |
+| `--ds-lime-700` | `77 67% 26%` | Light-mode text, icons and focus ring (5.7:1 on white, 4.9:1 on the tinted badge) |
+| `--ds-green-600` | `142 71% 45%` | Unused by semantics (kept as a primitive) |
+| `--ds-green-700` | `142 72% 29%` | Success fill and text (light), white text 5.6:1 |
 | `--ds-green-400` | `142 69% 58%` | Success (dark) |
-| `--ds-red-light` | `0 84.2% 60.2%` | Destructive (light) |
+| `--ds-red-light` | `0 84.2% 60.2%` | Unused by semantics (kept as a primitive) |
 | `--ds-red-dark` | `0 62.8% 30.6%` | Destructive (dark) |
 | `--ds-red-400` | `0 91% 71%` | Text on tinted red (dark) |
-| `--ds-red-600` | `0 72% 45%` | Text on tinted red (light) |
+| `--ds-red-600` | `0 72% 45%` | Destructive fill and status text (light), white text 5.6:1 |
 
 ### Semantic Aliases (Layer 2)
 
@@ -71,17 +72,17 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 | `--color-border` | stone-200 | stone-700 | `border-border` | Default borders |
 | `--color-border-muted` | stone-200 | stone-800 | `border-border/50` | Subtle borders |
 | `--color-input` | stone-500 | stone-500 | `border-input` | Form control borders (3:1) |
-| `--color-ring` | lime-500 | lime-400 | `ring-ring` | Focus rings |
+| `--color-ring` | lime-700 | lime-400 | `ring-ring` | Focus rings (>= 3:1 on page and card) |
 | `--color-card-bg` | white | stone-875 | `bg-card` | Card backgrounds |
 | `--color-card-text` | stone-900 | stone-50 | `text-card-foreground` | Card text |
-| `--color-destructive` | red-light | red-dark | `text-destructive`, `bg-destructive` | Errors, danger |
-| `--color-destructive-text` | stone-50 | stone-50 | `text-destructive-foreground` | Text on destructive bg |
+| `--color-destructive` | red-600 | red-dark | `bg-destructive` | Destructive fills (buttons, badges) |
+| `--color-destructive-foreground` | stone-50 | stone-50 | `text-destructive-foreground` | Text on destructive bg |
 | `--color-popover-bg` | white | stone-850 | `bg-popover` | Popovers, dropdowns |
 | `--color-secondary` | stone-200 | stone-800 | `bg-secondary` | Secondary surfaces |
-| `--color-primary-text` | lime-700 | lime-400 | `text-primary-text` | Text on tinted lime (badge positive) |
-| `--color-negative-text` | red-600 | red-400 | `text-destructive-text` | Text on tinted red (badge negative) |
-| `--color-success` | green-600 | green-400 | `text-success`, `bg-success` | Success states |
-| `--color-success-text` | green-600 | green-400 | `text-success` | Success text |
+| `--color-primary-text` | lime-700 | lime-400 | `text-primary-text` | Lime text and icons on light surfaces (badge positive, 404 eyebrow, hero icons, link buttons) |
+| `--color-negative-text` | red-600 | red-400 | `text-destructive-text` | Error text and tinted red badge text |
+| `--color-success` | green-700 | green-400 | `bg-success` | Success fills |
+| `--color-success-text` | green-700 | green-400 | `text-success-text` | Success message text |
 
 ### shadcn/ui Bridge Variables (globals.css)
 
@@ -105,9 +106,10 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 | `--muted` | `var(--color-bg-muted)` | `bg-muted` |
 | `--muted-foreground` | `var(--color-text-muted)` | `text-muted-foreground` |
 | `--destructive` | `var(--color-destructive)` | `bg-destructive`, `text-destructive` |
-| `--destructive-foreground` | `var(--color-destructive-text)` | `text-destructive-foreground` |
+| `--destructive-foreground` | `var(--color-destructive-foreground)` | `text-destructive-foreground` |
 | `--destructive-text` | `var(--color-negative-text)` | `text-destructive-text` |
-| `--success` | `var(--color-success)` | `bg-success`, `text-success` |
+| `--success` | `var(--color-success)` | `bg-success` |
+| `--success-text` | `var(--color-success-text)` | `text-success-text` |
 | `--success-foreground` | `var(--color-success-foreground)` | `text-success-foreground` |
 | `--border` | `var(--color-border)` | `border-border` |
 | `--input` | `var(--color-input)` | `border-input` |

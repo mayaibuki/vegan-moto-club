@@ -170,7 +170,9 @@ export function ProductGrid({ products }: ProductGridProps) {
 
   const goToPage = (page: number) => {
     setCurrentPage(page)
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    resultsRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })
+    resultsRef.current?.focus({ preventScroll: true })
   }
 
   const clearAllFilters = () => {
@@ -225,7 +227,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           onRemove()
           resetPage()
         }}
-        className="-mr-1 rounded p-1 hover:text-foreground"
+        className="-mr-1 p-1 hover:text-foreground focus-ring"
         aria-label={removeLabel}
         type="button"
       >
@@ -437,10 +439,11 @@ export function ProductGrid({ products }: ProductGridProps) {
           </div>
         </aside>
 
-        <section className="flex-1" aria-label="Product results" ref={resultsRef}>
+        <section className="flex-1 scroll-mt-24 focus:outline-none" aria-label="Product results" ref={resultsRef} tabIndex={-1}>
+          <h2 className="sr-only">Products</h2>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
-              Showing <span className="font-semibold text-foreground">
+              Showing <span className="font-semibold text-foreground tabular-nums">
                 {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + rowsPerPage, filteredProducts.length)}
               </span> of {filteredProducts.length} products
             </p>
@@ -513,7 +516,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                 filterChip(`"${search}"`, () => setSearch(""), `Remove search for "${search}"`)}
               <button
                 onClick={clearAllFilters}
-                className="text-sm text-muted-foreground hover:text-foreground underline"
+                className="text-sm text-muted-foreground hover:text-foreground underline focus-ring"
                 type="button"
               >
                 Clear all
@@ -549,7 +552,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                       resetPage()
                     }}
                   >
-                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`${rowsPerPage} rows per page`}>
+                    <SelectTrigger id="rows-per-page" className="w-20 h-9" aria-label={`Products per page, currently ${rowsPerPage}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
