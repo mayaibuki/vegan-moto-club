@@ -18,7 +18,11 @@ export function notionImageUrl(src: string, width: 256 | 600 | 1200): string {
 }
 
 export function formatPrice(price: number): string {
-  return price % 1 === 0 ? `$${price}` : `$${price.toFixed(2)}`
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: price % 1 === 0 ? 0 : 2,
+  }).format(price)
 }
 
 /**

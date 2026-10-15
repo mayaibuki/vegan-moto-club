@@ -206,31 +206,34 @@ export default async function ProductDetailPage({
         </figure>
 
         <div className="space-y-6">
-          <div>
+          <div className="space-y-1">
             <h1 className="h-page">{product.name}</h1>
-            <p className="text-lg text-muted-foreground">{product.brand}</p>
+            <p className="text-lg font-medium text-muted-foreground">{product.brand}</p>
+            <p className="pt-2 text-2xl md:text-3xl font-bold tabular-nums" aria-label={`Price: ${formatPrice(product.price)}`}>{formatPrice(product.price)}</p>
           </div>
+
+          {product.url && (
+            <Button size="lg" asChild className="w-full">
+              <a
+                href={product.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`View ${product.name} on store website (opens in new tab)`}
+              >
+                View on Store<span className="sr-only"> (opens in new tab)</span>
+              </a>
+            </Button>
+          )}
 
           {product.staffFavorite && <Badge><span aria-hidden="true">⭐</span> Staff Pick</Badge>}
 
-          <div>
-            <p className="text-sm text-muted-foreground font-medium mb-1">Price</p>
-            <p className="text-3xl font-bold" aria-label={`Price: ${formatPrice(product.price)}`}>{formatPrice(product.price)}</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground font-medium mb-1">Category</p>
-              <p className="font-semibold">{product.category}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium mb-1">Gender</p>
-              <p className="font-semibold">{product.gender}</p>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-sm text-muted-foreground font-medium mb-2">Specs</p>
+          <dl className="md:grid md:grid-cols-[auto_1fr] md:gap-x-6 md:gap-y-3">
+            <dt className="text-sm font-medium text-muted-foreground mb-2 mt-6 first:mt-0 md:mt-0">Category</dt>
+            <dd className="text-base font-semibold">{product.category}</dd>
+            <dt className="text-sm font-medium text-muted-foreground mb-2 mt-6 first:mt-0 md:mt-0">Gender</dt>
+            <dd className="text-base font-semibold">{product.gender}</dd>
+            <dt className="text-sm font-medium text-muted-foreground mb-2 mt-6 first:mt-0 md:mt-0">Specs</dt>
+            <dd>
             <ul className="flex flex-wrap gap-2 list-none" role="list" aria-label="Product specifications">
               {product.levelOfProtection && (
                 <li><Badge
@@ -288,11 +291,12 @@ export default async function ProductDetailPage({
                 </Link></li>
               )}
             </ul>
-          </div>
+            </dd>
 
           {product.ridingStyle.length > 0 && (
-            <div>
-              <p className="text-sm text-muted-foreground font-medium mb-2">Riding Styles</p>
+            <>
+              <dt className="text-sm font-medium text-muted-foreground mb-2 mt-6 first:mt-0 md:mt-0">Riding Styles</dt>
+              <dd>
               <ul className="flex flex-wrap gap-2 list-none" aria-label="Suitable riding styles">
                 {product.ridingStyle.map((style) => (
                   <li key={style}>
@@ -302,12 +306,14 @@ export default async function ProductDetailPage({
                   </li>
                 ))}
               </ul>
-            </div>
+              </dd>
+            </>
           )}
 
           {product.materials.length > 0 && (
-            <div>
-              <p className="text-sm text-muted-foreground font-medium mb-2">Materials</p>
+            <>
+              <dt className="text-sm font-medium text-muted-foreground mb-2 mt-6 first:mt-0 md:mt-0">Materials</dt>
+              <dd>
               <ul className="flex flex-wrap gap-2 list-none" aria-label="Product materials">
                 {product.materials.map((material) => (
                   <li key={material}>
@@ -317,21 +323,10 @@ export default async function ProductDetailPage({
                   </li>
                 ))}
               </ul>
-            </div>
+              </dd>
+            </>
           )}
-
-          {product.url && (
-            <Button size="lg" asChild className="w-full">
-              <a
-                href={product.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View ${product.name} on store website (opens in new tab)`}
-              >
-                View on Store<span className="sr-only"> (opens in new tab)</span>
-              </a>
-            </Button>
-          )}
+          </dl>
         </div>
       </div>
 
