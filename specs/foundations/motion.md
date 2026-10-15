@@ -199,3 +199,12 @@ Every motion in the product, with its trigger and reduced-motion behaviour. Only
 - **Card press** uses the `scale-98` entry in `theme.extend.scale` (0.98) instead of an arbitrary value.
 - **JS paths:** the only JS-driven motion is the promo banner. It reads `getComputedStyle(...).transitionDuration` at dismiss time and unmounts at once when it is 0; otherwise it unmounts on `transitionend` for `grid-template-rows`.
 - Not used: grid stagger, hero reveal, framer-motion.
+
+
+## Scroll-Driven Heading Degradation
+
+| Element | Trigger | Change | Timing | Reduced motion |
+| ------- | ------- | ------ | ------ | -------------- |
+| `.h-hero`, `.h-page`, `.h-section` | Scroll (rAF-throttled, passive) | Font face steps Redaction -> _10 -> _20 -> _35 as the heading top rises through the top 40% of the viewport (three equal bands); reverses on the way down | Discrete swap, no transition | Disabled; headings stay clean |
+
+Implemented in `components/DegradeOnScroll.tsx`; CSS in `app/globals.css` (`[data-degrade]` rules). See `foundations/typography.md`.

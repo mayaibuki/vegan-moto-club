@@ -2,34 +2,45 @@
 
 ## Overview
 
-Vegan Moto Club uses **DM Sans** as the sole typeface, loaded via `next/font/google` for optimal performance (no render-blocking CSS). The font is assigned to the `--font-dm-sans` CSS variable and consumed through Tailwind's `font-sans` utility.
+Vegan Moto Club uses two typefaces:
+
+- **DM Sans** for body copy and all UI (cards, h3s, buttons, prices, labels, `.lead`). Loaded with `next/font/google`.
+- **Redaction** for display headings only: every element carrying `.h-hero`, `.h-page` or `.h-section` (page h1s and section h2s). Loaded with `next/font/local` from `webfonts/`. As the visitor scrolls, these headings degrade from the clean cut to progressively pixelated cuts (see Scroll Degradation).
+
+Both are configured in `app/fonts.ts`; all font variables are applied on `<html>` in `app/layout.tsx`.
 
 ---
 
 ## Font Family
 
-| Role     | Family   | CSS Variable       | Tailwind Class | Fallback Stack                         |
-| -------- | -------- | ------------------ | -------------- | -------------------------------------- |
-| Primary  | DM Sans  | `--font-dm-sans`   | `font-sans`    | `system-ui, -apple-system, sans-serif` |
+| Role    | Family                 | CSS Variable           | Token                                         | Tailwind Class | Fallback Stack                         |
+| ------- | ---------------------- | ---------------------- | --------------------------------------------- | -------------- | -------------------------------------- |
+| Body/UI | DM Sans                | `--font-dm-sans`       | `--ds-font-sans` / `--font-family`            | `font-sans`    | `system-ui, -apple-system, sans-serif` |
+| Display | Redaction (clean)      | `--font-redaction`     | `--ds-font-serif` / `--font-family-display`   | `font-serif`   | `Georgia, serif`                       |
+| Display | Redaction 10 / 20 / 35 | `--font-redaction-10`, `--font-redaction-20`, `--font-redaction-35` | (used only by the `data-degrade` rules) | none | `Georgia, serif` |
 
-### Loading Configuration
+Each Redaction face loads weights 400 and 700 with `display: "swap"` and `adjustFontFallback: "Times New Roman"`. Headings use 700. Italics are not loaded for the degraded cuts; the clean Italic file stays in `webfonts/` but is unused. Cuts above 35 (`_50`, `_70`, `_100`) were removed.
 
-```tsx
-// app/layout.tsx
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-dm-sans",
-})
-```
+### Scroll Degradation
 
-The `display: "swap"` setting shows fallback text immediately, swapping in DM Sans once loaded. The font variable is applied to the `<html>` element and referenced in `tailwind.config.ts`:
+`components/DegradeOnScroll.tsx` (mounted once in the root layout) sets `data-degrade` on each heading from the position of its top edge in the viewport:
 
-```ts
-fontFamily: {
-  sans: ['var(--font-dm-sans)', 'system-ui', '-apple-system', 'sans-serif'],
-}
-```
+| Heading top (fraction of viewport height from the top) | `data-degrade` | Face            |
+| ------------------------------------------------------ | -------------- | --------------- |
+| 0.40 and below the fold (lower 60%)                    | none (0)       | Redaction       |
+| 0.267 to 0.40                                          | `10`           | Redaction_10    |
+| 0.133 to 0.267                                         | `20`           | Redaction_20    |
+| above 0.133 (including off the top)                    | `35`           | Redaction_35    |
+
+- It reverses as headings move back down. Levels above 35 are not used.
+- Nothing degrades before the first scroll, so headings above the fold paint clean.
+- Under `prefers-reduced-motion: reduce` it does nothing and headings stay clean.
+- The cuts share metrics: line heights are identical and single-line widths differ by at most ~2.7px at 30px (6px on the 60px hero), so swapping does not change line breaks or layout.
+- `font-synthesis: none` is set on the heading recipes.
+
+### Italics
+
+Not used. No italic accents in headings or `.lead`.
 
 ---
 
@@ -97,7 +108,7 @@ Three `@layer components` classes in `app/globals.css` set every page h1 and sec
 Rules:
 
 - **Sizes and weights are unchanged from before the recipes.** What changed is that one role now maps to one style (for example, every h2 section heading is 24px on mobile and 30px from `md`, weight 700).
-- **The recipes carry no `font-family`.** The site still uses one typeface (DM Sans). A display family would plug in here: add the font utility to `.h-hero`, `.h-page` and `.h-section` (or a `font-serif` accent class) and every heading follows. Do not add families anywhere else.
+- **The recipes set the display family.** `.h-hero`, `.h-page` and `.h-section` include `font-serif` (Redaction) and `font-synthesis: none`. Do not use `font-serif` anywhere else.
 - **Not covered by the recipes:** `CardTitle` (the Suggest forms' h2) stays `text-2xl font-semibold leading-none` without tracking; footer column headings stay `text-base font-bold`; h3s (product card names, event card titles, verification tier headings) are untouched and use `text-lg font-semibold` or their component's own style. The visually hidden "Products" h2s stay `sr-only`.
 - **Past Events** adds `text-muted-foreground` on top of `.h-section` to stay secondary to Upcoming Events.
 - Weights in use: 400 body, 500 labels/nav/buttons, 600 card titles, 700 headings and prices.
@@ -222,7 +233,7 @@ Use Tailwind responsive prefixes to scale typography at breakpoints:
 
 ## Rules
 
-1. **One typeface.** DM Sans is the only font. Do not introduce additional font families. The heading recipes are the one place a display family would be added later.
+1. **Two typefaces.** Redaction only through the three heading recipes; DM Sans for everything else. Do not introduce other families.
 2. **Use the scale.** Only use sizes defined in the size scale table. Do not use arbitrary sizes like `text-[17px]`.
 3. **Pair weight with purpose.** Bold (700) is for emphasis and headings. Normal (400) is for body text. Medium (500) is for labels and navigation.
 4. **Heading hierarchy matters.** Never skip heading levels. Use the recipe classes for visual styling while keeping semantic HTML correct.
