@@ -7,6 +7,27 @@ import { Product } from "@/lib/notion"
 import { formatPrice } from "@/lib/utils"
 import { seasonEmojis } from "@/lib/constants"
 
+// Short protection labels for narrow mobile cards; the full text shows from sm up
+// and is always available to screen readers.
+const protectionShortLabels: Record<string, string> = {
+  "Most protective": "Most",
+  "Highly protective": "High",
+  "Moderately protective": "Moderate",
+  "Slightly protective": "Slight",
+}
+
+// Notion season values usually carry their emoji ("☀️ Summer"); older plain values
+// ("Summer") get it from seasonEmojis. Returns the emoji and the bare name.
+function splitSeason(season: string): { emoji: string; name: string } {
+  const match = season.match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.+)$/u)
+  if (match) return { emoji: match[1], name: match[2] }
+  return { emoji: seasonEmojis[season] || "", name: season }
+}
+
+// Card badges are compact below sm and keep the default badge padding from sm up,
+// so desktop cards are unchanged.
+const cardBadge = "sm:px-3 sm:py-1"
+
 interface ProductCardProps {
   product: Product
 }
@@ -38,8 +59,8 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             )}
           </div>
 
-          <CardContent className="p-5 space-y-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <CardContent className="p-3 space-y-2 sm:p-5 sm:space-y-3">
+            <p className="text-xs font-medium text-muted-foreground">
               {product.brand}
             </p>
 
@@ -54,6 +75,8 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             <ul role="list" className="flex flex-wrap gap-1.5 pt-1 list-none" aria-label="Product attributes">
               {product.levelOfProtection && (
                 <li><Badge
+                  size="sm"
+                  className={`${cardBadge} whitespace-nowrap`}
                   variant={
                     product.levelOfProtection === "Most protective" ||
                     product.levelOfProtection === "Highly protective"
@@ -65,16 +88,39 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
                       : "negative"
                   }
                 >
-                  {product.levelOfProtection}
+                  <span className="sm:hidden" aria-hidden="true">
+                    {protectionShortLabels[product.levelOfProtection] ?? product.levelOfProtection}
+                  </span>
+                  <span className="hidden sm:inline" aria-hidden="true">
+                    {product.levelOfProtection}
+                  </span>
+                  <span className="sr-only">{product.levelOfProtection}</span>
                 </Badge></li>
               )}
-              {product.season.map((s) => (
-                <li key={s}><Badge variant="outline">
-                  <span aria-hidden="true">{seasonEmojis[s] || ""}</span> {s}
-                </Badge></li>
-              ))}
+              {product.season.map((s, i) => {
+                const { emoji, name } = splitSeason(s)
+                const more = product.season.length - 1
+                return (
+                  <li key={s} className={i > 0 ? "hidden sm:block" : undefined}>
+                    <Badge size="sm" variant="outline" className={`${cardBadge} whitespace-nowrap`}>
+                      <span className="hidden sm:inline">{s}</span>
+                      {/* Below sm: the first season as its emoji plus "+N" for the rest,
+                          so the attribute row stays on one line */}
+                      {i === 0 && (
+                        <span className="sm:hidden">
+                          <span aria-hidden="true">
+                            {emoji || name}
+                            {more > 0 && ` +${more}`}
+                          </span>
+                          <span className="sr-only">{product.season.map((x) => splitSeason(x).name).join(", ")}</span>
+                        </span>
+                      )}
+                    </Badge>
+                  </li>
+                )
+              })}
               {product.gender && (
-                <li><Badge variant="outline">
+                <li className="hidden sm:block"><Badge size="sm" variant="outline" className={cardBadge}>
                   {product.gender}
                 </Badge></li>
               )}

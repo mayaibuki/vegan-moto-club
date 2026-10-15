@@ -22,12 +22,12 @@ Displays a single product as a linked card with image, brand, name, price, and a
         <Badge />                  ← "Staff Pick" overlay (conditional)
       </div>
       <CardContent>
-        <p>                        ← brand (xs, uppercase, muted)
+        <p>                        ← brand (xs, medium, muted, sentence case as stored)
         <h3>                       ← product name (semibold, line-clamp-2)
         <p>                        ← price (xl, bold)
-        <div>                      ← badge row (protection, season, gender)
-          <Badge /> ...
-        </div>
+        <ul>                       ← badge row (protection, season, gender)
+          <li><Badge size="sm" /></li> ...
+        </ul>
         <p>                        ← category (xs, muted, conditional)
       </CardContent>
     </Card>
@@ -44,6 +44,9 @@ Displays a single product as a linked card with image, brand, name, price, and a
 | Product name        | `text-foreground` (inherit)| Primary text       |
 | Price               | `text-foreground`          | High emphasis      |
 | Category text       | `text-muted-foreground`    | De-emphasized      |
+| Content padding     | `p-3 space-y-2` below 640px, `sm:p-5 sm:space-y-3` | Compact mobile card |
+| Image padding       | `p-3 sm:p-4`               | Photo inset        |
+| Badges              | `size="sm"` + `sm:px-3 sm:py-1` | Compact below 640px, default padding from sm up |
 | Card hover          | `hover:shadow-lg` + `transition-[box-shadow,transform] duration-200` (hover-capable devices only) | Elevation feedback |
 | Card press          | `motion-safe:group-active:scale-[0.98]` (`group` is on the Link) | Touch/press feedback |
 | Keyboard focus      | `.focus-ring rounded-2xl` on the Link | Ring follows the 16px card radius |
@@ -66,6 +69,16 @@ Displays a single product as a linked card with image, brand, name, price, and a
 | Without image  | Shows "No Image" centered placeholder             |
 | Staff favorite | Overlays ⭐ Staff Pick badge on image top-left    |
 | Hover          | Card shadow increases, image scales up 5%         |
+
+## Mobile (below 640px)
+
+The two-column grid leaves about 145px of text width, so the attribute row is trimmed to stay on one line and the card stays under 340px tall at 390px:
+
+| Badge | Below 640px | 640px and up |
+|-------|-------------|--------------|
+| Protection | Short label (Most, High, Moderate, Slight), `whitespace-nowrap`; full label in `sr-only` | Full label |
+| Season | First season as its emoji only (name in `sr-only`), then a `+N` pill when there are more | Every season with emoji and name |
+| Gender | Hidden | Shown |
 
 ## Accessibility
 

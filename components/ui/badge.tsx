@@ -4,13 +4,17 @@ import { cn } from "@/lib/utils"
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "secondary" | "outline" | "accent" | "destructive" | "positive" | "negative"
+  /** sm: tighter padding for dense rows such as product card attributes */
+  size?: "default" | "sm"
 }
 
-function Badge({ className, variant = "default", ...props }: BadgeProps) {
+function Badge({ className, variant = "default", size = "default", ...props }: BadgeProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-colors",
+        "inline-flex items-center rounded-full text-xs font-semibold transition-colors",
+        size === "default" && "px-3 py-1",
+        size === "sm" && "px-2 py-0.5",
         variant === "default" &&
           "border border-transparent bg-primary text-primary-foreground",
         variant === "secondary" &&
