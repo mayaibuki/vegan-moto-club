@@ -73,7 +73,7 @@ export default async function EventsPage() {
       />
       <div className="space-y-10">
           <div className="space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold">Events</h1>
+            <h1 className="h-page">Events</h1>
             <p className="text-lg text-muted-foreground">
               Join our community at upcoming events and meetups
             </p>
@@ -81,7 +81,7 @@ export default async function EventsPage() {
 
           {/* Upcoming Events */}
           <section aria-labelledby="upcoming-heading" className="space-y-6">
-            <h2 id="upcoming-heading" className="text-2xl font-semibold">Upcoming Events</h2>
+            <h2 id="upcoming-heading" className="h-section">Upcoming Events</h2>
             {upcomingEvents.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">

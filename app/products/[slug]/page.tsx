@@ -207,7 +207,7 @@ export default async function ProductDetailPage({
 
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <h1 className="h-page">{product.name}</h1>
             <p className="text-lg text-muted-foreground">{product.brand}</p>
           </div>
 
@@ -337,7 +337,7 @@ export default async function ProductDetailPage({
 
       {product.description && (
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-xl font-bold mb-4">Description</h2>
+          <h2 className="h-section mb-4">Description</h2>
           <p className="text-muted-foreground whitespace-pre-wrap">
             {product.description}
           </p>

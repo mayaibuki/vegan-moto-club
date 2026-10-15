@@ -50,7 +50,7 @@ export default function VerificationPage() {
   return (
     <div className="max-w-3xl space-y-10">
       <div className="space-y-4">
-        <h1 className="text-3xl md:text-4xl font-bold">How we verify vegan gear</h1>
+        <h1 className="h-page">How we verify vegan gear</h1>
         <p className="text-lg text-muted-foreground">
           Every product in our database carries a verification badge. This page
           explains what each badge means and how a product earns it.
@@ -58,7 +58,7 @@ export default function VerificationPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">What counts as vegan gear</h2>
+        <h2 className="h-section">What counts as vegan gear</h2>
         <p className="text-muted-foreground">
           We list gear made without animal-derived materials: no leather, suede,
           wool, silk, down, or animal-based adhesives. Hard parts like armor,
@@ -69,7 +69,7 @@ export default function VerificationPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">The four verification tiers</h2>
+        <h2 className="h-section">The four verification tiers</h2>
         <div className="space-y-4">
           {TIERS.map((tier) => (
             <Card key={tier.label}>
@@ -78,7 +78,7 @@ export default function VerificationPage() {
                   <Badge variant={tier.badgeVariant}>
                     <span aria-hidden="true">✓</span> {tier.label}
                   </Badge>
-                  <h3 className="font-semibold">{tier.heading}</h3>
+                  <h3 className="text-lg font-semibold">{tier.heading}</h3>
                 </div>
                 <p className="text-muted-foreground">{tier.body}</p>
               </CardContent>
@@ -88,7 +88,7 @@ export default function VerificationPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Spotted an error?</h2>
+        <h2 className="h-section">Spotted an error?</h2>
         <p className="text-muted-foreground">
           Manufacturers change materials between production runs, and we&apos;d
           rather correct a listing than defend it. If you know something we

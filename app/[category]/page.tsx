@@ -90,7 +90,7 @@ export default async function CategoryLandingPage({
         />
 
         <div className="space-y-4 max-w-3xl">
-          <h1 className="text-3xl md:text-4xl font-bold">{page.title}</h1>
+          <h1 className="h-page">{page.title}</h1>
           {page.intro.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} className="text-lg text-muted-foreground">
               {paragraph}

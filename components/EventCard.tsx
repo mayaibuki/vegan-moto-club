@@ -80,7 +80,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
         </div>
 
         {/* Heading */}
-        <h3 className="text-xl font-semibold leading-7 tracking-tight text-foreground line-clamp-2 text-balance">
+        <h3 className="text-xl font-semibold leading-7 text-foreground line-clamp-2 text-balance">
           {event.name}
         </h3>
 

@@ -116,7 +116,7 @@ export default async function Home() {
               </div>
             )}
 
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-balance">
+            <h1 className="h-hero">
               Ride motorcycles, love animals
             </h1>
 
@@ -163,10 +163,10 @@ export default async function Home() {
 
       {/* Featured Products Section */}
       <section aria-labelledby="staff-picks-heading">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-10">
           <div className="space-y-1">
-            <h2 id="staff-picks-heading" className="text-3xl font-bold tracking-tight text-balance">Staff Picks</h2>
-            <p className="text-muted-foreground text-lg">Our favorite vegan motorcycle gear</p>
+            <h2 id="staff-picks-heading" className="h-section">Staff Picks</h2>
+            <p className="text-base md:text-lg text-muted-foreground">Our favorite vegan motorcycle gear</p>
           </div>
           <Button variant="outline" asChild>
             <Link href="/products">View All →</Link>
@@ -195,10 +195,10 @@ export default async function Home() {
       {/* Upcoming Events Section */}
       {upcomingEvents.length > 0 && (
         <section aria-labelledby="upcoming-events-heading">
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-10">
             <div className="space-y-1">
-              <h2 id="upcoming-events-heading" className="text-3xl font-bold tracking-tight text-balance">Upcoming Events</h2>
-              <p className="text-muted-foreground text-lg">Join the community</p>
+              <h2 id="upcoming-events-heading" className="h-section">Upcoming Events</h2>
+              <p className="text-base md:text-lg text-muted-foreground">Join the community</p>
             </div>
             <Button variant="outline" asChild>
               <Link href="/events">View All →</Link>

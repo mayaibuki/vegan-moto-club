@@ -84,6 +84,19 @@ fontFamily: {
 
 ## Usage Patterns
 
+### Heading Recipes
+
+Three utility classes in `app/globals.css` (`@layer components`) set every heading. Do not restyle headings inline.
+
+| Class        | Sizes                  | Weight | Use                                          |
+| ------------ | ---------------------- | ------ | -------------------------------------------- |
+| `.h-hero`    | `text-4xl md:text-6xl` | 700    | Home hero h1                                 |
+| `.h-page`    | `text-3xl md:text-4xl` | 700    | Every other page h1 (including product, 404) |
+| `.h-section` | `text-2xl md:text-3xl` | 700    | Every h2 section heading                     |
+
+All three use `tracking-tight text-balance`. Card and tier h3s use `text-lg font-semibold`.
+Weights in use: 400 body, 500 labels/nav/buttons, 600 card titles only, 700 headings and prices.
+
 ### Heading Hierarchy
 
 Maintain a strict heading hierarchy for both visual design and accessibility. Every page should have exactly one `<h1>`, and headings should not skip levels.

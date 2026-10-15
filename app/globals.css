@@ -79,6 +79,19 @@
   .focus-ring {
     @apply rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
+
+  /* Heading recipes. Page h1s and section h2s take one of these; do not restyle them inline.
+     They set size, weight and tracking only (no font-family), so a display family
+     can be added later in one place. */
+  .h-hero {
+    @apply text-4xl md:text-6xl font-bold tracking-tight text-balance;
+  }
+  .h-page {
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-balance;
+  }
+  .h-section {
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-balance;
+  }
 }
 
 /* Respect the OS "reduce motion" setting: no animated transitions, no smooth scrolling. */
