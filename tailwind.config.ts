@@ -17,6 +17,7 @@ const config: Config = {
           '-apple-system',
           'sans-serif',
         ],
+        serif: ['var(--font-redaction)', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
