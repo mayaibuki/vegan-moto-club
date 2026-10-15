@@ -26,7 +26,10 @@ The token architecture has three layers:
 | `--ds-stone-300`   | `12 5.4% 84%`       | `#d7d4d1`      | Chart fill, subtle UI     |
 | `--ds-stone-400`   | `12 4.9% 64%`       | `#a5a09c`      | Muted text (dark mode)    |
 | `--ds-stone-500`   | `12 6.5% 51.5%`     | `#8b8380`      | Muted text (light mode)   |
+| `--ds-stone-700`   | `12 5% 24%`         | `#403c3a`      | Border (dark)             |
 | `--ds-stone-800`   | `12 6.3% 18.8%`     | `#322f2d`      | Muted/secondary bg (dark) |
+| `--ds-stone-850`   | `12 6.5% 17%`       | `#2e2b29`      | Popover bg (dark)         |
+| `--ds-stone-875`   | `12 7.5% 14%`       | `#262322`      | Card bg (dark)            |
 | `--ds-stone-900`   | `12 8.7% 11.8%`     | `#211f1d`      | Card bg (dark), text (light) |
 | `--ds-stone-950`   | `12 8.3% 7.2%`      | `#141311`      | Background (dark mode)    |
 | `--ds-white`       | `0 0% 100%`         | `#ffffff`      | Background (light mode)   |
@@ -70,12 +73,12 @@ These are the tokens consumed by shadcn/ui components via `globals.css` and the 
 | **Accent Foreground**    | `--accent-foreground`     | Stone-950 `12 8.3% 7.2%` | Stone-950 `12 8.3% 7.2%` |
 | **Destructive**          | `--destructive`           | Red `0 84.2% 60.2%`  | Red (dark) `0 62.8% 30.6%` |
 | **Destructive FG**       | `--destructive-foreground`| `0 0% 98%`           | `0 0% 98%`           |
-| **Border**               | `--border`                | Stone-200 `12 6.3% 93.8%` | Stone-800 `12 6.3% 18.8%` |
+| **Border**               | `--border`                | Stone-200 `12 6.3% 93.8%` | Stone-700 `12 5% 24%` |
 | **Input**                | `--input`                 | Stone-500 `12 6.5% 51.5%` | Stone-500 `12 6.5% 51.5%` |
 | **Ring**                 | `--ring`                  | Lime-500 `77.9 54.4% 47.4%` | Lime-400 `79.1 64.5% 57.5%` |
-| **Card BG**              | `--card`                  | White `0 0% 100%`    | Stone-900 `12 8.7% 11.8%` |
+| **Card BG**              | `--card`                  | White `0 0% 100%`    | Stone-875 `12 7.5% 14%` |
 | **Card Foreground**      | `--card-foreground`       | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |
-| **Popover BG**           | `--popover`               | White `0 0% 100%`    | Stone-900 `12 8.7% 11.8%` |
+| **Popover BG**           | `--popover`               | White `0 0% 100%`    | Stone-850 `12 6.5% 17%` |
 | **Popover Foreground**   | `--popover-foreground`    | Stone-900 `12 8.7% 11.8%` | Stone-50 `0 0% 98%` |
 
 ### Extended Semantic Tokens (from `tokens.css`)

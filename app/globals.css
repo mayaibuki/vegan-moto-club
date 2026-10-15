@@ -57,9 +57,9 @@
     /* Maia Theme - Stone base + Lime accent - Dark Mode */
     --background: 12 8.3% 7.2%;           /* stone-950 */
     --foreground: 0 0% 98%;               /* stone-50 */
-    --card: 12 8.7% 11.8%;                /* stone-900 */
+    --card: 12 7.5% 14%;                  /* stone-875 */
     --card-foreground: 0 0% 98%;          /* stone-50 */
-    --popover: 12 8.7% 11.8%;             /* stone-900 */
+    --popover: 12 6.5% 17%;               /* stone-850 */
     --popover-foreground: 0 0% 98%;       /* stone-50 */
     --muted: 12 6.3% 18.8%;               /* stone-800 */
     --muted-foreground: 12 4.9% 64%;      /* stone-400 */
@@ -81,7 +81,7 @@
     --destructive-foreground: 0 0% 98%;
     --success: 142 69% 58%;               /* green-400 */
     --success-foreground: 0 0% 100%;
-    --border: 12 6.3% 18.8%;              /* stone-800 */
+    --border: 12 5% 24%;                  /* stone-700 */
     --input: 12 6.5% 51.5%;               /* stone-500 */
     --ring: 79.1 64.5% 57.5%;             /* lime-400 */
 

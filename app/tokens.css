@@ -25,7 +25,10 @@
   --ds-stone-400: 12 4.9% 64%;
   --ds-stone-500: 12 6.5% 51.5%;
   --ds-stone-600: 12 6.5% 44%; /* darkest "muted" that clears WCAG AA (4.9:1 on white, 4.65:1 on stone-100) */
+  --ds-stone-700: 12 5% 24%;   /* dark-mode border (1.48:1 vs dark card) */
   --ds-stone-800: 12 6.3% 18.8%;
+  --ds-stone-850: 12 6.5% 17%;  /* dark-mode popover (1.32:1 vs page) */
+  --ds-stone-875: 12 7.5% 14%;  /* dark-mode card (1.19:1 vs page) */
   --ds-stone-900: 12 8.7% 11.8%;
   --ds-stone-950: 12 8.3% 7.2%;
   --ds-white:     0 0% 100%;
@@ -262,12 +265,13 @@
   --color-primary-hover:   var(--ds-lime-500, 77.9 54.4% 47.4%);
   --color-accent:          var(--ds-lime-500, 77.9 54.4% 47.4%);
 
-  --color-border:          var(--ds-stone-800, 12 6.3% 18.8%);
+  --color-border:          var(--ds-stone-700, 12 5% 24%);
   --color-border-muted:    var(--ds-stone-800, 12 6.3% 18.8%);
   --color-input:           var(--ds-stone-500, 12 6.5% 51.5%);
   --color-ring:            var(--ds-lime-400, 79.1 64.5% 57.5%);
 
-  --color-card-bg:         var(--ds-stone-900, 12 8.7% 11.8%);
+  --color-card-bg:         var(--ds-stone-875, 12 7.5% 14%);
+  --color-popover-bg:      var(--ds-stone-850, 12 6.5% 17%);
   --color-card-text:       0 0% 98%;
 
   --color-destructive:     var(--ds-red-dark, 0 62.8% 30.6%);
