@@ -59,6 +59,11 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      zIndex: {
+        // Stacking tokens from tokens.css (--z-*)
+        sticky: "var(--z-sticky)",
+        overlay: "var(--z-overlay)",
+      },
       gridTemplateRows: {
         // Collapse wrapper rows (PromoBanner): animate open -> closed to collapse to zero height
         open: "1fr",

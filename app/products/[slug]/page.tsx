@@ -9,6 +9,7 @@ import { formatPrice, notionImageUrl, splitCategories } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
+import { StickyBuyBar } from "@/components/StickyBuyBar"
 import { SITE_URL, seasonEmojis } from "@/lib/constants"
 
 export async function generateStaticParams() {
@@ -213,7 +214,7 @@ export default async function ProductDetailPage({
           </div>
 
           {product.url && (
-            <Button size="lg" asChild className="w-full">
+            <Button id="store-cta" size="lg" asChild className="w-full">
               <a
                 href={product.url}
                 target="_blank"
@@ -342,6 +343,15 @@ export default async function ProductDetailPage({
       <RelatedProducts currentProduct={product} allProducts={allProducts} />
 
       <SuggestProductForm id="product" />
+
+      {product.url && (
+        <StickyBuyBar
+          targetId="store-cta"
+          price={formatPrice(product.price)}
+          url={product.url}
+          productName={product.name}
+        />
+      )}
     </div>
     </>
   )
