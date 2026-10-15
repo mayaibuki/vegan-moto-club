@@ -4,7 +4,7 @@ import { Logo } from "./Logo"
 export function Footer() {
   return (
     <footer className="border-t border-border bg-card mt-12" role="contentinfo">
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="page-container py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Brand Section */}
           <div className="text-center md:text-left">

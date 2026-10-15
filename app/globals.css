@@ -67,3 +67,9 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 }
+
+@layer components {
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+  }
+}

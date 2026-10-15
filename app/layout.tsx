@@ -135,7 +135,7 @@ export default function RootLayout({
         </a>
         <div className="min-h-screen flex flex-col bg-background">
           <Navbar />
-          <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 py-8" tabIndex={-1}>
+          <main id="main-content" className="page-container flex-1 py-8" tabIndex={-1}>
             {children}
           </main>
           <Footer />
