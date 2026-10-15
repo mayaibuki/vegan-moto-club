@@ -53,7 +53,7 @@ Displays a single event as a card with a poster image, an overlaid date block, a
 | DateBlock day      | `text-2xl font-semibold`          | Primary number                   |
 | Arrow              | `text-foreground`, `size-6`       | Multi-day separator              |
 | Price pill         | `bg-card`, `border-border`, `rounded-full`, `text-foreground`, `text-xs font-semibold` | Overlay chip |
-| Heading            | `text-xl font-semibold tracking-tight text-foreground` | Event name |
+| Heading            | `text-xl font-semibold text-foreground` (no tracking; only the `.h-*` heading recipes track tight) | Event name |
 | Location           | `text-sm font-medium text-muted-foreground` + `MapPin size-4` | Muted with icon |
 | Description        | `text-base text-foreground line-clamp-5 flex-1` | Fills remaining height |
 | CTA                | `bg-primary text-primary-foreground rounded-full h-10` | Full-width button |

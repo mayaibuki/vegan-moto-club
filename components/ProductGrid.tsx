@@ -442,8 +442,8 @@ export function ProductGrid({ products }: ProductGridProps) {
         <section className="flex-1 scroll-mt-24 focus:outline-none" aria-label="Product results" ref={resultsRef} tabIndex={-1}>
           <h2 className="sr-only">Products</h2>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
-              Showing <span className="font-semibold text-foreground tabular-nums">
+            <p className="text-sm font-medium text-foreground" aria-live="polite" aria-atomic="true">
+              Showing <span className="tabular-nums">
                 {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + rowsPerPage, filteredProducts.length)}
               </span> of {filteredProducts.length} products
             </p>

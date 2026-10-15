@@ -51,7 +51,7 @@ export default function VerificationPage() {
     <div className="max-w-3xl space-y-10">
       <div className="space-y-4">
         <h1 className="h-page">How we verify vegan gear</h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="lead">
           Every product in our database carries a verification badge. This page
           explains what each badge means and how a product earns it.
         </p>
@@ -59,7 +59,7 @@ export default function VerificationPage() {
 
       <div className="space-y-4">
         <h2 className="h-section">What counts as vegan gear</h2>
-        <p className="text-muted-foreground">
+        <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
           We list gear made without animal-derived materials: no leather, suede,
           wool, silk, down, or animal-based adhesives. Hard parts like armor,
           buckles, and sliders are synthetic across the industry; the animal
@@ -80,7 +80,7 @@ export default function VerificationPage() {
                   </Badge>
                   <h3 className="text-lg font-semibold">{tier.heading}</h3>
                 </div>
-                <p className="text-muted-foreground">{tier.body}</p>
+                <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">{tier.body}</p>
               </CardContent>
             </Card>
           ))}
@@ -89,7 +89,7 @@ export default function VerificationPage() {
 
       <div className="space-y-4">
         <h2 className="h-section">Spotted an error?</h2>
-        <p className="text-muted-foreground">
+        <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
           Manufacturers change materials between production runs, and we&apos;d
           rather correct a listing than defend it. If you know something we
           don&apos;t about a product, tell us on Discord and we&apos;ll review

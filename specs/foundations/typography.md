@@ -86,29 +86,55 @@ fontFamily: {
 
 ### Heading Recipes
 
-Three utility classes in `app/globals.css` (`@layer components`) set every heading. Do not restyle headings inline.
+Three `@layer components` classes in `app/globals.css` set every page h1 and section h2. Do not restyle those headings inline; pick the recipe that matches the heading's role.
 
-| Class        | Sizes                  | Weight | Use                                          |
-| ------------ | ---------------------- | ------ | -------------------------------------------- |
-| `.h-hero`    | `text-4xl md:text-6xl` | 700    | Home hero h1                                 |
-| `.h-page`    | `text-3xl md:text-4xl` | 700    | Every other page h1 (including product, 404) |
-| `.h-section` | `text-2xl md:text-3xl` | 700    | Every h2 section heading                     |
+| Class        | Sizes                  | Weight | Tracking / wrap                | Used on                                                                                                                 |
+| ------------ | ---------------------- | ------ | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `.h-hero`    | `text-4xl md:text-6xl` | 700    | `tracking-tight text-balance`  | Home hero h1                                                                                                            |
+| `.h-page`    | `text-3xl md:text-4xl` | 700    | `tracking-tight text-balance`  | Every other page h1: products, category pages, product detail, events, about, verification, 404, error                  |
+| `.h-section` | `text-2xl md:text-3xl` | 700    | `tracking-tight text-balance`  | Section h2s: home (Staff Picks, Upcoming Events), events, about, verification, product Description, Related Products, Past Events |
 
-All three use `tracking-tight text-balance`. Card and tier h3s use `text-lg font-semibold`.
-Weights in use: 400 body, 500 labels/nav/buttons, 600 card titles only, 700 headings and prices.
+Rules:
+
+- **Sizes and weights are unchanged from before the recipes.** What changed is that one role now maps to one style (for example, every h2 section heading is 24px on mobile and 30px from `md`, weight 700).
+- **The recipes carry no `font-family`.** The site still uses one typeface (DM Sans). A display family would plug in here: add the font utility to `.h-hero`, `.h-page` and `.h-section` (or a `font-serif` accent class) and every heading follows. Do not add families anywhere else.
+- **Not covered by the recipes:** `CardTitle` (the Suggest forms' h2) stays `text-2xl font-semibold leading-none` without tracking; footer column headings stay `text-base font-bold`; h3s (product card names, event card titles, verification tier headings) are untouched and use `text-lg font-semibold` or their component's own style. The visually hidden "Products" h2s stay `sr-only`.
+- **Past Events** adds `text-muted-foreground` on top of `.h-section` to stay secondary to Upcoming Events.
+- Weights in use: 400 body, 500 labels/nav/buttons, 600 card titles, 700 headings and prices.
+
+### Product Detail Title Block
+
+On `/products/[slug]` the name, brand and price read as one block, followed directly by the store button:
+
+| Element | Classes                                           | Computed (mobile / md+) |
+| ------- | ------------------------------------------------- | ----------------------- |
+| Name    | `.h-page` (h1)                                    | 30px / 36px, 700        |
+| Brand   | `text-lg font-medium text-muted-foreground`       | 18px, 500               |
+| Price   | `text-2xl md:text-3xl font-bold tabular-nums`     | 24px / 30px, 700        |
+
+The block uses `space-y-1`, with `pt-2` on the price. The price is always one size step below the name. Spec labels below it (`dt`) are `text-sm font-medium text-muted-foreground mb-2`; values are `text-base font-semibold`. From `md` the spec list is a two-column `dl` (`grid-cols-[auto_1fr]`).
+
+### Lead Paragraph
+
+A page that opens with an intro paragraph under its h1 uses the `.lead` class (`text-lg md:text-xl text-foreground leading-relaxed text-pretty`): 18px on mobile, 20px from `md`, in the full foreground colour, so it reads as the entry point of the page.
+
+- Applied on: about (both opening paragraphs), verification, `/products`, and the first intro paragraph of each category page.
+- Paragraphs that follow a lead are body copy: `text-base text-muted-foreground leading-relaxed max-w-prose text-pretty`. `max-w-prose` caps lines at about 65 characters; the `max-w-3xl` page container stays for headings and cards.
+- On category pages the lead also gets `max-w-prose`.
+- Result counts ("N products in this category", "Showing 1-24 of N products") use `text-sm font-medium text-foreground` so both pages match.
 
 ### Heading Hierarchy
 
 Maintain a strict heading hierarchy for both visual design and accessibility. Every page should have exactly one `<h1>`, and headings should not skip levels.
 
 ```html
-<!-- Page title -->
-<h1 class="text-4xl font-bold tracking-tight leading-tight">
+<!-- Page title (.h-page: text-3xl md:text-4xl font-bold tracking-tight text-balance) -->
+<h1 class="h-page">
   Vegan Motorcycle Gear
 </h1>
 
-<!-- Section heading -->
-<h2 class="text-3xl font-bold tracking-tight leading-tight">
+<!-- Section heading (.h-section: text-2xl md:text-3xl font-bold tracking-tight text-balance) -->
+<h2 class="h-section">
   Jackets
 </h2>
 
@@ -126,7 +152,7 @@ Maintain a strict heading hierarchy for both visual design and accessibility. Ev
 ### Display / Hero Text
 
 ```html
-<h1 class="text-6xl font-bold tracking-tight leading-none">
+<h1 class="h-hero">
   Ride Compassionate
 </h1>
 ```
@@ -139,9 +165,14 @@ Maintain a strict heading hierarchy for both visual design and accessibility. Ev
   All products are verified cruelty-free...
 </p>
 
-<!-- Lead paragraph -->
-<p class="text-lg font-normal leading-relaxed">
+<!-- Lead paragraph (the .lead class) -->
+<p class="lead">
   A curated database of vegan motorcycle gear...
+</p>
+
+<!-- Body paragraph that follows a lead -->
+<p class="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
+  Every product carries a verification badge...
 </p>
 
 <!-- Secondary / helper text -->
@@ -176,8 +207,8 @@ Maintain a strict heading hierarchy for both visual design and accessibility. Ev
 Use Tailwind responsive prefixes to scale typography at breakpoints:
 
 ```html
-<!-- Hero heading: scales up at larger screens -->
-<h1 class="text-4xl md:text-6xl font-bold tracking-tight">
+<!-- Hero heading (.h-hero): scales up at larger screens -->
+<h1 class="text-4xl md:text-6xl font-bold tracking-tight text-balance">
   Ride Compassionate
 </h1>
 
@@ -191,8 +222,9 @@ Use Tailwind responsive prefixes to scale typography at breakpoints:
 
 ## Rules
 
-1. **One typeface.** DM Sans is the only font. Do not introduce additional font families.
+1. **One typeface.** DM Sans is the only font. Do not introduce additional font families. The heading recipes are the one place a display family would be added later.
 2. **Use the scale.** Only use sizes defined in the size scale table. Do not use arbitrary sizes like `text-[17px]`.
 3. **Pair weight with purpose.** Bold (700) is for emphasis and headings. Normal (400) is for body text. Medium (500) is for labels and navigation.
-4. **Heading hierarchy matters.** Never skip heading levels. Use CSS classes for visual styling while keeping semantic HTML correct.
+4. **Heading hierarchy matters.** Never skip heading levels. Use the recipe classes for visual styling while keeping semantic HTML correct.
+6. **Three heading recipes, one lead.** Page h1s use `.h-page` (home hero: `.h-hero`), section h2s use `.h-section`, and the intro under an h1 uses `.lead`. No inline heading sizes.
 5. **Line height matches context.** Headings use tight (1.25). Body text uses normal (1.5). Long-form content uses relaxed (1.625).

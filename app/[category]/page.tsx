@@ -91,16 +91,19 @@ export default async function CategoryLandingPage({
 
         <div className="space-y-4 max-w-3xl">
           <h1 className="h-page">{page.title}</h1>
-          {page.intro.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)} className="text-lg text-muted-foreground">
+          {page.intro.map((paragraph, index) => (
+            <p
+              key={paragraph.slice(0, 24)}
+              className={index === 0 ? "lead max-w-prose" : "text-base text-muted-foreground leading-relaxed max-w-prose text-pretty"}
+            >
               {paragraph}
             </p>
           ))}
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">{products.length}</span>{" "}
+          <p className="text-sm font-medium text-foreground">
+            <span className="tabular-nums">{products.length}</span>{" "}
             {products.length === 1 ? "product" : "products"} in this category
           </p>
           <Button variant="outline" size="sm" asChild>

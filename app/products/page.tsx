@@ -32,7 +32,7 @@ export default async function ProductsPage() {
       <div className="space-y-4">
         <div className="space-y-2">
           <h1 className="h-page">Vegan Motorcycle Gear</h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="lead">
             Browse our curated database of ethical and cruelty-free motorcycle gear
           </p>
         </div>
