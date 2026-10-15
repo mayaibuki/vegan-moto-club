@@ -71,6 +71,7 @@
 
   /* ---- Typography Primitives ---- */
   --ds-font-sans: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+  --ds-font-serif: var(--font-redaction), Georgia, serif;
 
   --ds-text-xs:   0.75rem;     /* 12px */
   --ds-text-sm:   0.875rem;    /* 14px */
@@ -189,6 +190,7 @@
 
   /* ---- Semantic Typography ---- */
   --font-family:       var(--ds-font-sans);
+  --font-family-display: var(--ds-font-serif);
   --font-size-caption: var(--ds-text-xs, 0.75rem);
   --font-size-body-sm: var(--ds-text-sm, 0.875rem);
   --font-size-body:    var(--ds-text-base, 1rem);
