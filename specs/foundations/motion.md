@@ -201,10 +201,11 @@ Every motion in the product, with its trigger and reduced-motion behaviour. Only
 - Not used: grid stagger, hero reveal, framer-motion.
 
 
-## Scroll-Driven Heading Degradation
+## Heading Degradation
 
 | Element | Trigger | Change | Timing | Reduced motion |
 | ------- | ------- | ------ | ------ | -------------- |
-| `.h-hero`, `.h-page`, `.h-section` | Scroll (rAF-throttled, passive) | Font face steps Redaction -> _10 -> _20 -> _35 as the heading top rises through the top 40% of the viewport (three equal bands); reverses on the way down | Discrete swap, no transition | Disabled; headings stay clean |
+| `.h-hero`, `.h-page`, `.h-section` | Cursor proximity on pointer devices (`pointermove`, rAF-throttled, visible headings only) | Face steps Redaction -> _10 -> _20 -> _35 -> _50 as the cursor nears the heading box (400 / 240 / 120 / 40px), 12px hysteresis; resets on `pointerleave` | Discrete swap, no transition | Disabled; headings stay clean |
+| `.h-hero`, `.h-page`, `.h-section` | Scroll position on touch devices (rAF-throttled, passive) | Same faces as the heading top rises through the top 40% of the viewport (four equal bands); reverses on the way down | Discrete swap, no transition | Disabled; headings stay clean |
 
 Implemented in `components/DegradeOnScroll.tsx`; CSS in `app/globals.css` (`[data-degrade]` rules). See `foundations/typography.md`.

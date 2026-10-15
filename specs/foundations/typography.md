@@ -17,26 +17,31 @@ Both are configured in `app/fonts.ts`; all font variables are applied on `<html>
 | ------- | ---------------------- | ---------------------- | --------------------------------------------- | -------------- | -------------------------------------- |
 | Body/UI | DM Sans                | `--font-dm-sans`       | `--ds-font-sans` / `--font-family`            | `font-sans`    | `system-ui, -apple-system, sans-serif` |
 | Display | Redaction (clean)      | `--font-redaction`     | `--ds-font-serif` / `--font-family-display`   | `font-serif`   | `Georgia, serif`                       |
-| Display | Redaction 10 / 20 / 35 | `--font-redaction-10`, `--font-redaction-20`, `--font-redaction-35` | (used only by the `data-degrade` rules) | none | `Georgia, serif` |
+| Display | Redaction 10 / 20 / 35 / 50 | `--font-redaction-10`, `--font-redaction-20`, `--font-redaction-35`, `--font-redaction-50` | (used only by the `data-degrade` rules) | none | `Georgia, serif` |
 
-Each Redaction face loads weights 400 and 700 with `display: "swap"` and `adjustFontFallback: "Times New Roman"`. Headings use 700. Italics are not loaded for the degraded cuts; the clean Italic file stays in `webfonts/` but is unused. Cuts above 35 (`_50`, `_70`, `_100`) were removed.
+Each Redaction face loads weights 400 and 700 with `display: "swap"` and `adjustFontFallback: "Times New Roman"`. Headings use 700. Italics are not loaded for the degraded cuts; the clean Italic file stays in `webfonts/` but is unused. Cuts above 50 (`_70`, `_100`) were removed.
 
-### Scroll Degradation
+### Heading Degradation
 
-`components/DegradeOnScroll.tsx` (mounted once in the root layout) sets `data-degrade` on each heading from the position of its top edge in the viewport:
+`components/DegradeOnScroll.tsx` (mounted once in the root layout) sets `data-degrade` (0, 10, 20, 35, 50) on every `.h-hero`, `.h-page` and `.h-section`. The trigger depends on the input type: **cursor proximity on pointer devices, scroll position on touch devices**.
 
-| Heading top (fraction of viewport height from the top) | `data-degrade` | Face            |
-| ------------------------------------------------------ | -------------- | --------------- |
-| 0.40 and below the fold (lower 60%)                    | none (0)       | Redaction       |
-| 0.267 to 0.40                                          | `10`           | Redaction_10    |
-| 0.133 to 0.267                                         | `20`           | Redaction_20    |
-| above 0.133 (including off the top)                    | `35`           | Redaction_35    |
+**Pointer devices** (`(hover: hover) and (pointer: fine)`): level is a function of the distance from the cursor to the nearest edge of the heading's box (0 when the cursor is over it).
 
-- It reverses as headings move back down. Levels above 35 are not used.
-- Nothing degrades before the first scroll, so headings above the fold paint clean.
-- Under `prefers-reduced-motion: reduce` it does nothing and headings stay clean.
-- The cuts share metrics: line heights are identical and single-line widths differ by at most ~2.7px at 30px (6px on the 60px hero), so swapping does not change line breaks or layout.
-- `font-synthesis: none` is set on the heading recipes.
+| Distance | Level |
+| -------- | ----- |
+| 0 to 40px | 50 |
+| 40 to 120px | 35 |
+| 120 to 240px | 20 |
+| 240 to 400px | 10 |
+| beyond 400px | 0 |
+
+- Updates on `pointermove`, rAF-throttled; only headings intersecting the viewport (IntersectionObserver) are measured.
+- Hysteresis of 12px: a heading changes level only once the distance passes a band boundary by more than 12px, so a cursor resting on a boundary does not flicker.
+- Everything resets to 0 when the pointer leaves the document.
+
+**Touch / coarse-pointer devices**: level comes from the heading's top edge as a fraction of viewport height. Lower 60%: 0. The top 40% splits into four equal bands: 0.30 to 0.40 → 10, 0.20 to 0.30 → 20, 0.10 to 0.20 → 35, above 0.10 (including off the top) → 50. It reverses on the way down. Nothing degrades before the first scroll, so headings above the fold paint clean.
+
+**Both:** under `prefers-reduced-motion: reduce` nothing degrades. The cuts share metrics: line heights are identical and single-line widths differ by a few px at most, so swapping does not change line breaks or layout. `font-synthesis: none` is set on the recipes. Levels above 50 are not used.
 
 ### Italics
 
