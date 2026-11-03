@@ -19,7 +19,7 @@ Fetch the page yourself when you do not have its text. On Shopify stores, `<stor
 
 ## Read like a tester
 
-From the page take: the h1 name, the maker (not the retailer), price and currency, category, sizing offered, every material in the spec, every certification with its exact standard and class (EN 17092 class AAA/AA/A/B/C, EN 13594 level 1/2 for gloves, EN 13634 for boots, EN 1621 level 1/2 for armor), waterproof membrane names, liner details, closures, pockets, and any limitation the page admits (armor sold separately, no back protector, DWR only). Record one supporting sentence from the page for every field you fill. A field without a quote stays empty.
+From the page take: the h1 name, the maker (not the retailer), price and currency, category, sizing offered, every material in the spec, every certification with its exact standard and class (EN 17092 class AAA/AA/A/B/C, EN 13594 level 1/2 for gloves, EN 13634 for boots, EN 1621 level 1/2 for armor), waterproof membrane names, liner details, closures, pockets, and any limitation the page admits (armor sold separately, no back protector, DWR only). Record one supporting sentence from the page for every field you fill, including brand and name. The quote is verbatim page text, never your own words or a summary, and the value must follow from it on its own (a season value needs a line that names a season; a vegan status needs the materials lines or the absence of a claim stated in limitations, not in the quote). A field without such a quote stays empty.
 
 Search every material and trim for animal terms: leather, suede, nubuck, wool, down, fur, sheepskin, kangaroo, goat, cow, silk, merino, cashmere. Note each hit and where it appears (shell, palm, liner, trim, patch). Ignore hits in site chrome (navigation menus, footer, cross-sell blocks); only the product's own title, description, spec and variants count. Note any explicit vegan or animal-free claim in the maker's own words.
 
@@ -42,7 +42,7 @@ Search every material and trim for animal terms: leather, suede, nubuck, wool, d
 
 ## Description shape
 
-4 to 6 sentences, under 900 characters, plain prose. No bullets, headers, labels, emojis, em dashes, en dashes or double hyphens. Sentence one names the product, the maker, the category and the intended use; it becomes the page's search snippet, so keep it under 160 characters. Then construction and materials, protection with the exact standard, fit and sizing, and the limitation. Vary sentence length. Active voice. US spelling. Digits for numbers. Do not use the product name more than twice. Avoid the words and constructions listed in `docs/brand-voice.md`.
+Aim for 5 sentences. Never more than 6, never fewer than 4, under 900 characters, plain prose. A 7-sentence description is an invalid output, whatever it contains. No bullets, headers, labels, emojis, em dashes, en dashes or double hyphens. Sentence one names the product, the maker, the category and the intended use; it becomes the page's search snippet, so keep it under 160 characters. Then construction and materials, protection with the exact standard, fit and sizing, and the limitation. Vary sentence length. Active voice. US spelling. Digits for numbers. Do not use the product name more than twice. Avoid the words and constructions listed in `docs/brand-voice.md`.
 
 ## Field mapping
 
