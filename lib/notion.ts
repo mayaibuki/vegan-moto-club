@@ -87,6 +87,8 @@ interface NotionPageProperties {
 
 interface NotionPage {
   id: string
+  archived?: boolean
+  in_trash?: boolean
   created_time: string
   last_edited_time: string
   properties: NotionPageProperties
@@ -116,7 +118,19 @@ function resolveFileUrl(
   return file.external?.url ?? "";
 }
 
-/** Retry transient Notion failures (timeouts, 429s, 5xx) with a short backoff. */
+/** Seconds Notion asked us to wait, when the error carries a Retry-After hint. */
+function retryAfterMs(error: unknown): number | undefined {
+  const e = error as { headers?: { get?: (k: string) => string | null }; body?: string } | undefined;
+  const header = e?.headers?.get?.("retry-after");
+  const fromBody = typeof e?.body === "string" ? /"retry_after":"?(\d+)/.exec(e.body)?.[1] : undefined;
+  const seconds = Number(header ?? fromBody);
+  return Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds, 30) * 1000 : undefined;
+}
+
+/**
+ * Retry transient Notion failures (timeouts, 429s, 5xx). Honours Retry-After on
+ * 429s and adds jitter so concurrent callers do not retry in lockstep.
+ */
 async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -125,7 +139,8 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
     } catch (error) {
       lastError = error;
       if (attempt < attempts - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+        const base = retryAfterMs(error) ?? 1000 * (attempt + 1);
+        await new Promise((resolve) => setTimeout(resolve, base + Math.random() * 500));
       }
     }
   }
@@ -148,7 +163,7 @@ async function paginateDatabase(databaseId: string): Promise<NotionPage[]> {
       notion.databases.query({
         database_id: databaseId,
         start_cursor: startCursor,
-        page_size: 50,
+        page_size: 100,
       })
     );
 
@@ -210,9 +225,25 @@ function mapNotionPageToBlogPost(page: NotionPage): BlogPost {
 // empty catalog for the full revalidate window. The exported wrappers catch
 // per-request so pages degrade gracefully without poisoning the cache.
 
-async function fetchProductsFromNotion(): Promise<Product[]> {
+// Concurrent cache misses inside one server instance (a crawler burst right after
+// revalidateTag, or build workers) share a single Notion pagination instead of
+// each running their own, which is what tripped Notion's rate limit.
+let productsInFlight: Promise<Product[]> | null = null;
+
+function fetchProductsFromNotion(): Promise<Product[]> {
+  if (!productsInFlight) {
+    productsInFlight = fetchProductsFromNotionUncached().finally(() => {
+      productsInFlight = null;
+    });
+  }
+  return productsInFlight;
+}
+
+async function fetchProductsFromNotionUncached(): Promise<Product[]> {
   const pages = await paginateDatabase(process.env.NOTION_PRODUCTS_DB_ID!);
   return pages
+    // Belt and braces: the query API omits trashed pages, but never list one if it slips through.
+    .filter((page) => !page.archived && !page.in_trash)
     .map(mapNotionPageToProduct)
     // Rows created by the suggestion form live in the same database until
     // they're reviewed — keep them out of the public catalog and sitemap.
@@ -236,8 +267,10 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 async function fetchProductFromNotion(id: string): Promise<Product | null> {
-  const page = await withRetry(() => notion.pages.retrieve({ page_id: id }));
-  return mapNotionPageToProduct(page as NotionPage);
+  const page = (await withRetry(() => notion.pages.retrieve({ page_id: id }))) as NotionPage;
+  // pages.retrieve does return trashed pages; treat them as gone.
+  if (page.archived || page.in_trash) return null;
+  return mapNotionPageToProduct(page);
 }
 
 const getProductCached = unstable_cache(

@@ -21,8 +21,20 @@ type NotionParent = { id?: string; type?: string; database_id?: string; data_sou
 type NotionEvent = {
   type?: string;
   entity?: { id?: string; type?: string };
+  authors?: Array<{ id?: string; type?: string }>;
   data?: { id?: string; parent?: NotionParent };
 };
+
+// Edits made by integrations (the daily enrichment task, the product audit action)
+// arrive in bursts of dozens of events. Each one used to clear the products cache,
+// so the next visitors all triggered a full Notion re-fetch at once and hit 429s.
+// Those edits can wait for the hourly refresh; human edits and structural events
+// (created, deleted, restored, moved) still refresh immediately.
+function isBotEdit(event: NotionEvent): boolean {
+  const isEdit = /^page\.(properties_updated|content_updated)$/.test(event.type || "");
+  const authors = event.authors ?? [];
+  return isEdit && authors.length > 0 && authors.every((a) => a.type === "bot" || a.type === "agent");
+}
 
 const bareId = (id?: string) => (id || "").replace(/-/g, "").toLowerCase();
 
@@ -101,8 +113,12 @@ export async function POST(req: NextRequest) {
   // both the hourly data cache and the hourly page cache to expire, up to ~2 hours.
   // Locking or unlocking a page changes nothing the site shows.
   const changesContent = eventType.startsWith("page.") && !/^page\.(un)?locked$/.test(eventType);
-  const revalidated = changesContent ? tagsFor(payload.data?.parent) : [];
+  const skippedBotEdit = changesContent && isBotEdit(payload);
+  const revalidated = changesContent && !skippedBotEdit ? tagsFor(payload.data?.parent) : [];
   for (const tag of revalidated) revalidateTag(tag);
+  if (skippedBotEdit) {
+    console.log("[notion-webhook] skipped cache refresh for bot edit", eventType, payload.entity?.id || payload.data?.id);
+  }
 
   // The product audit only runs for new pages and content edits.
   if (!/page\.(created|content_updated)/.test(eventType)) {
