@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { JsonLd } from "@/components/JsonLd"
 import { getBlogPost, getBlogPosts } from "@/lib/notion"
 import { notFound } from "next/navigation"
 import Image from "next/image"
@@ -81,7 +82,7 @@ export default async function BlogPostPage({
       name: "Vegan Moto Club",
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/logo.png`,
+        url: `${SITE_URL}/images/logo.png`,
       },
     },
     mainEntityOfPage: {
@@ -92,10 +93,7 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <article className="max-w-3xl mx-auto space-y-8">
         {/* Back Button */}
       <Button variant="ghost" asChild className="mb-4">

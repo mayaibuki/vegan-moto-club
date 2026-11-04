@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next"
+import { JsonLd } from "@/components/JsonLd"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Navbar } from "@/components/Navbar"
@@ -98,19 +99,16 @@ export default function RootLayout({
             `,
           }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Vegan Moto Club",
-              url: SITE_URL,
-              logo: `${SITE_URL}/logo.png`,
-              description:
-                "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
-              sameAs: ["https://www.instagram.com/veganmotoclub", "https://discord.gg/J3vDjQvXPn"],
-            }),
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Vegan Moto Club",
+            url: SITE_URL,
+            logo: `${SITE_URL}/images/logo.png`,
+            description:
+              "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
+            sameAs: ["https://www.instagram.com/veganmotoclub", "https://discord.gg/J3vDjQvXPn"],
           }}
         />
       </head>
