@@ -18,7 +18,7 @@ Site-wide footer with brand info, navigation links, and social links.
   └─ [container]                   — `.page-container` (max-w-7xl, px-4 sm:px-6), py-10
        ├─ [grid]                   — grid-cols-2 md:grid-cols-4, gap-x-6 gap-y-8 md:gap-10, mb-10
        │    ├─ [Brand]             — Logo (sm), name, tagline; col-span-2 on mobile, left-aligned
-       │    ├─ [Nav]               — Products, Events, About, How we verify, Guides and FAQ
+       │    ├─ [Nav]               — Products, Events, About, How we verify, FAQ, Guides
        │    ├─ [Gear]              — the seven category pages from CATEGORY_PAGES (Gloves, Jackets, Boots, Pants, Racing Suits, Armor & Protection, Street Wear)
        │    └─ [Connect]           — Discord, Instagram (external)
        └─ [Copyright bar]          — border-t, pt-8, text-center
