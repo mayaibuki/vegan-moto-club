@@ -110,6 +110,10 @@ export default async function Home() {
               Ride motorcycles, love animals
             </h1>
 
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+              Vegan Moto Club is a database of motorcycle gear made without leather, wool or other animal materials, checked product by product.
+            </p>
+
             <ul className="space-y-3 text-base sm:text-lg text-muted-foreground mx-auto w-fit text-left lg:mx-0 max-w-2xl">
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary-text flex-shrink-0" />

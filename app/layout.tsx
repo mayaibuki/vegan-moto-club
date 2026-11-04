@@ -7,7 +7,7 @@ import { AgentationWrapper } from "@/components/AgentationWrapper"
 import ShaderBackground from "@/components/ShaderBackground"
 import { dmSans } from "./fonts"
 import "./globals.css"
-import { SITE_URL } from "@/lib/constants"
+import { SITE_URL, SITE_OG_IMAGE } from "@/lib/constants"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -43,14 +43,7 @@ export const metadata: Metadata = {
     title: "Vegan Moto Club - Cruelty-Free Motorcycle Gear",
     description:
       "A curated database of vegan motorcycle gear for compassionate riders. Find ethical alternatives to animal-based protective wear.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Vegan Moto Club - Cruelty-Free Motorcycle Gear",
-      },
-    ],
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",

@@ -5,12 +5,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { formatPrice, notionImageUrl, splitCategories, veganVerifiedVariant, waterproofVariant } from "@/lib/utils"
+import { formatPrice, notionImageUrl, splitCategories, truncateAtWord, veganVerifiedVariant, waterproofVariant } from "@/lib/utils"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { StickyBuyBar } from "@/components/StickyBuyBar"
-import { SITE_URL, seasonEmojis } from "@/lib/constants"
+import { SITE_URL, SITE_OG_IMAGE, seasonEmojis } from "@/lib/constants"
 
 export async function generateStaticParams() {
   const products = await getProducts()
@@ -41,24 +41,30 @@ export async function generateMetadata({
   ].filter(Boolean).join(", ")
 
   const description = product.description
-    ? product.description.slice(0, 160)
-    : `${product.name} by ${product.brand} - Vegan ${product.category} for motorcycle riders.${keyFeatures ? ` ${keyFeatures}.` : ""} Cruelty-free and ethical gear.`.slice(0, 160)
+    ? truncateAtWord(product.description)
+    : truncateAtWord(`${product.name} by ${product.brand} - Vegan ${product.category} for motorcycle riders.${keyFeatures ? ` ${keyFeatures}.` : ""} Cruelty-free and ethical gear.`)
+
+  const brand = product.brand.trim().toLowerCase()
+  const displayTitle =
+    brand && product.name.trim().toLowerCase().startsWith(brand)
+      ? product.name
+      : `${product.name} by ${product.brand}`
 
   return {
-    title: `${product.name} by ${product.brand}`,
+    title: displayTitle,
     description,
     openGraph: {
-      title: `${product.name} by ${product.brand} | Vegan Moto Club`,
+      title: `${displayTitle} | Vegan Moto Club`,
       description,
       url: `/products/${product.slug}`,
-      images: product.photos.length > 0 ? [{ url: product.photos[0] }] : [],
+      images: product.photos.length > 0 ? [{ url: product.photos[0] }] : [SITE_OG_IMAGE],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${product.name} by ${product.brand}`,
+      title: displayTitle,
       description,
-      images: product.photos.length > 0 ? [product.photos[0]] : [],
+      images: product.photos.length > 0 ? [product.photos[0]] : ["/og-image.png"],
     },
     alternates: {
       canonical: `/products/${product.slug}`,

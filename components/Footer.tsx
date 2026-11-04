@@ -1,11 +1,12 @@
 import Link from "next/link"
 import { Logo } from "./Logo"
+import { CATEGORY_PAGES } from "@/lib/constants"
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-card mt-12" role="contentinfo">
       <div className="page-container py-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-8 md:gap-10 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 md:gap-10 mb-10">
           {/* Brand Section */}
           <div className="col-span-2 md:col-span-1">
             <div className="mb-4 flex">
@@ -35,6 +36,25 @@ export function Footer() {
                   About
                 </Link>
               </li>
+              <li>
+                <Link href="/verification" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                  How we verify
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* Gear Categories Section */}
+          <nav aria-label="Gear categories">
+            <h2 className="text-sm font-semibold mb-2">Gear</h2>
+            <ul className="text-sm">
+              {CATEGORY_PAGES.map((page) => (
+                <li key={page.slug}>
+                  <Link href={`/${page.slug}`} className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                    {page.title.replace(/^Vegan Motorcycle /, "")}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
