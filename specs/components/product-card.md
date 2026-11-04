@@ -107,3 +107,7 @@ import { ProductCard } from "@/components/ProductCard"
 ## Motion
 
 Hover lifts the card 2px (`-translate-y-0.5`) with the shadow step `shadow-sm` to `shadow-md` (200ms, from the interactive `Card`). Pressing the link scales the card to `scale-98`. Both are instant under `prefers-reduced-motion`. The focus ring is unchanged. See [motion](../foundations/motion.md#implemented-motion).
+
+## Props
+
+`product` is a `ProductSummary` (`lib/notion.ts`): id, slug, name, brand, price, category, levelOfProtection, season, gender, staffFavorite, lastEditedTime and the first photo. A full `Product` also satisfies it. Category pages pass summaries so descriptions and extra photo URLs stay out of the page payload.

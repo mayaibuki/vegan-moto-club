@@ -1,12 +1,12 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import type { Product } from "@/lib/notion"
+import type { ProductSummary } from "@/lib/notion"
 import { ProductCard } from "./ProductCard"
 import { SortSelect, sortProducts, type SortValue } from "./SortSelect"
 
 interface CategoryProductListProps {
-  products: Product[]
+  products: ProductSummary[]
   /** Rendered next to the count (e.g. the "Filter & sort" link). */
   children?: React.ReactNode
 }

@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Card, CardContent } from "./ui/card"
 import { Badge } from "./ui/badge"
 import { ProductCardImage } from "./ProductCardImage"
-import { Product } from "@/lib/notion"
+import type { ProductSummary } from "@/lib/notion"
 import { formatPrice } from "@/lib/utils"
 import { seasonEmojis } from "@/lib/constants"
 
@@ -29,7 +29,8 @@ function splitSeason(season: string): { emoji: string; name: string } {
 const cardBadge = "sm:px-3 sm:py-1"
 
 interface ProductCardProps {
-  product: Product
+  /** A full Product also satisfies this type. */
+  product: ProductSummary
 }
 
 export const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
