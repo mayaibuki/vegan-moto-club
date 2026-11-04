@@ -1,20 +1,38 @@
 import type { MetadataRoute } from "next"
-import { getProducts } from "@/lib/notion"
+import { getProducts, type Product } from "@/lib/notion"
 import { SITE_URL, CATEGORY_PAGES } from "@/lib/constants"
-const STATIC_LAST_MODIFIED = new Date("2026-02-07")
+import { splitCategories } from "@/lib/utils"
+
+// Date of the last copy change to the hand-written pages (/about, /verification, /events).
+// Bump it when their content ships. Data-driven pages use the newest product edit instead.
+const STATIC_LAST_MODIFIED = new Date("2026-11-03")
+
+// Refresh hourly like the pages it lists; revalidateTag("products") refreshes sooner.
+export const revalidate = 3600
+
+/** Newest lastEditedTime in a list, or undefined when the list is empty. */
+function latestEdit(products: Product[]): Date | undefined {
+  let latest = ""
+  for (const p of products) if (p.lastEditedTime > latest) latest = p.lastEditedTime
+  return latest ? new Date(latest) : undefined
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Static pages
+  // getProducts() returns [] when Notion is unavailable; every lastmod then
+  // falls back to STATIC_LAST_MODIFIED and product entries are simply absent.
+  const products = await getProducts()
+  const catalogModified = latestEdit(products) ?? STATIC_LAST_MODIFIED
+
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: STATIC_LAST_MODIFIED,
+      lastModified: catalogModified,
       changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${SITE_URL}/products`,
-      lastModified: STATIC_LAST_MODIFIED,
+      lastModified: catalogModified,
       changeFrequency: "daily",
       priority: 0.9,
     },
@@ -38,21 +56,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Static category landing pages (real server-rendered pages, not
-  // query-param views of /products)
+  // Static category landing pages: lastmod is the newest edit among the
+  // products that page lists (same filter as app/[category]/page.tsx).
   const categoryPages: MetadataRoute.Sitemap = CATEGORY_PAGES.map((page) => ({
     url: `${SITE_URL}/${page.slug}`,
-    lastModified: STATIC_LAST_MODIFIED,
+    lastModified:
+      latestEdit(products.filter((p) => splitCategories(p.category).includes(page.category))) ??
+      STATIC_LAST_MODIFIED,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }))
 
-  // Dynamic product pages — real lastModified so crawlers can prioritize
-  // actual changes instead of seeing every URL "modified" on every build
-  const products = await getProducts()
+  // Product pages carry their own Notion edit time so crawlers can prioritize
+  // real changes instead of seeing every URL "modified" on every build.
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${SITE_URL}/products/${product.slug}`,
-    lastModified: product.lastEditedTime ? new Date(product.lastEditedTime) : new Date(),
+    lastModified: product.lastEditedTime ? new Date(product.lastEditedTime) : catalogModified,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }))
