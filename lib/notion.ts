@@ -35,6 +35,43 @@ export interface Product {
   lastEditedTime: string;
 }
 
+/**
+ * The fields a product card and the category sort need. Category pages pass
+ * these to the client grid instead of full products, which keeps long
+ * descriptions and extra photo URLs out of the serialized page payload.
+ */
+export type ProductSummary = Pick<
+  Product,
+  | "id"
+  | "slug"
+  | "name"
+  | "brand"
+  | "price"
+  | "category"
+  | "levelOfProtection"
+  | "season"
+  | "gender"
+  | "staffFavorite"
+  | "lastEditedTime"
+> & { photos: string[] };
+
+export function toProductSummary(product: Product): ProductSummary {
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    brand: product.brand,
+    price: product.price,
+    category: product.category,
+    levelOfProtection: product.levelOfProtection,
+    season: product.season,
+    gender: product.gender,
+    staffFavorite: product.staffFavorite,
+    lastEditedTime: product.lastEditedTime,
+    photos: product.photos.slice(0, 1),
+  };
+}
+
 export interface Event {
   id: string;
   name: string;
