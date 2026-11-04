@@ -77,9 +77,58 @@ reads `NOTION_TOKEN` / `NOTION_DB_ID`. Reports default to the `Scheduled audit/`
 
 ### `lib_anthropic.py`
 
-Thin wrapper around the Anthropic SDK used by the audit for description writing and vegan
-adjudication. Both helpers fall back to deterministic stubs when `ANTHROPIC_API_KEY` is not
-set, so the audit keeps working without an API key. Currently running in fallback mode.
+Legacy wrapper around the Anthropic SDK. No longer called by the audit; kept for reference only.
+The LLM second pass now runs on the Claude Code subscription (see below), never on API credits.
+
+### LLM second pass: `vmc-product-enrichment` (Claude Code desktop scheduled task)
+
+The Python audit leaves rows with a template description ("The X is a jackets from Y. Intended
+for...") and a placeholder title (`User Suggestion - <domain>`), which the site hides. A desktop
+scheduled task in Claude Code finishes them daily at 08:00 local while the Claude app is open.
+Its prompt lives at `~/.claude/scheduled-tasks/vmc-product-enrichment/SKILL.md`; the manual entry
+point is `/refine-products [page ids]`.
+
+Per row it runs three project subagents from `.claude/agents/`: `gear-researcher` (Reddit, forums,
+YouTube and retailer reviews, with sponsored sources labelled and discounted), `gear-writer` (the
+honest gear reviewer that turns maker copy into 4 to 6 plain sentences and the schema fields, each
+backed by a quote) and `gear-verifier` (fails any claim without a source, any animal term missed,
+any value outside the Notion option lists). Descriptions then pass the `humanizer` skill and a
+batch `marketing:brand-review` against `docs/brand-voice.md`.
+
+Queue: rows with a URL and a placeholder title, an empty or template description, or an empty
+Brand, Category, Riding style, Season or Vegan Verified; oldest first, 10 per run. Photos are
+HEAD-checked and topped up to 5 to 7. The row is renamed (which publishes it on the site) only when
+it passes the green gate: real name, Brand, price, Category, Gender, protection level and a vegan
+status set, no animal material in the spec, a verified description and at least 3 working photos.
+Report: `Scheduled audit/audit/YYYY-MM-DD/enrichment-YYYY-MM-DD.md` (gitignored).
+
+### Monthly SEO audit: `vmc-seo-audit` (Claude Code desktop scheduled task)
+
+A read-only desktop scheduled task that audits veganmotoclub.com for SEO and GEO (AI search
+visibility) on the first Monday of each month at 09:00 local, while the Claude app is open. Its
+prompt lives at `~/.claude/scheduled-tasks/vmc-seo-audit/SKILL.md`. The cron is weekly
+(`0 9 * * 1`) with a day-of-month guard at the top of the prompt, because the app's cron parser
+does not combine day-of-month with weekday.
+
+Scope per run: home, `/products`, the seven category pages from `CATEGORY_PAGES` in
+`lib/constants.ts`, `/verification`, `/about`, five product pages picked at random from
+`/feed.xml`, plus `robots.txt`, `sitemap.xml` and the product JSON-LD. It checks titles, meta
+descriptions, H1s, canonical and OG tags, internal links, alt text, structured data, Core Web
+Vitals (PageSpeed Insights; falls back to curl timings when the keyless quota is exhausted, add
+`PAGESPEED_API_KEY` to `.env.local` to avoid that), the canonical host (apex vs www), AI crawler
+access for Googlebot, Bingbot, PerplexityBot, GPTBot and ClaudeBot, answer-first copy and FAQ
+schema opportunities. Keyword research (15 to 25 keywords with intent and a rough current
+position) uses web search only; no Ahrefs or Similarweb connector is involved.
+
+Tools: the local `seo-geo` skill (`.agents/skills/seo-geo/scripts/seo_audit.py`, no API key)
+and the `marketing:seo-audit` skill with every input pre-filled. Everything runs on the Claude
+Code subscription. The task never edits the site, never writes to Notion, never commits or opens
+a PR; fixes are proposed in the report for the owner to pick up.
+
+Report: `Scheduled audit/audit/YYYY-MM-DD/seo-audit-YYYY-MM-DD.md` (gitignored), with an
+executive summary, an issues table with severity, a keyword table, a technical checklist, GEO
+notes and a prioritized action plan. To run it by hand, click Run now on the task in the
+Scheduled sidebar; `run_scheduled_task` from a session is refused by the auto-mode classifier.
 
 ---
 

@@ -34,6 +34,8 @@ components/        React components
 lib/
   notion.ts        Notion API client, typed interfaces, cached fetchers
   utils.ts         cn(), formatPrice(), formatDate(), filterProducts()
+docs/brand-voice.md   Voice rules for product copy (used by .claude/agents/gear-writer and marketing:brand-review)
+.claude/agents/       gear-researcher, gear-writer, gear-verifier subagents for the enrichment task
 ```
 
 **Patterns:** Server-first — only `ProductGrid` and `Navbar` are client components. Notion data cached via `unstable_cache` (1hr prod, 1min dev), fetched at build time with ISR. Typed via `NotionPage`, `NotionRichText`, `NotionFile` interfaces in `lib/notion.ts`. Theme: Stone base + Lime accent, dark mode via `.dark` on `<html>`.
@@ -76,13 +78,13 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [ ] Decide canonical host (apex vs www) and align `NEXT_PUBLIC_SITE_URL` + Vercel domain redirect
 - [ ] Configure ESLint (not yet set up — `npm run lint` prompts for config)
 - [ ] Discord → Notion event sync (GitHub Action polling Discord API)
-- [ ] Product audit LLM upgrade (replace keyword matching with LLM extraction)
-- [ ] Product detail writer LLM upgrade (better tone, more detailed specs)
 - [ ] Webflow portfolio case study (mayaibuki.com)
 - [ ] Project folder cleanup
 
 ## Shipped TODOs
 
+- [x] Product enrichment second pass: daily Claude Code scheduled task `vmc-product-enrichment` + `.claude/agents/gear-*` + `docs/brand-voice.md` (see `Scheduled audit/README.md`)
+- [x] Monthly SEO/GEO audit: read-only Claude Code scheduled task `vmc-seo-audit`, report in `Scheduled audit/audit/` (see `Scheduled audit/README.md`)
 - [x] Favicon + app icons
 - [x] Vercel Analytics
 - [x] Speed Insights
@@ -102,3 +104,4 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [x] RSS feed of newly added products (`/feed.xml`)
 - [x] OG image (`/public/og-image.png`, generator script pattern: sharp + SVG)
 - [x] Store link + price audit pipeline (`Scheduled audit/link_check/`, see its README)
+- [x] Grain gradient shader page background (`components/ShaderBackground.tsx`, Paper Shaders, colours from `--background` + `--primary`)
