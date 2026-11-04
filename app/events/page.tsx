@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { JsonLd } from "@/components/JsonLd"
 import { getEvents } from "@/lib/notion"
 import { Card, CardContent } from "@/components/ui/card"
 import { EventCard } from "@/components/EventCard"
@@ -67,10 +68,7 @@ export default async function EventsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }}
-      />
+      <JsonLd data={eventsJsonLd} />
       <div className="space-y-10">
           <div className="space-y-2">
             <h1 className="h-page">Events</h1>

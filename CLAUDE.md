@@ -4,7 +4,7 @@
 
 A curated database of vegan motorcycle gear. Next.js 14 site pulling product, event, and blog data from Notion databases via the Notion API, deployed on Vercel.
 
-- **Live URL**: https://veganmotoclub.com
+- **Live URL**: https://www.veganmotoclub.com (apex 308-redirects to www)
 - **GitHub**: https://github.com/mayaibuki/vegan-moto-club
 - **Vercel**: Auto-deploys on push to `main`
 
@@ -47,7 +47,7 @@ NOTION_API_KEY          # Notion integration token
 NOTION_PRODUCTS_DB_ID   # Products database ID
 NOTION_EVENTS_DB_ID     # Events database ID
 NOTION_BLOG_DB_ID       # Blog database ID
-NEXT_PUBLIC_SITE_URL    # Production URL (https://veganmotoclub.com)
+NEXT_PUBLIC_SITE_URL    # Canonical origin (https://www.veganmotoclub.com); code falls back to the same
 ```
 
 ## Design System
@@ -75,7 +75,6 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [ ] Add donations section (Venmo / PayPal.me link — no complex checkout)
 - [ ] Newsletter (Buttondown) hooked to the new `/feed.xml` RSS feed
 - [ ] Move user suggestions out of the products DB (own DB or Status property; currently filtered out by name prefix in `lib/notion.ts`)
-- [ ] Decide canonical host (apex vs www) and align `NEXT_PUBLIC_SITE_URL` + Vercel domain redirect
 - [ ] Configure ESLint (not yet set up — `npm run lint` prompts for config)
 - [ ] Discord → Notion event sync (GitHub Action polling Discord API)
 - [ ] Webflow portfolio case study (mayaibuki.com)
@@ -83,6 +82,7 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 
 ## Shipped TODOs
 
+- [x] Canonical host is www: `NEXT_PUBLIC_SITE_URL` set in Vercel, code fallback matches, apex redirects 308; shared `components/JsonLd.tsx` escapes JSON-LD
 - [x] Product enrichment second pass: daily Claude Code scheduled task `vmc-product-enrichment` + `.claude/agents/gear-*` + `docs/brand-voice.md` (see `Scheduled audit/README.md`)
 - [x] Monthly SEO/GEO audit: read-only Claude Code scheduled task `vmc-seo-audit`, report in `Scheduled audit/audit/` (see `Scheduled audit/README.md`)
 - [x] Favicon + app icons

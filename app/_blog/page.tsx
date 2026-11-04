@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { JsonLd } from "@/components/JsonLd"
 import { getBlogPosts } from "@/lib/notion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
@@ -39,10 +40,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListJsonLd) }}
-      />
+      <JsonLd data={blogListJsonLd} />
       <div className="space-y-10">
       <div className="space-y-2">
         <h1 className="text-3xl md:text-4xl font-bold">Blog</h1>

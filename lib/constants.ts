@@ -1,5 +1,10 @@
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.veganmotoclub.com"
+
+/** Absolute URL for a site-relative path. Already-absolute URLs pass through. */
+export function absoluteUrl(path: string): string {
+  return /^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`
+}
 
 export const SITE_OG_IMAGE = {
   url: "/og-image.png",

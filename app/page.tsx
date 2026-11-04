@@ -1,4 +1,5 @@
 import { getProducts, getEvents } from "@/lib/notion"
+import { JsonLd } from "@/components/JsonLd"
 import { ProductCard } from "@/components/ProductCard"
 import { EventCard } from "@/components/EventCard"
 import { Card, CardContent } from "@/components/ui/card"
@@ -91,14 +92,8 @@ export default async function Home() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={faqJsonLd} />
       <div className="space-y-16">
         <PromoBanner />
         {/* Hero Section */}

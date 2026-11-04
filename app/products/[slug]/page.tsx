@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { JsonLd } from "@/components/JsonLd"
 import { getProductBySlug, getProducts } from "@/lib/notion"
 import { notFound } from "next/navigation"
 import Image from "next/image"
@@ -10,7 +11,10 @@ import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { RelatedProducts } from "@/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { StickyBuyBar } from "@/components/StickyBuyBar"
-import { SITE_URL, SITE_OG_IMAGE, seasonEmojis } from "@/lib/constants"
+import { SITE_URL, SITE_OG_IMAGE, absoluteUrl, seasonEmojis } from "@/lib/constants"
+
+// Time-based fallback; revalidateTag("products") from the Notion webhook refreshes sooner.
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const products = await getProducts()
@@ -118,7 +122,7 @@ export default async function ProductDetailPage({
     "@type": "Product",
     name: product.name,
     description: product.description || `${product.name} - Vegan ${product.category}`,
-    image: product.photos,
+    ...(product.photos.length > 0 ? { image: product.photos.map(absoluteUrl) } : {}),
     brand: {
       "@type": "Brand",
       name: product.brand,
@@ -147,14 +151,8 @@ export default async function ProductDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={jsonLd} />
       <div className="space-y-8">
       <Breadcrumbs
         items={[
