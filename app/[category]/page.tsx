@@ -3,7 +3,7 @@ import { JsonLd } from "@/components/JsonLd"
 import { FaqSection } from "@/components/FaqSection"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getFaqs, getProducts } from "@/lib/notion"
+import { getFaqs, getProducts, toProductSummary } from "@/lib/notion"
 import { splitCategories } from "@/lib/utils"
 import { CATEGORY_PAGES, SITE_OG_IMAGE, SITE_URL } from "@/lib/constants"
 import { CategoryProductList } from "@/components/CategoryProductList"
@@ -114,7 +114,7 @@ export default async function CategoryLandingPage({
           </ul>
         </nav>
 
-        <CategoryProductList products={products}>
+        <CategoryProductList products={products.map(toProductSummary)}>
           <Button variant="outline" asChild>
             <Link href={`/products?category=${encodeURIComponent(page.category)}`}>
               More filters

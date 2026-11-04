@@ -19,7 +19,9 @@ export const SORT_OPTIONS = [
 export type SortValue = (typeof SORT_OPTIONS)[number]["value"]
 
 /** Sorts in place and returns the same array. */
-export function sortProducts(products: Product[], sortBy: SortValue): Product[] {
+type Sortable = Pick<Product, "price" | "name" | "lastEditedTime">
+
+export function sortProducts<T extends Sortable>(products: T[], sortBy: SortValue): T[] {
   switch (sortBy) {
     case "price-asc":
       return products.sort((a, b) => a.price - b.price)
