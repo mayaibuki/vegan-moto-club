@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { getFaqs } from "@/lib/notion"
+import { FaqSection } from "@/components/FaqSection"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -48,7 +50,10 @@ const TIERS = [
   },
 ]
 
-export default function VerificationPage() {
+export const revalidate = 3600
+
+export default async function VerificationPage() {
+  const faqs = await getFaqs("Verification")
   return (
     <div className="max-w-3xl space-y-10">
       <div className="space-y-4">
@@ -105,6 +110,8 @@ export default function VerificationPage() {
           ))}
         </div>
       </div>
+
+      <FaqSection items={faqs} title="Common questions about verification" />
 
       <div className="space-y-4">
         <h2 className="h-section">Spotted an error?</h2>

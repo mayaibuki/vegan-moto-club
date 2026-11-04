@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { JsonLd } from "@/components/JsonLd"
+import { FaqSection } from "@/components/FaqSection"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getProducts, toProductSummary } from "@/lib/notion"
+import { getFaqs, getProducts, toProductSummary } from "@/lib/notion"
 import { splitCategories } from "@/lib/utils"
 import { CATEGORY_PAGES, SITE_OG_IMAGE, SITE_URL } from "@/lib/constants"
 import { CategoryProductList } from "@/components/CategoryProductList"
@@ -43,7 +44,7 @@ export default async function CategoryLandingPage({
   const page = CATEGORY_PAGES.find((p) => p.slug === params.category)
   if (!page) notFound()
 
-  const allProducts = await getProducts()
+  const [allProducts, faqs] = await Promise.all([getProducts(), getFaqs(page.category)])
   const products = allProducts.filter((product) =>
     splitCategories(product.category).includes(page.category)
   )
@@ -130,6 +131,8 @@ export default async function CategoryLandingPage({
             .
           </p>
         )}
+
+        <FaqSection items={faqs} title={`Common questions about ${page.title.toLowerCase()}`} />
       </div>
     </>
   )

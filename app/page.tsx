@@ -1,5 +1,6 @@
-import { getProducts, getEvents } from "@/lib/notion"
+import { getProducts, getEvents, getFaqs } from "@/lib/notion"
 import { JsonLd } from "@/components/JsonLd"
+import { FaqSection } from "@/components/FaqSection"
 import { ProductCard } from "@/components/ProductCard"
 import { EventCard } from "@/components/EventCard"
 import { Card, CardContent } from "@/components/ui/card"
@@ -33,47 +34,9 @@ const jsonLd = {
   },
 }
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "What is vegan motorcycle gear?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Vegan motorcycle gear is protective riding equipment made without animal-derived materials like leather, suede, or wool. It uses synthetic alternatives such as Cordura, Kevlar, D3O armor, and microfiber that provide equivalent or superior protection while being cruelty-free.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is vegan motorcycle gear as protective as leather?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. Modern synthetic materials like Cordura 500D, SuperFabric, and Dyneema offer abrasion resistance comparable to or exceeding leather. CE-certified armor (D3O, Knox) provides the same impact protection regardless of the outer material. Many MotoGP and track riders use textile gear rated to the highest CE safety standards.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Where can I find vegan motorcycle jackets, gloves, and boots?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Vegan Moto Club maintains a curated database of over 200 vegan motorcycle products from brands like Alpinestars, REV'IT!, Dainese, and Knox. Browse by category, protection level, riding style, and season at veganmotoclub.com/products.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How do I know if motorcycle gear is truly vegan?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Check the materials list for animal-derived components (leather, suede, silk, wool, down). Vegan Moto Club verifies products through direct manufacturer confirmation, material analysis, and community review. Look for our 'Verified Vegan' badge on product listings.",
-      },
-    },
-  ],
-}
 
 export default async function Home() {
-  const [products, events] = await Promise.all([getProducts(), getEvents()])
+  const [products, events, faqs] = await Promise.all([getProducts(), getEvents(), getFaqs("General")])
 
   const staffPicks = products
     .filter((p) => p.staffFavorite)
@@ -93,7 +56,6 @@ export default async function Home() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <JsonLd data={faqJsonLd} />
       <div className="space-y-16">
         <PromoBanner />
         {/* Hero Section */}
@@ -220,6 +182,8 @@ export default async function Home() {
       </section>
 
       {/* Product Suggestion Form Section */}
+      <FaqSection items={faqs} title="Common questions" />
+
       <SuggestProductForm />
       </div>
     </>

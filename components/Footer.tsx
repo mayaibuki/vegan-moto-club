@@ -41,6 +41,11 @@ export function Footer() {
                   How we verify
                 </Link>
               </li>
+              <li>
+                <Link href="/blog" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                  Guides and FAQ
+                </Link>
+              </li>
             </ul>
           </nav>
 
