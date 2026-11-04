@@ -1189,6 +1189,11 @@ def run_audit(page_id: "str | None" = None, dry_run: bool = False):
         time.sleep(1.5)   # be polite to servers
 
     if dry_run:
+        # Say why a page printed nothing (e.g. a store returned 429).
+        for r in results:
+            if r["status"] != "dry-run":
+                log.warning(f"[dry-run] {r['name']}: {r['status']} "
+                            f"(URL status: {r['url_status']}) {r['product_url']}")
         log.info(f"=== Dry run done: {len(results)} page(s) previewed, nothing written ===")
         return
 
