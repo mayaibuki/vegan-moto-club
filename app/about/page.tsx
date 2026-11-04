@@ -2,16 +2,18 @@ import type { Metadata } from "next"
 import { SuggestProductForm } from "@/components/SuggestProductForm"
 import { InstagramGallery } from "@/components/InstagramGallery"
 import { ExternalLink } from "lucide-react"
+import { SITE_OG_IMAGE } from "@/lib/constants"
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About the Club: Bay Area Vegan Riders",
   description:
     "The Vegan Moto Club is a community that started in the San Francisco Bay Area, with a focus on animal liberation and having fun.",
   openGraph: {
-    title: "About | Vegan Moto Club",
+    title: "About the Club: Bay Area Vegan Riders | Vegan Moto Club",
     description:
       "The Vegan Moto Club is a community that started in the San Francisco Bay Area, with a focus on animal liberation and having fun.",
     url: "/about",
+    images: [SITE_OG_IMAGE],
   },
   alternates: {
     canonical: "/about",

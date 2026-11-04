@@ -2,6 +2,14 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { Product } from "./notion"
 
+export function truncateAtWord(text: string, max = 155): string {
+  if (text.length <= max) return text
+  const cut = text.slice(0, max + 1)
+  const lastSpace = cut.lastIndexOf(" ")
+  const base = lastSpace > 0 ? cut.slice(0, lastSpace) : text.slice(0, max)
+  return `${base.trimEnd()}...`
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }

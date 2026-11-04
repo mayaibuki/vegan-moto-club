@@ -1,6 +1,13 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://veganmotoclub.com"
 
+export const SITE_OG_IMAGE = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: "Vegan Moto Club - Cruelty-Free Motorcycle Gear",
+}
+
 export const seasonEmojis: Record<string, string> = {
   Summer: "☀️",
   "Mid season": "🌦",

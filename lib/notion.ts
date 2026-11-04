@@ -255,8 +255,9 @@ export async function getProduct(id: string): Promise<Product | null> {
   }
 }
 
+// No try/catch on purpose: a Notion outage must throw (5xx via app/error.tsx), not look like an unknown slug (404).
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const products = await getProducts();
+  const products = await getProductsCached();
   return products.find((p) => p.slug === slug) || null;
 }
 

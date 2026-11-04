@@ -4,7 +4,7 @@ import { getProducts } from "@/lib/notion"
 import { ProductGrid } from "@/components/ProductGrid"
 import { PromoBanner } from "@/components/PromoBanner"
 import { Card, CardContent } from "@/components/ui/card"
-import { CATEGORY_PAGES } from "@/lib/constants"
+import { CATEGORY_PAGES, SITE_OG_IMAGE } from "@/lib/constants"
 
 export const revalidate = 3600
 
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description:
       "Browse our curated database of ethical and cruelty-free motorcycle gear. Find vegan jackets, gloves, boots, and protective wear for every riding style.",
     url: "/products",
+    images: [SITE_OG_IMAGE],
   },
   alternates: {
     canonical: "/products",

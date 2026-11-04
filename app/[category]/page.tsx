@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { getProducts } from "@/lib/notion"
 import { splitCategories } from "@/lib/utils"
-import { CATEGORY_PAGES, SITE_URL } from "@/lib/constants"
+import { CATEGORY_PAGES, SITE_OG_IMAGE, SITE_URL } from "@/lib/constants"
 import { CategoryProductList } from "@/components/CategoryProductList"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ export function generateMetadata({ params }: { params: { category: string } }): 
       title: `${page.title} | Vegan Moto Club`,
       description: page.description,
       url: `/${page.slug}`,
+      images: [SITE_OG_IMAGE],
     },
     alternates: {
       canonical: `/${page.slug}`,

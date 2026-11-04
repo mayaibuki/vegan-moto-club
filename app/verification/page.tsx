@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { SITE_OG_IMAGE } from "@/lib/constants"
 
 export const metadata: Metadata = {
   title: "How We Verify Vegan Gear",
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     description:
       "What the verification badges on Vegan Moto Club mean: how we confirm motorcycle gear is free of leather, wool, and other animal materials.",
     url: "/verification",
+    images: [SITE_OG_IMAGE],
   },
   alternates: {
     canonical: "/verification",
