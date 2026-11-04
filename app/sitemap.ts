@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { getProducts, getPosts, type Product } from "@/lib/notion"
 import { SITE_URL, CATEGORY_PAGES } from "@/lib/constants"
+import { GUIDES } from "@/lib/guides"
 import { splitCategories } from "@/lib/utils"
 
 // Date of the last copy change to the hand-written pages (/about, /verification, /events).
@@ -62,6 +63,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
+  const guidePages: MetadataRoute.Sitemap = [
+    {
+      url: `${SITE_URL}/guides`,
+      lastModified: GUIDES.reduce((latest, g) => (g.dateModified > latest ? g.dateModified : latest), "") ? new Date(GUIDES.reduce((latest, g) => (g.dateModified > latest ? g.dateModified : latest), "")) : STATIC_LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    ...GUIDES.map((guide) => ({
+      url: `${SITE_URL}/guides/${guide.slug}`,
+      lastModified: new Date(guide.dateModified),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+  ]
+
   const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${SITE_URL}/blog/${post.id}`,
     lastModified: post.publishDate ? new Date(post.publishDate) : STATIC_LAST_MODIFIED,
@@ -89,5 +105,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...categoryPages, ...postPages, ...productPages]
+  return [...staticPages, ...categoryPages, ...guidePages, ...postPages, ...productPages]
 }

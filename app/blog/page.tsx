@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/JsonLd"
 import { faqPageJsonLd } from "@/lib/seo"
 import { formatDate, notionImageUrl } from "@/lib/utils"
 import { SITE_URL, SITE_OG_IMAGE, CATEGORY_PAGES } from "@/lib/constants"
+import { GUIDES } from "@/lib/guides"
 
 const DESCRIPTION =
   "Answers to the questions riders ask about vegan motorcycle gear: materials, CE ratings, how we verify products, and what to check before buying."
@@ -70,6 +71,19 @@ export default async function BlogPage() {
           <h1 className="h-page">Guides and FAQ</h1>
           <p className="lead">{DESCRIPTION}</p>
         </div>
+
+        <section aria-labelledby="guides-heading" className="space-y-4">
+          <h2 id="guides-heading" className="h-section">Guides</h2>
+          <ul className="space-y-1 text-base">
+            {GUIDES.map((guide) => (
+              <li key={guide.slug}>
+                <Link href={`/guides/${guide.slug}`} className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 focus-ring">
+                  {guide.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         {groups.length === 0 && posts.length === 0 && (
           <p className="text-muted-foreground py-8">Nothing here yet. Check back soon.</p>

@@ -43,7 +43,12 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/blog" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
-                  Guides and FAQ
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/guides" className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
+                  Guides
                 </Link>
               </li>
             </ul>
