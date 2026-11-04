@@ -71,6 +71,23 @@ export default function VerificationPage() {
       </div>
 
       <div className="space-y-4">
+        <h2 className="h-section">Standards we look for</h2>
+        <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
+          Vegan status and protection are separate questions, so we record both.
+          For abrasion we look for the EN 17092 class on jackets, pants, and
+          street wear: AAA, AA, or A. Gloves carry EN 13594:2015 level 1 or 2,
+          boots carry an EN 13634:2017 code with 4 digits, and armor carries
+          EN 1621-1 or EN 1621-2 at Level 1 or Level 2. We copy the rating the
+          maker prints and link to the maker&apos;s page.
+        </p>
+        <p className="text-base text-muted-foreground leading-relaxed max-w-prose text-pretty">
+          A rating is a test result, not a guarantee. A certified product can
+          still be built with leather trims or a wool liner, which is why both
+          checks matter.
+        </p>
+      </div>
+
+      <div className="space-y-4">
         <h2 className="h-section">The four verification tiers</h2>
         <div className="space-y-4">
           {TIERS.map((tier) => (
