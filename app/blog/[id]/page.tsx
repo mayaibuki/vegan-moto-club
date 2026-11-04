@@ -1,19 +1,23 @@
 import type { Metadata } from "next"
 import { JsonLd } from "@/components/JsonLd"
-import { getBlogPost, getBlogPosts } from "@/lib/notion"
+import { getBlogPost, getPosts } from "@/lib/notion"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { formatDate, notionImageUrl } from "@/lib/utils"
-import { SITE_URL } from "@/lib/constants"
+import { formatDate, notionImageUrl, truncateAtWord } from "@/lib/utils"
+import { SITE_URL, SITE_OG_IMAGE } from "@/lib/constants"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
+import { breadcrumbJsonLd } from "@/lib/seo"
 
 export async function generateStaticParams() {
-  const posts = await getBlogPosts()
+  const posts = await getPosts()
   return posts.map((post) => ({
     id: post.id,
   }))
 }
+
+export const revalidate = 3600
 
 export async function generateMetadata({
   params,
@@ -22,15 +26,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const post = await getBlogPost(params.id)
 
-  if (!post) {
+  if (!post || post.type !== "Post") {
     return {
       title: "Post Not Found",
     }
   }
 
   const description = post.content
-    ? post.content.slice(0, 160)
-    : `Read ${post.title} on Vegan Moto Club blog.`
+    ? truncateAtWord(post.content)
+    : `Read ${post.title} on Vegan Moto Club.`
 
   return {
     title: post.title,
@@ -41,13 +45,13 @@ export async function generateMetadata({
       url: `/blog/${post.id}`,
       type: "article",
       publishedTime: post.publishDate,
-      images: post.featuredImage ? [{ url: post.featuredImage }] : [],
+      images: post.featuredImage ? [{ url: post.featuredImage }] : [SITE_OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description,
-      images: post.featuredImage ? [post.featuredImage] : [],
+      images: post.featuredImage ? [post.featuredImage] : [SITE_OG_IMAGE.url],
     },
     alternates: {
       canonical: `/blog/${post.id}`,
@@ -62,7 +66,8 @@ export default async function BlogPostPage({
 }) {
   const post = await getBlogPost(params.id)
 
-  if (!post) {
+  // FAQ rows are rendered inline on their pages, never as standalone posts.
+  if (!post || post.type !== "Post") {
     notFound()
   }
 
@@ -70,7 +75,7 @@ export default async function BlogPostPage({
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
-    description: post.content ? post.content.slice(0, 160) : "",
+    description: post.content ? truncateAtWord(post.content) : "",
     image: post.featuredImage || undefined,
     datePublished: post.publishDate,
     author: {
@@ -94,15 +99,13 @@ export default async function BlogPostPage({
   return (
     <>
       <JsonLd data={jsonLd} />
-      <article className="max-w-3xl mx-auto space-y-8">
-        {/* Back Button */}
-      <Button variant="ghost" asChild className="mb-4">
-        <Link href="/blog">← Back to Blog</Link>
-      </Button>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Guides and FAQ", path: "/blog" }, { name: post.title, path: `/blog/${post.id}` }])} />
+      <article className="max-w-3xl space-y-8">
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Guides and FAQ", href: "/blog" }, { label: post.title }]} />
 
       {/* Header */}
       <header className="space-y-4">
-        <h1 className="text-4xl font-bold">{post.title}</h1>
+        <h1 className="h-page">{post.title}</h1>
         <p className="text-muted-foreground">
           Published on {formatDate(post.publishDate)}
         </p>
@@ -130,10 +133,9 @@ export default async function BlogPostPage({
         </div>
       </div>
 
-      {/* Back to Blog Link */}
       <div className="border-t border-border pt-8">
         <Button variant="outline" asChild>
-          <Link href="/blog">← Back to All Posts</Link>
+          <Link href="/blog">All guides and questions</Link>
         </Button>
       </div>
       </article>

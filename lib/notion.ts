@@ -53,6 +53,15 @@ export interface BlogPost {
   content: string;
   publishDate: string;
   featuredImage: string;
+  /** "Post" is an article at /blog/<id>; "FAQ" is a question and answer shown inline. */
+  type: "Post" | "FAQ";
+  /** For FAQ rows: "General" (home), "Verification", or a gear category name. */
+  category: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
 }
 
 // ─── Notion API response types ───────────────────────────────────
@@ -215,6 +224,8 @@ function mapNotionPageToBlogPost(page: NotionPage): BlogPost {
     content: extractText(properties.Description?.rich_text || []),
     publishDate: properties.Date?.date?.start || "",
     featuredImage: resolveFileUrl(page.id, properties["Thumbnail Image"]?.files?.[0] as NotionFile | undefined, "Thumbnail Image", 0),
+    type: properties.Type?.select?.name === "FAQ" ? "FAQ" : "Post",
+    category: properties.Category?.select?.name || "General",
   };
 }
 
@@ -379,4 +390,21 @@ export async function getBlogPost(id: string): Promise<BlogPost | null> {
     console.error("[Notion] Failed to fetch blog post:", error);
     return null;
   }
+}
+
+/** Articles only (rows whose Type is not FAQ), newest first. */
+export async function getPosts(): Promise<BlogPost[]> {
+  return (await getBlogPosts()).filter((post) => post.type === "Post");
+}
+
+/**
+ * FAQ rows from the Blog database, oldest Date first so the owner controls
+ * the order from Notion. Pass a Category name to get one page's questions.
+ */
+export async function getFaqs(category?: string): Promise<FaqItem[]> {
+  const posts = await getBlogPosts();
+  return posts
+    .filter((post) => post.type === "FAQ" && post.content !== "" && (!category || post.category === category))
+    .sort((a, b) => a.publishDate.localeCompare(b.publishDate))
+    .map((post) => ({ question: post.title, answer: post.content }));
 }

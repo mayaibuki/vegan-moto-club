@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next"
-import { getProducts, type Product } from "@/lib/notion"
+import { getProducts, getPosts, type Product } from "@/lib/notion"
 import { SITE_URL, CATEGORY_PAGES } from "@/lib/constants"
 import { splitCategories } from "@/lib/utils"
 
@@ -20,7 +20,7 @@ function latestEdit(products: Product[]): Date | undefined {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // getProducts() returns [] when Notion is unavailable; every lastmod then
   // falls back to STATIC_LAST_MODIFIED and product entries are simply absent.
-  const products = await getProducts()
+  const [products, posts] = await Promise.all([getProducts(), getPosts()])
   const catalogModified = latestEdit(products) ?? STATIC_LAST_MODIFIED
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -54,7 +54,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    {
+      url: `${SITE_URL}/blog`,
+      lastModified: STATIC_LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
   ]
+
+  const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: `${SITE_URL}/blog/${post.id}`,
+    lastModified: post.publishDate ? new Date(post.publishDate) : STATIC_LAST_MODIFIED,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }))
 
   // Static category landing pages: lastmod is the newest edit among the
   // products that page lists (same filter as app/[category]/page.tsx).
@@ -76,5 +89,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...categoryPages, ...productPages]
+  return [...staticPages, ...categoryPages, ...postPages, ...productPages]
 }
