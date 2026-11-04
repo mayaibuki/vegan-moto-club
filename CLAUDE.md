@@ -84,6 +84,7 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 ## Shipped TODOs
 
 - [x] Product enrichment second pass: daily Claude Code scheduled task `vmc-product-enrichment` + `.claude/agents/gear-*` + `docs/brand-voice.md` (see `Scheduled audit/README.md`)
+- [x] Monthly SEO/GEO audit: read-only Claude Code scheduled task `vmc-seo-audit`, report in `Scheduled audit/audit/` (see `Scheduled audit/README.md`)
 - [x] Favicon + app icons
 - [x] Vercel Analytics
 - [x] Speed Insights
