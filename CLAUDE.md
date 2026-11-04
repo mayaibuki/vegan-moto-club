@@ -22,7 +22,8 @@ npm run start    # Serve production build
 app/               Server components (pages, layouts)
   products/        Product listing + [id] detail pages
   events/          Events listing
-  _blog/           Blog listing + [id] detail (hidden: `_` = private folder, not routed; rename to `blog/` to restore)
+  blog/            "Guides and FAQ" hub: Notion FAQ rows grouped by category + posts + [id] detail
+  guides/          Static explainer guides from `lib/guides.ts` (index + [slug])
   about/           Static about page
 components/        React components
   ui/              shadcn/ui primitives (Button, Card, Badge, etc.)
@@ -82,6 +83,7 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 
 ## Shipped TODOs
 
+- [x] FAQ sections fed by the Notion Blog DB (`Type`/`Category` selects, `getFaqs()`, `components/FaqSection.tsx`, one FAQPage block per page), CE standards in category intros and `/verification`, three guides under `/guides`
 - [x] Canonical host is www: `NEXT_PUBLIC_SITE_URL` set in Vercel, code fallback matches, apex redirects 308; shared `components/JsonLd.tsx` escapes JSON-LD
 - [x] Product enrichment second pass: daily Claude Code scheduled task `vmc-product-enrichment` + `.claude/agents/gear-*` + `docs/brand-voice.md` (see `Scheduled audit/README.md`)
 - [x] Monthly SEO/GEO audit: read-only Claude Code scheduled task `vmc-seo-audit`, report in `Scheduled audit/audit/` (see `Scheduled audit/README.md`)
