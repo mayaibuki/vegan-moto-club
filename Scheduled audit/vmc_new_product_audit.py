@@ -14,8 +14,9 @@ For each entry, it:
      workspace folder, then auto-applies all safe changes to Notion
 
 REQUIRED ENV VARS
-  NOTION_TOKEN   — Notion integration token (secret_...)
-  NOTION_DB_ID   — Notion database ID (default: 3323ccff-5165-4a31-93bc-232407c82454)
+  NOTION_TOKEN   — Notion integration token (falls back to NOTION_API_KEY)
+  NOTION_DB_ID   — Products database or data source ID (falls back to
+                   NOTION_PRODUCTS_DB_ID, then 3323ccff-5165-4a31-93bc-232407c82454)
 
 OPTIONAL ENV VARS
   WORKSPACE_DIR  — Where to save reports and photos
@@ -36,8 +37,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 # ── Config ────────────────────────────────────────────────────────────────────
-NOTION_TOKEN  = os.environ["NOTION_TOKEN"]
-NOTION_DB_ID  = os.environ.get("NOTION_DB_ID", "3323ccff-5165-4a31-93bc-232407c82454")
+# The GitHub Action passes NOTION_TOKEN / NOTION_DB_ID; .env.local (manual runs)
+# defines NOTION_API_KEY / NOTION_PRODUCTS_DB_ID. Accept either pair.
+NOTION_TOKEN  = os.environ.get("NOTION_TOKEN") or os.environ.get("NOTION_API_KEY")
+NOTION_DB_ID  = (os.environ.get("NOTION_DB_ID") or os.environ.get("NOTION_PRODUCTS_DB_ID")
+                 or "3323ccff-5165-4a31-93bc-232407c82454")
 WORKSPACE_DIR = pathlib.Path(
     os.environ.get("WORKSPACE_DIR",
                    "/sessions/gifted-confident-shannon/mnt/Scheduled audit")
@@ -56,17 +60,24 @@ HEADERS = {
 }
 
 # ── Valid schema options — NEVER create new options ───────────────────────────
-VALID = {
+# FALLBACK_VALID is only used when the live schema fetch fails (see
+# load_valid_options). Keep Notion's exact spelling, typos and trailing spaces
+# included ("Cordura® (Synhtetic fabric)", "Waterproof (Gore-tex®) "): the API
+# matches option names exactly and returns 400 on anything else.
+# Last synced with the live schema: 2026-11-03.
+FALLBACK_VALID = {
     "Brand": [
-        "250London","AeroStitch","Aether","Alpinestars","Andromeda","Atwyld",
+        "250London","Aerostitch","Aether","Alpinestars","Andromeda","Atwyld",
         "Belstaff","Bering","BILT","Bison","Bitwell","Bull-it Jeans","Cortech",
-        "Dainese","FIVE","Fox Racing","FXR","Gaerne","Icon","Joe Rocket","Keis",
-        "Klim","Helite","Merla Moto","Merlin","Motogirl","Motonation","Motoport",
-        "Nine Lives Motorwear","Olympia","Oxford products","Reax","REV'IT!",
-        "Rokker","Roland Sands RSD","RST moto","Rukka","Scorpion EXO","Sedici",
-        "She Wolf Moto Co","SIDI","Skull Riderz","Sojourn","Speed and Strenght",
-        "Spidi","Stellar","Street & Steel","TCX","Tobacco Motorwear","Tour Master",
-        "uglyBROS","Virus Power","Wind and Throttle","WSI Sports wear","Shima",
+        "Dainese","FIVE","Forma","Fox Racing","FXR","Gaerne","Held","Helite",
+        "Highway 21","Icon","Joe Rocket","Keis","Kemimoto","Klim","Knox",
+        "Merla Moto","Merlin","Motogirl","Motonation","Motoport",
+        "Nine Lives Motorwear","Olympia","Oxford products","Pando Moto","Reax",
+        "REV'IT!","Rokker","Roland Sands RSD","RST moto","Rukka","Scorpion EXO",
+        "Sedici","She Wolf Moto Co","Shima","SIDI","Skull Riderz","Sojourn",
+        "Speed and Strength","Spidi","Stellar","Street & Steel","TCX","Terje Vegan",
+        "Tobacco Motorwear","Tour Master","uglyBROS","Virus Power",
+        "Wind and Throttle","WSI Sports wear",
     ],
     "Category": ["Jackets","Gloves","Pants","Boots","Racing Suits","Protection","Street wear"],
     "Gender":   ["Women","Men","Unisex"],
@@ -102,18 +113,107 @@ VALID = {
         "Stretch wrist","Tightening strap","Thermal padding",
         "Waterproof D-Dry® membrane","Wind-block insert",
         "Gloves certified to CE - Cat. II - EN 13594/2015 Standard cat. II lev. 1",
-        "Reinforced palm",
+        "Reinforced palm","AX Leather laredo",
     ],
     "Riding style": [
         "Off-roading","Adventure / Touring","Commute / Street",
-        "Street","Sport / Canyons","Racing / Trackdays"
+        "Sport / Canyons","Racing / Trackdays"
     ],
     "Season": ["☀️ Summer","🌦 Mid season","❄️ Winter"],
     "Vegan Verified": [
-        "Verified Vegan by us","Confirmed Vegan by maker",
-        "Waiting for confirmation as Vegan","Verified Vegan by AI"
+        "Verified Vegan by us","Confirmed Vegan by maker","Verified Vegan by AI",
+        "Waiting for confirmation as Vegan","Not vegan"
     ],
 }
+
+# Active option lists. Starts as the fallback; run_audit() replaces it with the
+# live schema via load_valid_options().
+VALID = {k: list(v) for k, v in FALLBACK_VALID.items()}
+VALID_SOURCE = "hardcoded fallback"
+
+NOTION_API = "https://api.notion.com/v1"
+
+
+def _is_junk_option(name: str) -> bool:
+    """Multi-value options like "Nylon, Polyester, Ripstop nylon" were created
+    by an old import. They exist in Notion but the audit must never pick them."""
+    return "," in name or ";" in name
+
+
+def _options_from_properties(properties: dict) -> dict:
+    """Pull {field: [option names]} for the fields in FALLBACK_VALID out of a
+    Notion `properties` schema object (databases or data_sources response)."""
+    out = {}
+    for field in FALLBACK_VALID:
+        prop = properties.get(field) or {}
+        kind = prop.get("type")
+        if kind not in ("select", "multi_select", "status"):
+            raise KeyError(f"schema field {field!r} missing or not a select")
+        names = [o["name"] for o in prop[kind].get("options", [])]
+        out[field] = [n for n in names if not _is_junk_option(n)]
+    return out
+
+
+def fetch_live_options(token: str, db_id: str, timeout: int = 15) -> dict:
+    """Read the live select / multi-select options from the Notion API.
+
+    NOTION_DB_ID can hold either the database ID (only resolves at
+    /v1/databases with the 2022-06-28 API) or the data source ID (only
+    resolves at /v1/data_sources with 2025-09-03), so try both.
+    Raises on failure; callers fall back to FALLBACK_VALID.
+    """
+    attempts = [
+        (f"{NOTION_API}/databases/{db_id}", "2022-06-28"),
+        (f"{NOTION_API}/data_sources/{db_id}", "2025-09-03"),
+    ]
+    errors = []
+    for url, version in attempts:
+        r = requests.get(url, timeout=timeout, headers={
+            "Authorization": f"Bearer {token}", "Notion-Version": version})
+        if r.status_code == 200:
+            return _options_from_properties(r.json().get("properties") or {})
+        errors.append(f"{url.split('/v1/')[1].split('/')[0]} -> HTTP {r.status_code}")
+    raise RuntimeError("; ".join(errors))
+
+
+def load_valid_options() -> str:
+    """Point VALID at the live schema, or keep the fallback. Returns the source."""
+    global VALID, VALID_SOURCE
+    try:
+        if not NOTION_TOKEN:
+            raise RuntimeError("no Notion token set")
+        live = fetch_live_options(NOTION_TOKEN, NOTION_DB_ID)
+        VALID, VALID_SOURCE = live, "live Notion schema"
+        drift = {f: sorted(set(FALLBACK_VALID[f]) ^ set(live[f]))
+                 for f in live if set(FALLBACK_VALID[f]) != set(live[f])}
+        if drift:
+            log.info(f"FALLBACK_VALID is out of date (update it when convenient): {drift}")
+    except Exception as e:
+        VALID = {k: list(v) for k, v in FALLBACK_VALID.items()}
+        VALID_SOURCE = "hardcoded fallback"
+        log.warning(f"Live schema fetch failed ({e}); using hardcoded fallback")
+    log.info(f"Option lists source: {VALID_SOURCE}")
+    return VALID_SOURCE
+
+
+def filter_to_schema(mapped: dict) -> dict:
+    """Drop any select / multi-select value that is not an existing option, so
+    a stale keyword map can never 400 the page update or create an option."""
+    clean = dict(mapped)
+    for field, allowed in VALID.items():
+        val = clean.get(field)
+        if not val:
+            continue
+        if isinstance(val, list):
+            kept = [v for v in val if v in allowed]
+            dropped = [v for v in val if v not in allowed]
+            clean[field] = kept
+        else:
+            dropped = [] if val in allowed else [val]
+            clean[field] = val if val in allowed else None
+        if dropped:
+            log.warning(f"Dropping {field} value(s) not in Notion schema: {dropped}")
+    return clean
 
 TRUSTED_DOMAINS = [
     "revzilla.com","fortnine.ca","cyclegear.com","sportbiketrackgear.com",
@@ -356,11 +456,46 @@ def slugify(text: str) -> str:
 
 # ── Field mapping (schema-only) ───────────────────────────────────────────────
 
-def infer_brand(full_text: str, url: str) -> "str | None":
-    domain = re.sub(r"https?://(www\.)?", "", url).split("/")[0].lower()
-    combined = (full_text + " " + domain).lower()
+def _norm_brand_text(s: str) -> str:
+    """Lowercase, drop apostrophes and '!' so "REV'IT!" matches "revit"."""
+    return re.sub(r"['’!]", "", (s or "").lower())
+
+
+def _brand_pattern(brand: str) -> "re.Pattern":
+    """Whole-word pattern for a brand. Spaces inside the name are optional
+    ("Tour Master" matches "tourmaster") but the name must not sit inside a
+    longer word, so "Icon" no longer matches "silicone" and "Bison" no longer
+    matches "bisonte"."""
+    words = _norm_brand_text(brand).split()
+    body = r"\s*".join(re.escape(w) for w in words)
+    return re.compile(rf"(?<![a-z0-9]){body}(?![a-z0-9])")
+
+
+# Brands that are also everyday English words ("held in place", "five
+# pockets", "cart icon", "stellar grip"). Body text is too noisy for these;
+# they are only matched via the store domain or the product name.
+COMMON_WORD_BRANDS = {"Held", "FIVE", "Icon", "Stellar", "Forma", "Merlin", "Olympia"}
+
+
+def infer_brand(full_text: str, url: str, name: str = "") -> "str | None":
+    # 1. Store domain: most reliable signal. The brand (spaces/punctuation
+    #    removed) must start a hostname label: revitsport.com -> REV'IT!,
+    #    icon-motosports.com -> Icon, but ridericon.com is not Icon.
+    host = re.sub(r"^https?://(www\.)?", "", (url or "").lower()).split("/")[0]
+    labels = host.split(".")[:-1] or [host]
     for brand in VALID["Brand"]:
-        if brand.lower().replace("'","").replace(" ","") in combined.replace("'","").replace(" ",""):
+        compact = re.sub(r"[^a-z0-9]", "", _norm_brand_text(brand))
+        if compact and any(lbl.replace("-", "").startswith(compact) for lbl in labels):
+            return brand
+    # 2. Product name, whole words only (safe for every brand).
+    name_txt = _norm_brand_text(name)
+    for brand in VALID["Brand"]:
+        if name_txt and _brand_pattern(brand).search(name_txt):
+            return brand
+    # 3. Page text, whole words only, skipping common-word brands.
+    text = _norm_brand_text(full_text)
+    for brand in VALID["Brand"]:
+        if brand not in COMMON_WORD_BRANDS and _brand_pattern(brand).search(text):
             return brand
     return None
 
@@ -467,8 +602,7 @@ def infer_riding_style(name: str, full_text: str) -> list[str]:
     style_kw = {
         "Off-roading":         ["off-road","offroad","enduro","motocross","dirt bike","mx ","dirt"],
         "Adventure / Touring": ["adventure","adv ","dual sport","touring","tourer"],
-        "Commute / Street":    ["commute","commuting","urban","city"],
-        "Street":              ["streetbike"],
+        "Commute / Street":    ["commute","commuting","urban","city","streetbike"],
         "Sport / Canyons":     ["canyon","superbike"],
         "Racing / Trackdays":  ["racing","trackday","track day","circuit"],
     }
@@ -838,7 +972,7 @@ function submitAll() {{
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def process_entry(entry: dict) -> dict:
+def process_entry(entry: dict, dry_run: bool = False) -> dict:
     page_id      = entry["id"]
     notion_url   = f"https://www.notion.so/{page_id.replace('-','')}"
     props        = entry.get("properties", {})
@@ -898,12 +1032,15 @@ def process_entry(entry: dict) -> dict:
     result["photos_broken"] = len(broken)
 
     # Download working photos
-    brand_name = infer_brand(full_text, product_url) or "Unknown"
+    brand_name = infer_brand(full_text, product_url, name) or "Unknown"
     slug       = slugify(name)
     photo_dir  = WORKSPACE_DIR / "Photos" / slugify(brand_name) / slug
     saved_urls = []
     for i, url in enumerate(photo_urls[:7]):
         if check_image_url(url):
+            if dry_run:                     # no local writes in dry-run mode
+                saved_urls.append(url)
+                continue
             ext      = url.split("?")[0].rsplit(".",1)[-1] or "jpg"
             filename = f"{slug}-{i+1}.{ext}"
             dest     = photo_dir / filename
@@ -914,7 +1051,7 @@ def process_entry(entry: dict) -> dict:
     # ── Map fields (deterministic: keyword heuristics, no LLM) ───────────────
     # The Shopify-tags override below is authoritative for supported storefronts
     # and corrects the known keyword noise (e.g. substring "bison"/"icon").
-    brand      = infer_brand(full_text, product_url)
+    brand      = infer_brand(full_text, product_url, name)
     cats       = infer_categories(name, full_text)
     gend       = infer_gender(full_text)
     styles     = infer_riding_style(name, full_text)
@@ -948,6 +1085,8 @@ def process_entry(entry: dict) -> dict:
         "Vegan Verified":     infer_vegan_status(full_text, soup),
         "Price":              price,
     }
+    # Never send a value Notion doesn't already have as an option.
+    mapped = filter_to_schema(mapped)
 
     # ── Description (deterministic, built from mapped fields) ────────────────
     desc   = write_description(mapped)
@@ -957,6 +1096,20 @@ def process_entry(entry: dict) -> dict:
 
     # ── Write to Notion (non-destructive: only fill currently-empty fields) ──
     notion_props = build_notion_props(mapped, existing=props)
+    # Photos follow the same rule: never replace photos already on the page.
+    if not notion_field_empty(props, "Photos"):
+        saved_urls = []
+    if dry_run:
+        preview = dict(notion_props)
+        if saved_urls:
+            preview["Photos"] = {"files": [{"external": {"url": u}} for u in saved_urls[:7]]}
+        print(f"\n[dry-run] {name} ({page_id}) — would write {len(preview)} "
+              f"field(s), options from {VALID_SOURCE}:")
+        print(json.dumps(preview, indent=2, ensure_ascii=False))
+        print("[dry-run] everything inferred (fields already filled in Notion are not written):")
+        print(json.dumps(mapped, indent=2, ensure_ascii=False))
+        result["status"] = "dry-run"
+        return result
     try:
         notion.pages.update(page_id=page_id, properties=notion_props)
         upload_photos_to_notion(page_id, saved_urls)
@@ -969,14 +1122,21 @@ def process_entry(entry: dict) -> dict:
     return result
 
 
-def run_audit(page_id: "str | None" = None):
+def run_audit(page_id: "str | None" = None, dry_run: bool = False):
     """
     page_id=None (default) -> batch mode: process up to BATCH_LIMIT entries
                               with empty Description (the original behaviour).
     page_id=<id>           -> single-product mode used by the Notion webhook.
                               Skips the database query entirely.
+    dry_run=True           -> read Notion and scrape as usual, but print the
+                              properties instead of writing them; no photo
+                              downloads and no report files.
     """
-    log.info("=== VMC New Product Audit Started ===")
+    log.info("=== VMC New Product Audit Started" + (" (DRY RUN)" if dry_run else "") + " ===")
+    if not NOTION_TOKEN:
+        log.error("Set NOTION_TOKEN (or NOTION_API_KEY)")
+        sys.exit(1)
+    load_valid_options()
 
     if page_id:
         try:
@@ -998,9 +1158,17 @@ def run_audit(page_id: "str | None" = None):
 
     results = []
     for entry in entries:
-        r = process_entry(entry)
+        r = process_entry(entry, dry_run=dry_run)
         results.append(r)
         time.sleep(1.5)   # be polite to servers
+
+    if dry_run:
+        for r in results:
+            if r["status"] != "dry-run":
+                log.warning(f"[dry-run] {r['name']}: {r['status']} "
+                            f"(URL status: {r['url_status']}) {r['product_url']}")
+        log.info(f"=== Dry run done: {len(results)} product(s), nothing written ===")
+        return
 
     # ── Save reports ────────────────────────────────────────────────────────
     md_path   = WORKSPACE_DIR / f"new-product-audit-{DATE_STR}.md"
@@ -1026,5 +1194,7 @@ def run_audit(page_id: "str | None" = None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="VMC new product audit")
     parser.add_argument("--page-id", help="Process a single Notion page id (event-driven mode)")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Print the properties that would be written; change nothing")
     args = parser.parse_args()
-    run_audit(page_id=args.page_id)
+    run_audit(page_id=args.page_id, dry_run=args.dry_run)
