@@ -28,39 +28,31 @@ The only script that runs automatically. Triggered two ways:
 - Checks for a maker "Vegan" label in label-like HTML elements (headings, spec cells,
   sustainability sections) and sets `Vegan Verified = Confirmed Vegan by maker` when found
 - Keyword-infers Brand, Category, Materials, Season, Protection from page text as a fallback
-- Writes only to fields that are currently empty in Notion, Photos included — never overwrites curated data
-- Downloads and uploads up to 7 product photos as external file links
+- Writes only to fields that are currently empty in Notion — never overwrites curated data
+- Downloads and uploads up to 7 product photos as external file links, only when the page has
+  no photos yet
 - Generates a dated `.md` and `.html` report saved to `WORKSPACE_DIR`
-
-**Where the option lists come from:**
-
-At start-up the script reads the select / multi-select options straight from the Notion API
-(`load_valid_options`) and logs `Option lists source: live Notion schema`. If that request fails
-it logs a warning and uses the hardcoded `FALLBACK_VALID` dict instead
-(`Option lists source: hardcoded fallback`). When the live schema differs from the fallback it
-logs the difference, so you know when to refresh the dict.
-
-- `NOTION_DB_ID` may be the database ID or the data source ID; the fetch tries
-  `/v1/databases` and then `/v1/data_sources`.
-- Multi-value Materials options such as `Nylon, Polyester, Ripstop nylon` exist in Notion from
-  an old import. They are excluded from both the live and fallback lists, so the script never
-  picks them.
-- Keep Notion's exact spelling in `FALLBACK_VALID`, typos and trailing spaces included
-  (`Cordura® (Synhtetic fabric)`, `Waterproof (Gore-tex®) `). The API rejects anything else
-  with a 400.
 
 **Key design decisions:**
 
-- Never creates new Notion select options. `filter_to_schema` drops any inferred value that is
-  not an existing option (and logs it) before the page update is built.
+- Never creates new Notion select options. At the start of each run `load_schema_options()`
+  fetches the live option lists from the Notion API (same token and database id as the rest of
+  the script; it accepts either the database id or the `collection://` data source id) and
+  `filter_to_schema()` drops any value that is not an existing option before writing, because
+  the API returns 400 on unknown options. The log says which source was used
+  (`Schema source: live Notion schema` or `hardcoded VALID (live schema fetch failed)`) and
+  lists any drift between Notion and `VALID`.
+- `VALID` is the fallback copy of those lists, last synced 2026-11-03. It keeps Notion's exact
+  spelling, typos included (`Cordura® (Synhtetic fabric)`, the trailing space in
+  `Waterproof (Gore-tex®) `). The Materials options that are several values joined with commas
+  or semicolons exist in Notion but are left out of `VALID` and ignored in the live schema too.
+- Brand matching uses whole words (no more "icon" inside "silicon"). Trust order: store domain,
+  then product name, then page text. Brands that are also common words (Held, Icon, FIVE, Bison,
+  Stellar and a few others in `AMBIGUOUS_BRANDS`) are never taken from page text.
 - Non-destructive: `build_notion_props` receives the current page properties and skips any
-  field that already has a value. Photos are only written to pages that have none.
+  field that already has a value.
 - Shopify tags take priority over scraped text for gender, riding style, and waterproofing.
   Avoids false positives like footer cross-sell links tagging unrelated products.
-- Brand matching checks the store domain first, then the product name, then page text, always
-  on whole words (so "silicone" is not Icon and "bisonte" is not Bison). Brands that are also
-  common English words (`COMMON_WORD_BRANDS`: Held, FIVE, Icon, Stellar…) are never matched
-  from body text, only from the domain or product name.
 
 **Run manually:**
 
@@ -72,16 +64,16 @@ python3 "Scheduled audit/vmc_new_product_audit.py"
 # single-product (webhook-equivalent)
 python3 "Scheduled audit/vmc_new_product_audit.py" --page-id <notion-page-id>
 
-# dry run: scrape and print the properties it would write; no Notion writes,
-# no photo downloads, no report files. Works with or without --page-id.
+# preview only: prints inferred values and the properties it would write; no Notion
+# writes, no photo downloads, no reports
 python3 "Scheduled audit/vmc_new_product_audit.py" --page-id <notion-page-id> --dry-run
-```
 
-**Tests** (offline, stdlib `unittest`):
-
-```bash
+# tests (no network, no token)
 python3 -m unittest discover -s "Scheduled audit/tests" -v
 ```
+
+Locally the script reads `NOTION_API_KEY` / `NOTION_PRODUCTS_DB_ID` from `.env.local`; in CI it
+reads `NOTION_TOKEN` / `NOTION_DB_ID`. Reports default to the `Scheduled audit/` folder.
 
 ### `lib_anthropic.py`
 
@@ -194,9 +186,9 @@ All scripts read from `.env.local` at the project root.
 
 | Variable | Required by | Description |
 |---|---|---|
-| `NOTION_API_KEY` | Catalog expansion + data quality scripts; audit fallback | Notion integration token |
-| `NOTION_TOKEN` | `vmc_new_product_audit.py` | Same token, name used by the GitHub Action. The audit falls back to `NOTION_API_KEY`, so `.env.local` alone is enough for manual runs |
-| `NOTION_PRODUCTS_DB_ID` | All scripts | Products database ID. The audit reads `NOTION_DB_ID` first, then this |
+| `NOTION_API_KEY` | Catalog expansion + data quality scripts | Notion integration token |
+| `NOTION_TOKEN` | `vmc_new_product_audit.py` (CI) | Same token, CI name. The audit falls back to `NOTION_API_KEY` |
+| `NOTION_PRODUCTS_DB_ID` | All scripts | Products database ID |
 | `ANTHROPIC_API_KEY` | `lib_anthropic.py` | Optional. Enables LLM descriptions and vegan adjudication. Falls back to stubs if absent. |
 
 ```bash
