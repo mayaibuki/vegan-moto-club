@@ -1,15 +1,8 @@
 name: Design system
 
 on:
+  # Every pull request, so the required check always reports (it takes seconds).
   pull_request:
-    paths:
-      - "app/**"
-      - "components/**"
-      - "specs/**"
-      - "tailwind.config.ts"
-      - "scripts/token-audit.js"
-      - "scripts/spec-hex.js"
-      - ".github/workflows/design-system.yml"
   push:
     branches: [main]
     paths:
@@ -22,6 +15,7 @@ on:
 
 jobs:
   audit:
+    name: Design system audit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
