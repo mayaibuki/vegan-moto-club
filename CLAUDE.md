@@ -55,10 +55,9 @@ NEXT_PUBLIC_SITE_URL    # Canonical origin (https://www.veganmotoclub.com); code
 
 ### Rules
 
-1. **Read specs before writing UI code.** Read the relevant file in `specs/components/` and `specs/foundations/` first.
-2. **Use only tokens from `tokens.css`.** No hardcoded colors (`text-red-600`, `bg-white`, `#hex`), no arbitrary values (`h-[30px]`, `z-[100]`). Use semantic Tailwind classes or standard scale.
-3. **Run audit before committing.** `node scripts/token-audit.js` must return exit code 0.
-4. **Zero errors required** before any PR is merged.
+The rules live in `AGENTS.md` so every coding agent reads the same ones: reuse existing components before building, spec first for anything new, tokens only, run the audit. Read them before writing UI code.
+
+@AGENTS.md
 
 ### Token Layers
 
