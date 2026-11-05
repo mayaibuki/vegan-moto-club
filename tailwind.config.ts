@@ -81,6 +81,16 @@ const config: Config = {
       aspectRatio: {
         "4/3": "4 / 3",
       },
+      keyframes: {
+        // Auto-advance progress fill (FaqShowcase): grows left to right over one dwell
+        progress: {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
+      },
+      animation: {
+        progress: "progress var(--duration-dwell) linear forwards",
+      },
       transitionTimingFunction: {
         DEFAULT: "cubic-bezier(0.4, 0, 0.2, 1)",
       },

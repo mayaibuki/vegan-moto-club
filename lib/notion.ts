@@ -99,6 +99,8 @@ export interface BlogPost {
 export interface FaqItem {
   question: string;
   answer: string;
+  /** The row's Featured image, if any. Shown by FaqShowcase on the home page. */
+  image?: string;
 }
 
 // ─── Notion API response types ───────────────────────────────────
@@ -443,5 +445,5 @@ export async function getFaqs(category?: string): Promise<FaqItem[]> {
   return posts
     .filter((post) => post.type === "FAQ" && post.content !== "" && (!category || post.category === category))
     .sort((a, b) => a.publishDate.localeCompare(b.publishDate))
-    .map((post) => ({ question: post.title, answer: post.content }));
+    .map((post) => ({ question: post.title, answer: post.content, image: post.featuredImage || undefined }));
 }
