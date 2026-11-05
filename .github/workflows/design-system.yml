@@ -1,0 +1,37 @@
+name: Design system
+
+on:
+  # Every pull request, so the required check always reports (it takes seconds).
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "components/**"
+      - "specs/**"
+      - "tailwind.config.ts"
+      - "scripts/token-audit.js"
+      - "scripts/spec-hex.js"
+
+jobs:
+  audit:
+    name: Design system audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Token audit (no hardcoded colours or arbitrary values)
+        run: node scripts/token-audit.js
+
+      - name: Colour spec matches its HSL values
+        run: |
+          node scripts/spec-hex.js
+          git diff --exit-code specs/foundations/color.md || {
+            echo "::error file=specs/foundations/color.md::Hex column is out of date. Run 'node scripts/spec-hex.js' and commit the result."
+            exit 1
+          }
