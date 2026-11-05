@@ -15,6 +15,7 @@ All motion primitives are defined in `app/tokens.css` with semantic aliases for 
 | `--ds-duration-fast`  | 150ms  | `duration-150`  | Micro-interactions: color changes, opacity   |
 | `--ds-duration-normal`| 200ms  | `duration-200`  | Standard transitions: hover states, focus    |
 | `--ds-duration-slow`  | 300ms  | `duration-300`  | Layout transitions: accordion, slide, expand |
+| `--ds-duration-dwell` | 10s    | `animate-progress` | How long an auto-advancing item stays open (FaqShowcase). Not a transition duration |
 
 ### Semantic Aliases
 
@@ -23,6 +24,7 @@ All motion primitives are defined in `app/tokens.css` with semantic aliases for 
 | `--duration-fast`  | `--ds-duration-fast`   | 150ms  | Immediate feedback (color, opacity)|
 | `--duration-normal`| `--ds-duration-normal` | 200ms  | Default transition duration        |
 | `--duration-slow`  | `--ds-duration-slow`   | 300ms  | Spatial movement (position, size)  |
+| `--duration-dwell` | `--ds-duration-dwell`  | 10s    | Auto-advance timer (see Auto-advance below) |
 
 ---
 
@@ -121,6 +123,33 @@ Use for fade-in/fade-out effects on tooltips, overlays, and notifications.
 
 ---
 
+### Media Crossfade (slow)
+
+Swapping one large photo for another. 150ms reads as a flash at this size, so photo crossfades use the slow duration. All images sit stacked in one frame; only the visible one has `opacity-100`.
+
+```html
+<img class="absolute inset-0 object-cover transition-opacity duration-300 opacity-100" />
+<img class="absolute inset-0 object-cover transition-opacity duration-300 opacity-0" />
+```
+
+### Auto-advance (dwell)
+
+The one exception to "UI transitions only". A set of items opens one after another on a timer, with a 1px progress fill showing the time left. Used only by `FaqShowcase` on the home page.
+
+```html
+<div class="relative h-px overflow-hidden bg-border">
+  <div class="absolute inset-0 origin-left bg-primary-text animate-progress"></div>
+</div>
+```
+
+- `animate-progress` = the `progress` keyframe (`scaleX(0)` to `scaleX(1)`) over `--duration-dwell`, linear. Linear on purpose: it is a clock, not a movement, so the single easing curve does not apply.
+- The animation is the timer. `animationend` opens the next item; pausing is `animation-play-state: paused`.
+- Allowed only from `lg` up, only while the block is on screen (IntersectionObserver), paused on hover and keyboard focus, and stopped for good once the reader opens an item.
+- Off under `prefers-reduced-motion: reduce`. Do not render the fill at all: the global rule shortens animations to 0.01ms, which would fire `animationend` at once and cycle the items.
+- The fill is `bg-primary-text`, not `bg-primary`: lime-500 on the page colour is under 3:1.
+
+---
+
 ## Tailwind Transition Utilities Reference
 
 | Utility               | Properties Transitioned                                                  | When to Use                |
@@ -173,7 +202,7 @@ The design system includes opacity primitives for disabled and muted states:
      }
    }
    ```
-5. **No decorative animations.** Motion is purely functional -- providing feedback for user interactions. Avoid loading animations, bouncing elements, or continuous motion.
+5. **No decorative animations.** Motion is purely functional -- providing feedback for user interactions. Avoid loading animations, bouncing elements, or continuous motion. The single exception is the Auto-advance pattern above, with its limits.
 6. **One easing curve.** Use the default `cubic-bezier(0.4, 0, 0.2, 1)` for all transitions. The curve is registered as Tailwind's default `transitionTimingFunction` in `tailwind.config.ts`, so no `ease-[...]` class is needed (the audit warns on it). Do not introduce custom easing curves without design review.
 
 ---
@@ -192,6 +221,9 @@ Every motion in the product, with its trigger and reduced-motion behaviour. Only
 | Promo banner | Dismiss | `grid-template-rows` 1fr to 0fr, `opacity` | 300ms | `--ease` | Computed duration is 0, so the banner is removed immediately without waiting for `transitionend` |
 | Theme toggle icon | Click | `opacity`, `transform` (rotate + scale); both icons cross-fade | 150ms | `--ease` | Instant swap; no page-wide transition |
 | Nav link underline | Hover / current page | `text-decoration-color` (transparent to `decoration-primary`) | 150ms | `--ease` | Instant; no layout change |
+| FaqShowcase panel | Open / close a question | `grid-template-rows` (`grid-rows-closed` / `grid-rows-open`), chevron `transform` (rotate 180°) | 300ms | `--ease` | Instant |
+| FaqShowcase photo (lg+) | Open question changes | `opacity` crossfade | 300ms | `--ease` | Instant swap |
+| FaqShowcase progress (lg+) | Auto-advance while on screen | `transform` (`scaleX`) via `animate-progress` | `--duration-dwell` (10s) | linear | Not rendered; no auto-advance |
 | Page background (ShaderBackground) | Continuous | WebGL grain gradient (Paper Shaders), see `specs/components/shader-background.md` | Shader `speed={1}` | n/a | Shader `speed={0}`: a static gradient |
 
 ### Implementation notes

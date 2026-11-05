@@ -11,7 +11,7 @@
 
 An always-open list of questions and answers fed by FAQ rows in the Notion Blog database (`getFaqs(category)` in `lib/notion.ts`). The text stays visible so search engines and AI crawlers can quote it, and the FAQPage JSON-LD is generated from the same items so the two cannot drift. No accordion: nothing to open, no JavaScript, no motion.
 
-Used on the home page (Category "General"), `/verification` ("Verification"), each category landing page (the gear category name) and grouped on `/blog`.
+Used on `/verification` ("Verification"), each category landing page (the gear category name), the guides, and grouped on `/blog`. The home page uses the progressive-disclosure variant, `FaqShowcase` (`specs/components/faq-showcase.md`), fed by the same rows (Category "General").
 
 ## Anatomy
 

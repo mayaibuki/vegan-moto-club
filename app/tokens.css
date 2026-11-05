@@ -123,6 +123,7 @@
   --ds-duration-fast:   150ms;
   --ds-duration-normal: 200ms;
   --ds-duration-slow:   300ms;
+  --ds-duration-dwell:  10s;     /* how long an auto-advancing item stays before the next one opens */
   --ds-ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ---- Opacity Primitives ---- */
@@ -234,6 +235,7 @@
   --duration-fast:   var(--ds-duration-fast, 150ms);
   --duration-normal: var(--ds-duration-normal, 200ms);
   --duration-slow:   var(--ds-duration-slow, 300ms);
+  --duration-dwell:  var(--ds-duration-dwell, 10s);
   --ease:            var(--ds-ease-default);
 
   /* ---- Component-Specific Sizing ---- */

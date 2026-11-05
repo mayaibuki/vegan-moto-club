@@ -1,6 +1,6 @@
 import { getProducts, getEvents, getFaqs } from "@/lib/notion"
 import { JsonLd } from "@/components/JsonLd"
-import { FaqSection } from "@/components/FaqSection"
+import { FaqShowcase } from "@/components/FaqShowcase"
 import { ProductCard } from "@/components/ProductCard"
 import { EventCard } from "@/components/EventCard"
 import { Card, CardContent } from "@/components/ui/card"
@@ -182,9 +182,10 @@ export default async function Home() {
       </section>
 
       {/* Product Suggestion Form Section */}
-      <FaqSection items={faqs} title="Common questions" />
-
       <SuggestProductForm />
+
+      {/* Common Questions: last section before the footer */}
+      <FaqShowcase items={faqs} title="Common Questions" />
       </div>
     </>
   )

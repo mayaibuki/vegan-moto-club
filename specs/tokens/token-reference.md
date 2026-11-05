@@ -275,6 +275,7 @@ The project also maintains the **shadcn/ui variable convention** (`--background`
 | `--duration-fast` | `150ms` | `duration-150` | Micro-interactions |
 | `--duration-normal` | `200ms` | `duration-200` | Color/shadow transitions |
 | `--duration-slow` | `300ms` | `duration-300` | Layout, transform transitions |
+| `--duration-dwell` | `10s` | `animate-progress` | Auto-advance timer (FaqShowcase progress fill) |
 
 ### Easing
 
