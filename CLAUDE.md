@@ -107,3 +107,9 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [x] OG image (`/public/og-image.png`, generator script pattern: sharp + SVG)
 - [x] Store link + price audit pipeline (`Scheduled audit/link_check/`, see its README)
 - [x] Grain gradient shader page background (`components/ShaderBackground.tsx`, Paper Shaders, colours from `--background` + `--primary`)
+
+<!-- claude-reflect: learned rules (saved from the band; edit freely) -->
+## Learned rules
+- Rate Level of Protection: level 1 armor is moderately protective; level 2 armor or AA is mostly protected; AAA or level 2 racing gear is most protective.
+- Treat all Anderson Mountain Bags products as confirmed vegan by maker, since the brand and its owner are vegan.
+<!-- end claude-reflect -->
