@@ -115,7 +115,7 @@ export const CATEGORY_PAGES: CategoryPage[] = [
       "Rain layers, base and thermal layers, luggage and other vegan motorcycle gear that does not fit the protective categories, free of animal materials.",
     intro: [
       "This page covers gear that does not fit the protective categories: rain jackets and pants without armor, base and thermal layers, casual clothing, luggage and bags, and a few accessories.",
-      "Each item is checked for leather, wool, down, and silk, the same way as the rest of the catalog. Where a maker states that a product is vegan, we quote it. Anything uncertain is noted on the product page.",
+      "Every item listed here is free of leather, wool, down, and silk, checked the same way as the rest of the catalog. The materials and vegan status are listed on each product.",
       "These items carry no CE garment class and are not protective on their own. Rain and base layers are meant to be worn over or under rated gear, not in place of it.",
     ],
   },
