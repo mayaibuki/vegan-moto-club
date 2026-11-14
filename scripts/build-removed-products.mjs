@@ -44,7 +44,8 @@ const CATEGORY_SLUGS = {
   Pants: "/vegan-motorcycle-pants",
   "Racing Suits": "/vegan-motorcycle-racing-suits",
   Protection: "/vegan-motorcycle-protection",
-  "Street wear": "/vegan-motorcycle-street-wear",
+  Other: "/other-vegan-motorcycle-gear",
+  "Street wear": "/other-vegan-motorcycle-gear", // retired category, kept so old audit data resolves
 }
 
 const trashedIds = new Set([...read("trash_ids.json"), ...read("trash_louise.json")])

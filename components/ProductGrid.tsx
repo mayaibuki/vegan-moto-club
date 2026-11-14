@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { Search, X, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
+import { CATEGORY_PAGES } from "@/lib/constants"
 import { ProductCard } from "./ProductCard"
 import { Product } from "@/lib/notion"
 import {
@@ -288,7 +289,7 @@ export function ProductGrid({ products }: ProductGridProps) {
             <RadioGroupItem value="all" id="category-all" />
             <span>All Categories</span>
           </Label>
-          {["Gloves", "Jackets", "Boots", "Pants", "Racing Suits", "Protection", "Street wear"].map((category) => (
+          {CATEGORY_PAGES.map((page) => page.category).map((category) => (
             <Label key={category} htmlFor={`category-${category}`} className={optionRow}>
               <RadioGroupItem value={category} id={`category-${category}`} />
               <span>{category}</span>

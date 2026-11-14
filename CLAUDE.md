@@ -36,6 +36,7 @@ lib/
   notion.ts        Notion API client, typed interfaces, cached fetchers
   utils.ts         cn(), formatPrice(), formatDate(), filterProducts()
 docs/brand-voice.md   Voice rules for product copy (used by .claude/agents/gear-writer and marketing:brand-review)
+docs/category-rules.md  Which Notion Category a product gets (Jackets, Pants, Protection, Other, ...)
 .claude/agents/       gear-researcher, gear-writer, gear-verifier subagents for the enrichment task
 ```
 
