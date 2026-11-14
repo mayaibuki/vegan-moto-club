@@ -20,7 +20,7 @@ export function RelatedProducts({
     .filter((p) => p.id !== currentProduct.id)
     .map((p) => {
       let score = 0
-      if (p.category === currentProduct.category) score += 3
+      if (currentProduct.category !== "Other" && p.category === currentProduct.category) score += 3
       const sharedStyles = p.ridingStyle.filter((s) =>
         currentProduct.ridingStyle.includes(s)
       )

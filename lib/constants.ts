@@ -29,6 +29,8 @@ export interface CategoryPage {
   title: string
   description: string
   intro: string[]
+  /** Short label for the footer and chips when the title does not shorten cleanly. */
+  navLabel?: string
 }
 
 export const CATEGORY_PAGES: CategoryPage[] = [
@@ -105,15 +107,16 @@ export const CATEGORY_PAGES: CategoryPage[] = [
     ],
   },
   {
-    slug: "vegan-motorcycle-street-wear",
-    category: "Street wear",
-    title: "Vegan Motorcycle Street Wear",
+    slug: "other-vegan-motorcycle-gear",
+    category: "Other",
+    title: "Other Vegan Motorcycle Gear",
+    navLabel: "Other",
     description:
-      "Casual riding gear without animal materials: armored hoodies, riding shirts, and street clothing with abrasion-resistant linings.",
+      "Rain layers, base and thermal layers, luggage and other vegan motorcycle gear that does not fit the protective categories, free of animal materials.",
     intro: [
-      "Street wear covers the casual end of protective gear: hoodies, flannels, and shirts with hidden aramid linings and low-profile armor. It trades some protection for comfort and looks, which makes it popular for short city rides.",
-      "Each item listed is free of leather, wool, and down. Protection levels vary widely in this category, so check the armor and lining details before relying on a garment for serious riding.",
-      "Armored hoodies and shirts are rated under EN 17092 like any jacket, and most land in class A or AA. Anything without a printed class has not been tested as protective clothing.",
+      "This page covers gear that does not fit the protective categories: rain jackets and pants without armor, base and thermal layers, casual clothing, luggage and bags, and a few accessories.",
+      "Every item listed here is free of leather, wool, down, and silk, checked the same way as the rest of the catalog. The materials and vegan status are listed on each product.",
+      "These items carry no CE garment class and are not protective on their own. Rain and base layers are meant to be worn over or under rated gear, not in place of it.",
     ],
   },
 ]

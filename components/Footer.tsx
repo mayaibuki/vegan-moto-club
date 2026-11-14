@@ -61,7 +61,7 @@ export function Footer() {
               {CATEGORY_PAGES.map((page) => (
                 <li key={page.slug}>
                   <Link href={`/${page.slug}`} className="inline-flex min-h-11 items-center hover:underline underline-offset-4 decoration-primary decoration-2 transition-colors focus-ring">
-                    {page.title.replace(/^Vegan Motorcycle /, "")}
+                    {page.navLabel ?? page.title.replace(/^Vegan Motorcycle /, "")}
                   </Link>
                 </li>
               ))}

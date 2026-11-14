@@ -23,6 +23,12 @@ export async function generateStaticParams() {
   }))
 }
 
+/** Category as a word in prose. "Other" is a catch-all label, not a noun. */
+function categoryPhrase(category: string): string {
+  const first = splitCategories(category)[0]
+  return !first || first === "Other" ? "gear" : category
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -46,7 +52,7 @@ export async function generateMetadata({
 
   const description = product.description
     ? truncateAtWord(product.description)
-    : truncateAtWord(`${product.name} by ${product.brand} - Vegan ${product.category} for motorcycle riders.${keyFeatures ? ` ${keyFeatures}.` : ""} Cruelty-free and ethical gear.`)
+    : truncateAtWord(`${product.name} by ${product.brand} - Vegan ${categoryPhrase(product.category)} for motorcycle riders.${keyFeatures ? ` ${keyFeatures}.` : ""} Cruelty-free and ethical gear.`)
 
   const brand = product.brand.trim().toLowerCase()
   const displayTitle =
@@ -121,7 +127,7 @@ export default async function ProductDetailPage({
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.description || `${product.name} - Vegan ${product.category}`,
+    description: product.description || `${product.name} - Vegan ${categoryPhrase(product.category)}`,
     ...(product.photos.length > 0 ? { image: product.photos.map(absoluteUrl) } : {}),
     brand: {
       "@type": "Brand",
@@ -174,7 +180,7 @@ export default async function ProductDetailPage({
               <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden">
                 <Image
                   src={notionImageUrl(product.photos[0], 1200)}
-                  alt={`${product.name} by ${product.brand} - ${product.category || "motorcycle gear"}`}
+                  alt={`${product.name} by ${product.brand} - ${categoryPhrase(product.category)}`}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"

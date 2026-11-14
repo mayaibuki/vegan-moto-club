@@ -5,11 +5,26 @@ const removedProducts = require('./lib/removed-products.json')
 const nextConfig = {
   reactStrictMode: true,
   async redirects() {
-    return Object.entries(removedProducts).map(([slug, destination]) => ({
+    const removed = Object.entries(removedProducts).map(([slug, destination]) => ({
       source: `/products/${slug}`,
       destination,
       permanent: true,
     }))
+    // "Street wear" was retired on 2026-11-14. Most of its products are now Jackets.
+    return [
+      {
+        source: '/vegan-motorcycle-street-wear',
+        destination: '/vegan-motorcycle-jackets',
+        permanent: true,
+      },
+      {
+        source: '/products',
+        has: [{ type: 'query', key: 'category', value: 'Street wear' }],
+        destination: '/products?category=Jackets',
+        permanent: true,
+      },
+      ...removed,
+    ]
   },
   experimental: {
     serverComponentsExternalPackages: ['sharp'],

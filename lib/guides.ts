@@ -76,7 +76,7 @@ export const GUIDES: Guide[] = [
           "Not on its own. EN 17092 rates the finished garment, including seams and construction. A 1000D shell often reaches AA or AAA, but the class on the label is the only reliable figure.",
       },
     ],
-    relatedCategories: ["vegan-motorcycle-jackets", "vegan-motorcycle-pants", "vegan-motorcycle-street-wear"],
+    relatedCategories: ["vegan-motorcycle-jackets", "vegan-motorcycle-pants"],
     sources: [
       { label: "Cordura fabric technologies, Invista", url: "https://www.cordura.com/en/technologies" },
       { label: "EN 17092 series overview, CEN", url: "https://standards.cencenelec.eu/" },
