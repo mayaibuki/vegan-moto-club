@@ -23,14 +23,16 @@ Run 4 to 6 searches with WebSearch (mode "standard" first, "extended" only when 
 
 Read the top results with WebFetch. On a retailer page, read the review tab. On YouTube, read the page title, description and any transcript text the page exposes. Never download media. Use Bash only for curl when WebFetch is blocked.
 
-Stop after about 12 page reads. Pads are worse than gaps.
+Always read the product's own customer reviews first, before the searches: the review section on the maker's product page, then the same product's review tab on revzilla.com, cyclegear.com, fortnine.ca and sportsbikeshop.co.uk when it is sold there. If a page only loads its reviews in a browser, open it in the browser and expand the review list. Record the review count and average rating per site in `notes`. Reviews hosted on the maker's own site are `type: maker_site_review`, `independence: unknown` (the maker moderates them): use them for fit, sizing and recurring complaints, and count them toward a consensus only when an independent source says the same.
+
+Stop after about 12 page reads beyond those review sections. Pads are worse than gaps.
 
 ## Judge every source
 
 For each source record:
 
 - `url`
-- `type`: owner_post, forum_thread, retailer_review, youtube, press, maker, other
+- `type`: owner_post, forum_thread, retailer_review, maker_site_review, youtube, press, maker, other
 - `date` if visible
 - `independence`: `independent`, `affiliate_or_sponsored`, or `unknown`, with a one-line `reason`
 - `ownership_length` if stated (unboxing, weeks, months, seasons)
