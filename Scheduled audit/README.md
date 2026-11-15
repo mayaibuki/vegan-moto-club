@@ -21,8 +21,11 @@ enrichment.
 
 A desktop scheduled task in Claude Code enriches new rows daily at 05:00 local while the Claude
 app is open.
-Its prompt lives at `~/.claude/scheduled-tasks/vmc-product-enrichment/SKILL.md`; the manual entry
-point is `/refine-products [page ids]`.
+The rules live at `.claude/skills/vmc-product-enrichment/SKILL.md`, shared by both runners; the
+manual entry point is `/refine-products [page ids]`. A cloud scheduled task (daily 19:00 UTC) is
+the fallback for when the Mac is off; it skips when the Notion run log shows a run today. The
+pasteable task bodies are `Scheduled audit/desktop-task-prompt.md` and
+`Scheduled audit/cloud-task-prompt.md`.
 
 Per row it runs three project subagents from `.claude/agents/`: `gear-researcher` (Reddit, forums,
 YouTube and retailer reviews, with sponsored sources labelled and discounted), `gear-writer` (the
