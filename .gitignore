@@ -43,7 +43,9 @@ tsconfig.tsbuildinfo
 # Claude / AI tooling
 .agents/
 .claude/dev.sh
-.claude/skills/
+.claude/skills/*
+!.claude/skills/vmc-product-enrichment/
+!.claude/skills/humanizer/
 skills-lock.json
 .playwright-mcp/
 
@@ -53,6 +55,8 @@ Scheduled audit/Photos/
 Scheduled audit/__pycache__/
 Scheduled audit/*.html
 Scheduled audit/*.md
+!Scheduled audit/desktop-task-prompt.md
+!Scheduled audit/cloud-task-prompt.md
 Scheduled audit/link_check/runs/
 Scheduled audit/link_check/__pycache__/
 Scheduled audit/discovery/*/
