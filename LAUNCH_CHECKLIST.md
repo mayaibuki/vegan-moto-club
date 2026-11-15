@@ -40,6 +40,6 @@ Recurring tasks to keep the live site healthy.
 ## Automation Health
 
 - [ ] Verify `vmc_product_audit.py` is running daily and producing reports
-- [ ] Verify `vmc_new_product_audit.py` is running daily and enriching new submissions
+- [ ] Verify the `vmc-product-enrichment` task is running daily and enriching new submissions
 - [ ] Review audit HTML reports for false positives or missed fields
 - [ ] Check that automation respects schema constraints (no new select options created)

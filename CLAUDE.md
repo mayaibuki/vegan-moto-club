@@ -107,6 +107,7 @@ See `specs/` — `foundations/` (color, spacing, typography, radius, elevation, 
 - [x] OG image (`/public/og-image.png`, generator script pattern: sharp + SVG)
 - [x] Store link + price audit pipeline (`Scheduled audit/link_check/`, see its README)
 - [x] Grain gradient shader page background (`components/ShaderBackground.tsx`, Paper Shaders, colours from `--background` + `--primary`)
+- [x] Retired the webhook-triggered Python product audit (2026-11-14); the daily `vmc-product-enrichment` task is the only enrichment pass, the Notion webhook only refreshes the site cache
 
 <!-- claude-reflect: learned rules (saved from the band; edit freely) -->
 ## Learned rules
