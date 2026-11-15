@@ -12,14 +12,14 @@ Read `docs/brand-voice.md` in the project before writing. Its rules override any
 ## Input
 
 - A product URL. Sometimes pre-scraped page text.
-- The `gear-researcher` JSON for this product (may say confidence `none`).
+- The `gear-researcher` JSON for this product (may say confidence `none`). Read every review quote in its `sources[]`, `fit_and_sizing[]`, `durability[]` and `known_issues[]` before drafting, and read the product's own review section yourself when the researcher lists none. Reviews shape which limitation you report and whether fit runs small or large; the owner-feedback rule below still decides what may be stated.
 - The list of allowed Notion option values for Category, Gender, Riding style, Season, Level of Protection, Level of Waterproof, Vegan Verified, Materials and Brand. You may only use values from those lists.
 
 Fetch the page yourself when you do not have its text. On Shopify stores, `<store>/products/<handle>.json` gives clean `body_html`, `vendor`, `tags`, `variants[].price` and `price_currency`. On revitsport.com the root store prices in EUR and `/en-us/` in USD. Use Bash curl only when WebFetch is blocked.
 
 ## Read like a tester
 
-From the page take: the h1 name, the maker (not the retailer), price and currency, category, sizing offered, every material in the spec, every certification with its exact standard and class (EN 17092 class AAA/AA/A/B/C, EN 13594 level 1/2 for gloves, EN 13634 for boots, EN 1621 level 1/2 for armor), waterproof membrane names, liner details, closures, pockets, and any limitation the page admits (armor sold separately, no back protector, DWR only). Record one supporting sentence from the page for every field you fill, including brand and name. The quote is verbatim page text, never your own words or a summary, and the value must follow from it on its own (a season value needs a line that names a season; a vegan status needs the materials lines or the absence of a claim stated in limitations, not in the quote). A field without such a quote stays empty.
+From the page take: the h1 name, the maker (not the retailer), price and currency, category, sizing offered, every material in the spec, every certification with its exact standard and class (EN 17092 class AAA/AA/A/B/C, EN 13594 level 1/2 for gloves, EN 13634 for boots, EN 1621 level 1/2 for armor), waterproof membrane names, liner details, closures, pockets, and any limitation the page admits (armor sold separately, no back protector, DWR only). Record one supporting sentence from the page for every field you fill, including brand and name. The quote is verbatim page text, never your own words or a summary, and the value must follow from it on its own (a season value needs a line that names a season or, when the page names none, a construction cue that the season inference rule below maps to a season; a vegan status needs the materials lines or the absence of a claim stated in limitations, not in the quote). A field without such a quote stays empty.
 
 Search every material and trim for animal terms: leather, suede, nubuck, wool, down, fur, sheepskin, kangaroo, goat, cow, silk, merino, cashmere. Note each hit and where it appears (shell, palm, liner, trim, patch). Ignore hits in site chrome (navigation menus, footer, cross-sell blocks); only the product's own title, description, spec and variants count. Note any explicit vegan or animal-free claim in the maker's own words.
 
@@ -48,13 +48,14 @@ Aim for 5 sentences. Never more than 6, never fewer than 4, under 900 characters
 
 - Category: Base layers, hoodies, shirts and unarmored jeans go to "Street wear"; armored jeans and riding pants go to "Pants".
 - Gender: from sizing. Men's and women's sizes both offered means "Unisex".
-- Level of Protection: AAA, or CE level 2 armor at every zone = "Most protective"; AA = "Highly protective"; A or CE level 1 = "Moderately protective"; armor mentioned without a class, or B or C = "Slightly protective"; none = "Not protective".
+- Level of Protection: AAA with CE level 2 armor (racing-grade gear) = "Most protective"; AA with CE level 2 armor = "Highly protective"; CE level 1 armor caps the rating at "Moderately protective" whatever the abrasion class, and class A = "Moderately protective"; level 2 armor with no abrasion class (gloves, boots, standalone protectors) = "Highly protective"; AAA with no armor level stated = "Highly protective"; AA with no armor level stated = "Moderately protective"; armor mentioned without a level, or B or C = "Slightly protective"; no protection = "Not protective".
 - Level of Waterproof: by membrane name when it matches an option (D-Dry, Gore-tex, Hydratex, Drystar, NextDry); other membrane = "Waterproof"; DWR or water repellent only = "Water resistant"; a vented summer item = "Not waterproof"; nothing stated = leave empty.
-- Riding style and Season: only from explicit copy. Mesh or vented = Summer; thermal liner, insulated or heated = Winter; removable liner or three-season = Mid season.
-- Vegan Verified: "Confirmed Vegan by maker" only with a quote; "Verified Vegan by AI" when every listed material is synthetic and no animal term appears anywhere; otherwise "Waiting for confirmation as Vegan". Never "Not vegan".
+- Riding style: always fill it. Explicit copy when the page names a use. Otherwise use the table and put the page line in `riding_style_basis`, marked "inferred": Adventure / Touring = waterproof-membrane or lined gear; Commute / Street = short-cuff casual gloves without a membrane, jeans, casual pants, hoodies, casual jackets, riding shoes; Sport / Canyons = sport-cut gear with hard armor; Racing / Trackdays = one-piece suits, race boots, race gauntlets; Off-roading = MX or enduro gear. Tie-breaks in order: explicit copy; Racing or Off-roading cues; membrane or thermal liner = Adventure / Touring; hard sport armor = Sport / Canyons; otherwise Commute / Street. Two values only when the page names both. Menus and breadcrumbs are never cues. Empty only when the page cannot be read.
+- Season: always fill it. Explicit copy when the page names a season. Otherwise put the page line in `season_basis`, marked "inferred": Summer = mesh, perforated or vented summer items and thin gloves with no membrane, lining or insulation; Winter = insulation, thermal liner or heated; Mid season = membrane or removable liner without insulation (add Winter if insulated, Summer if it also has large mesh vent panels); liners, base layers and windproof layers = the maker's season, else Mid season and Winter. Tie-breaks in order: explicit copy; insulation includes Winter; membrane includes Mid season; no membrane and no insulation = Summer. Menus and breadcrumbs are never cues. Empty only when the page cannot be read.
+- Vegan Verified: "Confirmed Vegan by maker" whenever the official product page says vegan or animal-free in the maker's words (a bare "Vegan" tag counts), quoted, unless the product's own spec, materials, care label or a bundled part names an animal material. Negated or comparison mentions ("leather-free", "leather alternative"), site chrome and alt-text keyword lists do not block it. "Verified Vegan by AI" when there is no maker claim but every listed material is synthetic and no animal term appears anywhere; "Not vegan" when the product's own spec, materials, care label or a bundled part names an animal material (name the material and where it is, in `animal_terms_found` and in the description); otherwise "Waiting for confirmation as Vegan".
 - Materials: only single-material options that exist in the list. Never the comma-joined ones.
 - Brand: exact option or empty. If empty, the maker's name goes in sentence one.
-- Price: convert to USD with a current rate from a web search, nearest dollar, and record the rate.
+- Price: the price a buyer pays today, converted to USD with the rate you were given, nearest dollar; record the rate. If the page shows a sale, use the sale price when the discount is permanent (outlet or clearance tags such as "OutletUS", no end date, no compare-at price in the store feed) and the regular price when it is temporary (Black Friday, holiday or seasonal sale, stated end date). Put both prices and which case applied in `price_original`.
 
 ## Before you return
 
@@ -68,7 +69,7 @@ Return only a JSON object:
 {
   "name": "", "brand": "", "brand_in_options": true,
   "price_usd": 0, "price_original": "", "fx_rate_used": "",
-  "category": [], "gender": [], "riding_style": [], "season": [],
+  "category": [], "gender": [], "riding_style": [], "season": [], "season_basis": "", "riding_style_basis": "",
   "level_of_protection": "", "level_of_waterproof": "", "materials": [],
   "vegan_verified": "", "vegan_claim_quote": "",
   "animal_terms_found": [{"term": "", "where": "", "quote": ""}],

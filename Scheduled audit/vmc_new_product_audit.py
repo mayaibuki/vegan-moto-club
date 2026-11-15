@@ -524,13 +524,25 @@ def infer_gender(full_text: str) -> list[str]:
     return g or ["Unisex"]
 
 def infer_protection(full_text: str) -> "str | None":
-    if any(k in full_text for k in ["ce level 2","cat ii level 2","level 2"]):
-        return "Most protective"
-    if any(k in full_text for k in ["ce level 1","cat ii level 1","level 1"]):
-        return "Highly protective"
-    if any(k in full_text for k in ["armor","armour","protector","protection","d3o","sas-tec"]):
+    # Owner rule (2026-11-11): level 1 armor caps the rating at Moderately;
+    # Highly needs AA plus level 2 armor; Most needs AAA plus level 2 armor.
+    t = full_text
+    aaa = re.search(r"\baaa\b", t) is not None
+    aa = (not aaa) and re.search(r"\baa\b", t) is not None
+    class_a = re.search(r"class a\b", t) is not None
+    lvl2 = any(k in t for k in ["ce level 2", "cat ii level 2", "level 2"])
+    lvl1 = any(k in t for k in ["ce level 1", "cat ii level 1", "level 1"])
+    if lvl1:
         return "Moderately protective"
-    if any(k in full_text for k in ["jacket","glove","pant","boot"]):
+    if lvl2:
+        return "Most protective" if aaa else "Highly protective"
+    if aaa:
+        return "Highly protective"
+    if aa or class_a:
+        return "Moderately protective"
+    if any(k in t for k in ["armor", "armour", "protector", "protection", "d3o", "sas-tec"]):
+        return "Slightly protective"
+    if any(k in t for k in ["jacket", "glove", "pant", "boot"]):
         return "Slightly protective"
     return None
 
