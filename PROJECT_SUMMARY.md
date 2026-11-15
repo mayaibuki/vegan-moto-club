@@ -61,9 +61,9 @@ Curated database of vegan motorcycle gear. Live at https://veganmotoclub.com. Ne
 - Stable notion-image proxy prevents cache churn
 
 ## Automations (Scheduled audit/)
-Two Python scripts run daily:
+Automations:
 1. `vmc_product_audit.py` — Audits existing Notion product entries. Scrapes product URLs with BeautifulSoup, maps fields using keyword matching (never creates new select options), writes dated .md + .html reports.
-2. `vmc_new_product_audit.py` — Enriches new user-submitted products (URL present, Description empty). Scrapes, writes humanized description, downloads photos, sets Vegan Verified = "Verified Vegan by AI". Batch limit 20/run. Outputs daily reports.
+2. `vmc-product-enrichment` — daily Claude Code scheduled task that enriches new and user-submitted products (research, description, photos, vegan status). It replaced the retired Python new-product audit (2026-11-14). The Notion webhook only refreshes the site cache.
 See `Scheduled audit/README.md` for full details.
 
 ## Environment Variables

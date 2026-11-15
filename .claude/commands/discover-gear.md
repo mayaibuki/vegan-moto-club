@@ -13,7 +13,7 @@ Field mapping, description rules, photo rules and the green gate live in `~/.cla
 - Never create select options, Materials included. Use the live option lists only.
 - One row per model. Colourways of a model are duplicates. Men's and women's versions, and a jacket and its matching pants, are separate models.
 - You coordinate only. You do not scrape or draft. Every agent call passes `model: "opus"`.
-- Never call the Anthropic API or `Scheduled audit/lib_anthropic.py`.
+- Never call the Anthropic API.
 - New agent files register only at session start. If `gear-vegan-expert` or `gear-photo-finder` is not available as a subagent type, use `general-purpose` with `model: "opus"` and tell it to read the matching file in `.claude/agents/` and follow it.
 
 ## Waves

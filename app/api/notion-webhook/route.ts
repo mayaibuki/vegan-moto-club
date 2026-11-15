@@ -1,3 +1,5 @@
+// Notion webhook: refreshes the site's cached Notion data (products, events, blog)
+// when a page changes. Verifies Notion's signature, then revalidates cache tags.
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import crypto from "crypto";
@@ -5,10 +7,6 @@ import crypto from "crypto";
 export const runtime = "nodejs";
 
 const NOTION_WEBHOOK_SECRET = process.env.NOTION_WEBHOOK_SECRET;
-const GH_TOKEN = process.env.GH_DISPATCH_TOKEN;
-const GH_OWNER = process.env.GH_OWNER || "mayaibuki";
-const GH_REPO  = process.env.GH_REPO  || "vegan-moto-club";
-const GH_WORKFLOW = process.env.GH_WORKFLOW || "product-audit.yml";
 
 // Cache tags used by the fetchers in lib/notion.ts, keyed by the database they read.
 const DB_TAGS: Array<[string | undefined, string]> = [
@@ -25,7 +23,7 @@ type NotionEvent = {
   data?: { id?: string; parent?: NotionParent };
 };
 
-// Edits made by integrations (the daily enrichment task, the product audit action)
+// Edits made by integrations (the daily enrichment task)
 // arrive in bursts of dozens of events. Each one used to clear the products cache,
 // so the next visitors all triggered a full Notion re-fetch at once and hit 429s.
 // Those edits can wait for the hourly refresh; human edits and structural events
@@ -58,24 +56,6 @@ function verifySignature(rawBody: string, signature: string | null): boolean {
     return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig));
   } catch {
     return false;
-  }
-}
-
-async function dispatchWorkflow(pageId: string) {
-  if (!GH_TOKEN) throw new Error("GH_DISPATCH_TOKEN not configured");
-  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${GH_TOKEN}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
-    body: JSON.stringify({ ref: "main", inputs: { page_id: pageId } }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`GitHub dispatch failed: ${res.status} ${body}`);
   }
 }
 
@@ -120,25 +100,5 @@ export async function POST(req: NextRequest) {
     console.log("[notion-webhook] skipped cache refresh for bot edit", eventType, payload.entity?.id || payload.data?.id);
   }
 
-  // The product audit only runs for new pages and content edits.
-  if (!/page\.(created|content_updated)/.test(eventType)) {
-    return NextResponse.json({ ok: true, event: eventType, revalidated, dispatched: false });
-  }
-
-  const pageId = payload.entity?.id || payload.data?.id;
-  if (!pageId) {
-    return NextResponse.json({ error: "no page id in payload" }, { status: 400 });
-  }
-
-  // Always acknowledge with 200 once the event is verified. Notion pauses the
-  // subscription after sustained non-2xx responses, and a failed GitHub
-  // dispatch is our problem, not a delivery problem. The weekly cron in
-  // product-audit.yml picks up anything missed here.
-  try {
-    await dispatchWorkflow(pageId);
-  } catch (e) {
-    console.error("dispatchWorkflow failed", e);
-    return NextResponse.json({ ok: true, revalidated, dispatched: false, error: String(e) });
-  }
-  return NextResponse.json({ ok: true, revalidated, dispatched: pageId });
+  return NextResponse.json({ ok: true, event: eventType, revalidated });
 }

@@ -1,90 +1,26 @@
 # Scheduled Audit — Scripts Reference
 
-Automation scripts for maintaining and expanding the Vegan Moto Club Notion product database.
-There are two categories of work here: the **live audit** (runs automatically on a GitHub Actions
-cron + webhook) and **catalog expansion** scripts (run manually when adding a new brand or category).
+Automation for maintaining and expanding the Vegan Moto Club Notion product database.
+There are two categories of work here: **automatic enrichment** (a daily Claude Code scheduled
+task) and **catalog expansion** scripts (run manually when adding a new brand or category).
 
 ---
 
-## Live Audit
+## Automatic enrichment
 
-### `vmc_new_product_audit.py`
+The only automatic enrichment pass is the daily `vmc-product-enrichment` task below. New rows,
+including site suggestions titled `User Suggestion - <host>`, wait for that run. The Notion
+webhook (`app/api/notion-webhook/route.ts`) only refreshes the site cache; it does not start any
+enrichment.
 
-The only script that runs automatically. Triggered two ways:
+> **Retired 2026-11-14:** the Python audit (`vmc_new_product_audit.py`, its tests and
+> `lib_anthropic.py`), its GitHub workflow (`product-audit.yml`) and the webhook dispatch to it
+> were removed. They are in git history.
 
-1. **Webhook mode** — a user submits a product via the form on veganmotoclub.com, Notion fires
-   a webhook to `app/api/notion-webhook/route.ts`, which dispatches the GitHub Action
-   `.github/workflows/product-audit.yml` with a `page_id` argument. The script processes
-   that one page immediately.
-2. **Batch mode** — a weekly cron (Mondays 09:00 UTC) runs the same script without `--page-id`,
-   picking up to 20 entries where Description is still empty.
+### `vmc-product-enrichment` (Claude Code desktop scheduled task)
 
-**What it does per product:**
-
-- Scrapes the product URL with `requests` + `BeautifulSoup`
-- Detects Shopify-backed brands (e.g. REV'IT! on `revitsport.com`) and reads their
-  structured `tags` field via `/products/{handle}.json` for authoritative Gender, Riding style,
-  and Level of Waterproof — more reliable than scraping page text
-- Checks for a maker "Vegan" label in label-like HTML elements (headings, spec cells,
-  sustainability sections) and sets `Vegan Verified = Confirmed Vegan by maker` when found
-- Keyword-infers Brand, Category, Materials, Season, Protection from page text as a fallback
-- Writes only to fields that are currently empty in Notion — never overwrites curated data
-- Downloads and uploads up to 7 product photos as external file links, only when the page has
-  no photos yet
-- Generates a dated `.md` and `.html` report saved to `WORKSPACE_DIR`
-
-**Key design decisions:**
-
-- Never creates new Notion select options. At the start of each run `load_schema_options()`
-  fetches the live option lists from the Notion API (same token and database id as the rest of
-  the script; it accepts either the database id or the `collection://` data source id) and
-  `filter_to_schema()` drops any value that is not an existing option before writing, because
-  the API returns 400 on unknown options. The log says which source was used
-  (`Schema source: live Notion schema` or `hardcoded VALID (live schema fetch failed)`) and
-  lists any drift between Notion and `VALID`.
-- `VALID` is the fallback copy of those lists, last synced 2026-11-03. It keeps Notion's exact
-  spelling, typos included (`Cordura® (Synhtetic fabric)`, the trailing space in
-  `Waterproof (Gore-tex®) `). The Materials options that are several values joined with commas
-  or semicolons exist in Notion but are left out of `VALID` and ignored in the live schema too.
-- Brand matching uses whole words (no more "icon" inside "silicon"). Trust order: store domain,
-  then product name, then page text. Brands that are also common words (Held, Icon, FIVE, Bison,
-  Stellar and a few others in `AMBIGUOUS_BRANDS`) are never taken from page text.
-- Non-destructive: `build_notion_props` receives the current page properties and skips any
-  field that already has a value.
-- Shopify tags take priority over scraped text for gender, riding style, and waterproofing.
-  Avoids false positives like footer cross-sell links tagging unrelated products.
-
-**Run manually:**
-
-```bash
-# from the project root
-set -a && source ./.env.local && set +a
-python3 "Scheduled audit/vmc_new_product_audit.py"
-
-# single-product (webhook-equivalent)
-python3 "Scheduled audit/vmc_new_product_audit.py" --page-id <notion-page-id>
-
-# preview only: prints inferred values and the properties it would write; no Notion
-# writes, no photo downloads, no reports
-python3 "Scheduled audit/vmc_new_product_audit.py" --page-id <notion-page-id> --dry-run
-
-# tests (no network, no token)
-python3 -m unittest discover -s "Scheduled audit/tests" -v
-```
-
-Locally the script reads `NOTION_API_KEY` / `NOTION_PRODUCTS_DB_ID` from `.env.local`; in CI it
-reads `NOTION_TOKEN` / `NOTION_DB_ID`. Reports default to the `Scheduled audit/` folder.
-
-### `lib_anthropic.py`
-
-Legacy wrapper around the Anthropic SDK. No longer called by the audit; kept for reference only.
-The LLM second pass now runs on the Claude Code subscription (see below), never on API credits.
-
-### LLM second pass: `vmc-product-enrichment` (Claude Code desktop scheduled task)
-
-The Python audit leaves rows with a template description ("The X is a jackets from Y. Intended
-for...") and a placeholder title (`User Suggestion - <domain>`), which the site hides. A desktop
-scheduled task in Claude Code finishes them daily at 08:00 local while the Claude app is open.
+A desktop scheduled task in Claude Code enriches new rows daily at 05:00 local while the Claude
+app is open.
 Its prompt lives at `~/.claude/scheduled-tasks/vmc-product-enrichment/SKILL.md`; the manual entry
 point is `/refine-products [page ids]`.
 
@@ -225,7 +161,7 @@ python3 "Scheduled audit/revit_maker_vegan.py"
 | `resolve_shopify.py` | Resolves a product name to its Shopify handle across multiple brand storefronts. Used when a product URL is known but the handle is not. |
 | `dealer_photos.py` | Manually verified product-to-dealer mappings (`pid, name, base, handle`). Fetches and writes photos for products whose brand storefront does not carry good images. Add new entries to the `MAP` list and re-run. |
 | `apply_shopify_photos.py` | Fetches photos from a Shopify storefront and applies them to existing Notion pages. |
-| `export_revit_source.py` | Exports cleaned body_html feature text for each REV'IT! model to a local JSON file, for use when writing descriptions outside the audit. |
+| `export_revit_source.py` | Exports cleaned body_html feature text for each REV'IT! model to a local JSON file, for use when writing descriptions outside the enrichment task. |
 
 ---
 
@@ -236,9 +172,7 @@ All scripts read from `.env.local` at the project root.
 | Variable | Required by | Description |
 |---|---|---|
 | `NOTION_API_KEY` | Catalog expansion + data quality scripts | Notion integration token |
-| `NOTION_TOKEN` | `vmc_new_product_audit.py` (CI) | Same token, CI name. The audit falls back to `NOTION_API_KEY` |
 | `NOTION_PRODUCTS_DB_ID` | All scripts | Products database ID |
-| `ANTHROPIC_API_KEY` | `lib_anthropic.py` | Optional. Enables LLM descriptions and vegan adjudication. Falls back to stubs if absent. |
 
 ```bash
 # Load all env vars for a manual run
@@ -247,32 +181,14 @@ set -a && source ./.env.local && set +a
 
 ---
 
-## GitHub Actions Secrets
-
-| Secret | Description |
-|---|---|
-| `NOTION_TOKEN` | Notion integration token |
-| `NOTION_DB_ID` | Products database ID (has default) |
-| `ANTHROPIC_API_KEY` | Anthropic API key (optional) |
-
 ## Vercel Environment Variables (webhook handler)
 
 | Variable | Description |
 |---|---|
-| `NOTION_WEBHOOK_SECRET` | Shared secret for verifying the `x-notion-signature` header |
-| `GH_DISPATCH_TOKEN` | Fine-grained GitHub PAT with `actions:write` on the repo |
-| `GH_OWNER`, `GH_REPO`, `GH_WORKFLOW` | Optional overrides; default to `mayaibuki/vegan-moto-club` and `product-audit.yml` |
+| `NOTION_WEBHOOK_SECRET` | Shared secret for verifying the `x-notion-signature` header. Needed for the cache refresh. |
 
 ---
 
 ## Known Limitations
 
-- Keyword-based field inference (Brand, Category, Materials) can misclassify edge cases —
-  for example, a page mentioning "leather" in a "no leather used" context will still trigger
-  the animal-material flag. Shopify tag-based inference (Gender, Riding style, Waterproof)
-  does not have this problem.
-- Descriptions are currently written manually (Pro-quota) or via the fallback stub in
-  `lib_anthropic.py`. LLM-quality descriptions require a working `ANTHROPIC_API_KEY`.
-- Batch limit of 20 products per audit run. Large backlogs need multiple runs.
-- Photo scraping relies on CSS selectors and URL patterns that differ across e-commerce
-  platforms. Some images may be missed.
+- The enrichment task handles 10 rows per run. Large backlogs take several days.

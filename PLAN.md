@@ -24,7 +24,7 @@ Condensed timeline of what's been built:
 - ISR: revalidate=3600 on all data pages, dynamic import for ProductGrid
 - Event card redesign from Figma (poster + date overlay + price pill)
 - UTC-safe event date formatting
-- Python automation: daily product audit (vmc_product_audit.py) + new product enrichment (vmc_new_product_audit.py)
+- Python automation: daily product audit (vmc_product_audit.py) + new product enrichment (vmc_new_product_audit.py, retired 2026-11-14 for the `vmc-product-enrichment` task)
 
 ## In Progress / To Improve
 
@@ -33,7 +33,7 @@ Current: keyword-match pipeline using BeautifulSoup scraping.
 Next: Replace keyword matching with LLM-based field extraction for better accuracy on materials, season, riding style classification.
 
 ### Product Detail Writer
-Current: vmc_new_product_audit.py writes humanized descriptions for new submissions.
+Current: the daily `vmc-product-enrichment` task writes descriptions for new submissions.
 Next: Improve LLM-generated descriptions — better tone, more detailed specs, consistent format across all products.
 
 ### Discord → Notion Event Sync
