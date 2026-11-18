@@ -1,45 +1,18 @@
-// Old URLs of products removed from the catalog (see scripts/build-removed-products.mjs).
-const removedProducts = require('./lib/removed-products.json')
+// Static export for Cloudflare Pages: `next build` writes plain HTML, CSS, JS and
+// images to out/. Nothing runs per visitor, so there is no server CPU to run out
+// of. Data comes from the Notion snapshot (scripts/notion-snapshot.mjs) and is
+// refreshed by rebuilding (.github/workflows/deploy-cloudflare.yml).
+//
+// Redirects for removed products are written to out/_redirects by
+// scripts/write-cloudflare-files.mjs, since a static export cannot redirect.
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  async redirects() {
-    const removed = Object.entries(removedProducts).map(([slug, destination]) => ({
-      source: `/products/${slug}`,
-      destination,
-      permanent: true,
-    }))
-    // "Street wear" was retired on 2026-11-14. Most of its products are now Jackets.
-    return [
-      {
-        source: '/vegan-motorcycle-street-wear',
-        destination: '/vegan-motorcycle-jackets',
-        permanent: true,
-      },
-      {
-        source: '/products',
-        has: [{ type: 'query', key: 'category', value: 'Street wear' }],
-        destination: '/products?category=Jackets',
-        permanent: true,
-      },
-      ...removed,
-    ]
-  },
-  experimental: {
-    serverComponentsExternalPackages: ['sharp'],
-  },
+  output: 'export',
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-    formats: ['image/webp'],
-    minimumCacheTTL: 2678400,
-    deviceSizes: [640, 1200],
-    imageSizes: [96, 256],
+    // Photos are pre-resized at build time; there is no image optimizer on a static host.
+    unoptimized: true,
   },
 }
 

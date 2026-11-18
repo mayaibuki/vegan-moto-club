@@ -2,12 +2,14 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CATEGORY_PAGES } from "@/lib/constants"
+import { LegacyProductRedirect } from "@/components/LegacyProductRedirect"
 
 export const metadata: Metadata = { title: "Page not found" }
 
 export default function NotFound() {
   return (
     <div className="py-24 text-center space-y-8">
+      <LegacyProductRedirect />
       <div className="space-y-3">
         <p className="text-sm font-semibold uppercase tracking-wide text-primary-text">404</p>
         <h1 className="h-page">This page took a wrong turn</h1>

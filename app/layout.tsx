@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { JsonLd } from "@/components/JsonLd"
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import Script from "next/script"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { AgentationWrapper } from "@/components/AgentationWrapper"
@@ -9,6 +8,9 @@ import ShaderBackground from "@/components/ShaderBackground"
 import { dmSans } from "./fonts"
 import "./globals.css"
 import { SITE_URL, SITE_OG_IMAGE } from "@/lib/constants"
+
+// Cloudflare Web Analytics (free, cookieless). Set at build time; no token, no beacon.
+const CF_ANALYTICS_TOKEN = process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -128,8 +130,13 @@ export default function RootLayout({
           <Footer />
         </div>
         <AgentationWrapper />
-        <Analytics />
-        <SpeedInsights />
+        {CF_ANALYTICS_TOKEN && (
+          <Script
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: CF_ANALYTICS_TOKEN })}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   )

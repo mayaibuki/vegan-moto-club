@@ -37,7 +37,7 @@ function useMediaQuery(query: string): boolean {
 
 function imageProps(item: FaqItem, width: 600 | 1200) {
   const src = item.image || FALLBACK_IMAGE
-  return { src: notionImageUrl(src, width), unoptimized: src.startsWith("/api/notion-image") }
+  return { src: notionImageUrl(src, width), unoptimized: true }
 }
 
 /**

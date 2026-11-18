@@ -124,8 +124,7 @@ export default async function BlogPage() {
                             sizes="(max-width: 768px) 100vw, 33vw"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                             loading="lazy"
-                            unoptimized={post.featuredImage.startsWith("/api/notion-image")}
-                          />
+                                                      />
                         </div>
                       )}
                       <div className={`flex flex-col justify-between ${post.featuredImage ? "md:col-span-2" : "col-span-1"}`}>

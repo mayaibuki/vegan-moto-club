@@ -185,8 +185,7 @@ export default async function ProductDetailPage({
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                   priority
-                  unoptimized={product.photos[0].startsWith("/api/notion-image")}
-                />
+                                  />
               </div>
               {product.photos.length > 1 && (
                 <div className="grid grid-cols-3 gap-2" role="group" aria-label="Additional product images">
@@ -202,8 +201,7 @@ export default async function ProductDetailPage({
                         sizes="(max-width: 768px) 33vw, 16vw"
                         className="object-cover"
                         loading="lazy"
-                        unoptimized={photo.startsWith("/api/notion-image")}
-                      />
+                                              />
                     </div>
                   ))}
                 </div>
