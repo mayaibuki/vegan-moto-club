@@ -1,0 +1,107 @@
+# Builds the static site and deploys it to Cloudflare Pages.
+#
+# Triggers:
+#   push to main        code changes
+#   workflow_dispatch   Notion webhook (functions/api/notion-webhook.ts) after a human edit, or by hand
+#   schedule (hourly)   picks up integration edits; deploys only if the Notion data changed
+#
+# Setup (once):
+#   Secrets:   CLOUDFLARE_API_TOKEN (Cloudflare Pages: Edit), CLOUDFLARE_ACCOUNT_ID,
+#              NOTION_API_KEY, NOTION_PRODUCTS_DB_ID, NOTION_EVENTS_DB_ID, NOTION_BLOG_DB_ID
+#   Variables (optional): CF_PAGES_PROJECT (default vegan-moto-club),
+#              SITE_URL (default https://www.veganmotoclub.com), CF_ANALYTICS_TOKEN
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+# One build at a time. A new trigger waits; GitHub keeps only the latest waiting
+# run, so a burst of Notion edits collapses into at most one extra build.
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+      NOTION_PRODUCTS_DB_ID: ${{ secrets.NOTION_PRODUCTS_DB_ID }}
+      NOTION_EVENTS_DB_ID: ${{ secrets.NOTION_EVENTS_DB_ID }}
+      NOTION_BLOG_DB_ID: ${{ secrets.NOTION_BLOG_DB_ID }}
+      NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL || 'https://www.veganmotoclub.com' }}
+      NEXT_PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
+      CF_PAGES_PROJECT: ${{ vars.CF_PAGES_PROJECT || 'vegan-moto-club' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      # Resized photos from earlier runs, so only new photos are downloaded.
+      - name: Restore photo cache
+        uses: actions/cache/restore@v4
+        with:
+          path: public/photos
+          key: photos-none
+          restore-keys: photos-
+
+      - name: Snapshot Notion and resize photos
+        run: node scripts/notion-snapshot.mjs
+
+      - name: Save photo cache
+        run: echo "key=photos-$(ls public/photos | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+        id: photokey
+      - uses: actions/cache/save@v4
+        with:
+          path: public/photos
+          key: ${{ steps.photokey.outputs.key }}
+        continue-on-error: true # the key already exists when no photo changed
+
+      # Fingerprint of code + Notion data. Notion's signed file URLs and their
+      # expiry times change every hour, so they are left out.
+      - name: Compare with the live site
+        id: diff
+        run: |
+          HASH=$(node -e '
+            const fs = require("fs"), crypto = require("crypto");
+            const h = crypto.createHash("sha256").update(process.env.GITHUB_SHA);
+            for (const f of fs.readdirSync(".notion-snapshot").sort()) {
+              h.update(fs.readFileSync(".notion-snapshot/" + f, "utf8")
+                .replace(/\?X-Amz-[^"]*/g, "")
+                .replace(/"expiry_time":"[^"]*"/g, ""));
+            }
+            console.log(h.digest("hex").slice(0, 32));
+          ')
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          LIVE=$(curl -fsS --max-time 10 "https://${CF_PAGES_PROJECT}.pages.dev/build-hash.txt" || true)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$LIVE" = "$HASH" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Live site already matches this data; nothing to deploy."
+          fi
+
+      - name: Build
+        if: steps.diff.outputs.skip != 'true'
+        run: |
+          npx next build
+          node scripts/write-cloudflare-files.mjs
+          echo "${{ steps.diff.outputs.hash }}" > out/build-hash.txt
+
+      - name: Deploy
+        if: steps.diff.outputs.skip != 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler pages deploy out --project-name="$CF_PAGES_PROJECT" --branch=main --commit-dirty=true

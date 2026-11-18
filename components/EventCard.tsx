@@ -66,8 +66,7 @@ export function EventCard({ event, muted = false }: EventCardProps) {
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                 className="object-cover"
-                unoptimized={event.poster.startsWith("/api/notion-image")}
-              />
+                              />
             </div>
             {/* Hairline outline so light posters keep an edge against the card */}
             <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-foreground/10" aria-hidden="true" />

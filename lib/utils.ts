@@ -14,15 +14,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** True for photos the build downloaded and resized into /photos (see scripts/notion-snapshot.mjs). */
+export function isLocalPhoto(src: string): boolean {
+  return src.startsWith("/photos/")
+}
+
 /**
- * Append a width hint to a Notion proxy URL so the proxy returns a resized
- * WebP. Non-proxy URLs (external images) are returned unchanged. Used together
- * with `unoptimized` on <Image> to bypass Vercel's image optimizer.
+ * Pick the pre-resized variant of a local photo: /photos/<hash>.webp becomes
+ * /photos/<hash>-w600.webp. The plain file is already 1200px wide, so 1200
+ * returns it as is. Other URLs (external fallbacks) are returned unchanged.
+ * Widths must match WIDTHS and FULL_WIDTH in scripts/notion-snapshot.mjs.
  */
 export function notionImageUrl(src: string, width: 256 | 600 | 1200): string {
-  if (!src.startsWith("/api/notion-image")) return src
-  const sep = src.includes("?") ? "&" : "?"
-  return `${src}${sep}w=${width}`
+  if (!isLocalPhoto(src) || width === 1200) return src
+  return src.replace(/\.webp$/, `-w${width}.webp`)
 }
 
 export function formatPrice(price: number): string {

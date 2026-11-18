@@ -1,3 +1,5 @@
+> **Outdated (Nov 2026):** the site now deploys to Cloudflare Pages. See `docs/cloudflare-pages.md`. The Vercel notes below are kept for reference.
+
 # Deployment — Vegan Moto Club
 
 ## Live Site

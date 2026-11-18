@@ -1,5 +1,7 @@
 import { Client } from "@notionhq/client";
 import { unstable_cache } from "next/cache";
+import fs from "fs";
+import path from "path";
 import { generateSlug } from "./utils";
 
 export const notion = new Client({
@@ -10,6 +12,48 @@ export const notion = new Client({
 });
 
 const REVALIDATE_TIME = process.env.NODE_ENV === "production" ? 3600 : 60;
+
+// ─── Build snapshot ──────────────────────────────────────────────
+// Production builds read the Notion snapshot that scripts/notion-snapshot.mjs
+// writes just before `next build`: one Notion pull per build instead of one per
+// build worker, and photos already resized to static files. `next dev` keeps
+// querying Notion live.
+
+const SNAPSHOT_DIR = path.join(process.cwd(), ".notion-snapshot");
+const USE_SNAPSHOT =
+  process.env.NODE_ENV === "production" && fs.existsSync(path.join(SNAPSHOT_DIR, "photos.json"));
+
+const bareId = (id: string) => id.replace(/-/g, "").toLowerCase();
+
+function readSnapshot(databaseId: string): NotionPage[] {
+  const file = path.join(SNAPSHOT_DIR, `${bareId(databaseId)}.json`);
+  return JSON.parse(fs.readFileSync(file, "utf8")) as NotionPage[];
+}
+
+/** One page by id from any snapshot database, or undefined when it is not there. */
+function snapshotPage(id: string): NotionPage | undefined {
+  const target = bareId(id);
+  for (const dbId of [process.env.NOTION_PRODUCTS_DB_ID, process.env.NOTION_EVENTS_DB_ID, process.env.NOTION_BLOG_DB_ID]) {
+    if (!dbId) continue;
+    const hit = readSnapshot(dbId).find((page) => bareId(page.id) === target);
+    if (hit) return hit;
+  }
+  return undefined;
+}
+
+/** "<pageId>:<prop>:<idx>" -> "/photos/<hash>.webp", written by the snapshot script. */
+const photoManifest: Record<string, string> = USE_SNAPSHOT
+  ? JSON.parse(fs.readFileSync(path.join(SNAPSHOT_DIR, "photos.json"), "utf8"))
+  : {};
+
+/** Skip unstable_cache when reading the snapshot: a reused .next/cache would serve an older build's data. */
+function cached<A extends unknown[], R>(
+  fn: (...args: A) => Promise<R>,
+  key: string[],
+  tags: string[]
+): (...args: A) => Promise<R> {
+  return USE_SNAPSHOT ? fn : unstable_cache(fn, key, { revalidate: REVALIDATE_TIME, tags });
+}
 
 // ─── Exported types ──────────────────────────────────────────────
 
@@ -149,9 +193,10 @@ function extractText(richText: NotionRichText[]): string {
 }
 
 /**
- * Resolve a Notion file to a stable URL. External files use their URL directly;
- * Notion-hosted files go through the /api/notion-image proxy so Vercel's image
- * optimizer cache key doesn't rotate with Notion's signed URLs.
+ * Resolve a Notion file to the URL the page should show. Production builds use
+ * the pre-resized local copy from the photo manifest. Without one, an external
+ * file falls back to its source URL; a Notion-hosted file is skipped in
+ * production (its signed URL expires within an hour) and used directly in dev.
  */
 function resolveFileUrl(
   pageId: string,
@@ -160,9 +205,9 @@ function resolveFileUrl(
   idx: number
 ): string {
   if (!file) return "";
-  if (file.type === "file") {
-    return `/api/notion-image?pageId=${pageId}&prop=${encodeURIComponent(prop)}&idx=${idx}`;
-  }
+  const local = photoManifest[`${pageId}:${prop}:${idx}`];
+  if (local) return local;
+  if (file.type === "file") return USE_SNAPSHOT ? "" : file.file?.url ?? "";
   return file.external?.url ?? "";
 }
 
@@ -202,6 +247,7 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
  * timing out on them. Callers filter and sort in JS instead.
  */
 async function paginateDatabase(databaseId: string): Promise<NotionPage[]> {
+  if (USE_SNAPSHOT) return readSnapshot(databaseId);
   const allResults: NotionPage[] = [];
   let hasMore = true;
   let startCursor: string | undefined = undefined;
@@ -301,10 +347,10 @@ async function fetchProductsFromNotionUncached(): Promise<Product[]> {
     .sort((a, b) => b.lastEditedTime.localeCompare(a.lastEditedTime));
 }
 
-const getProductsCached = unstable_cache(
+const getProductsCached = cached(
   fetchProductsFromNotion,
   ["products"],
-  { revalidate: REVALIDATE_TIME, tags: ["products"] }
+  ["products"]
 );
 
 export async function getProducts(): Promise<Product[]> {
@@ -317,16 +363,19 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 async function fetchProductFromNotion(id: string): Promise<Product | null> {
-  const page = (await withRetry(() => notion.pages.retrieve({ page_id: id }))) as NotionPage;
+  const page = USE_SNAPSHOT
+    ? snapshotPage(id)
+    : ((await withRetry(() => notion.pages.retrieve({ page_id: id }))) as NotionPage);
+  if (!page) return null;
   // pages.retrieve does return trashed pages; treat them as gone.
   if (page.archived || page.in_trash) return null;
   return mapNotionPageToProduct(page);
 }
 
-const getProductCached = unstable_cache(
+const getProductCached = cached(
   fetchProductFromNotion,
   ["product"],
-  { revalidate: REVALIDATE_TIME, tags: ["products"] }
+  ["products"]
 );
 
 export async function getProduct(id: string): Promise<Product | null> {
@@ -371,10 +420,10 @@ async function fetchEventsFromNotion(): Promise<Event[]> {
     .sort((a, b) => a.startDate.localeCompare(b.startDate));
 }
 
-const getEventsCached = unstable_cache(
+const getEventsCached = cached(
   fetchEventsFromNotion,
   ["events"],
-  { revalidate: REVALIDATE_TIME, tags: ["events"] }
+  ["events"]
 );
 
 export async function getEvents(): Promise<Event[]> {
@@ -396,10 +445,10 @@ async function fetchBlogPostsFromNotion(): Promise<BlogPost[]> {
     .sort((a, b) => b.publishDate.localeCompare(a.publishDate));
 }
 
-const getBlogPostsCached = unstable_cache(
+const getBlogPostsCached = cached(
   fetchBlogPostsFromNotion,
   ["blog-posts"],
-  { revalidate: REVALIDATE_TIME, tags: ["blog"] }
+  ["blog"]
 );
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
@@ -412,14 +461,14 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 }
 
 async function fetchBlogPostFromNotion(id: string): Promise<BlogPost | null> {
-  const page = await withRetry(() => notion.pages.retrieve({ page_id: id }));
-  return mapNotionPageToBlogPost(page as NotionPage);
+  const page = USE_SNAPSHOT ? snapshotPage(id) : await withRetry(() => notion.pages.retrieve({ page_id: id }));
+  return page ? mapNotionPageToBlogPost(page as NotionPage) : null;
 }
 
-const getBlogPostCached = unstable_cache(
+const getBlogPostCached = cached(
   fetchBlogPostFromNotion,
   ["blog-post"],
-  { revalidate: REVALIDATE_TIME, tags: ["blog"] }
+  ["blog"]
 );
 
 export async function getBlogPost(id: string): Promise<BlogPost | null> {

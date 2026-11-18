@@ -22,6 +22,9 @@ export default function robots(): MetadataRoute.Robots {
           "cohere-ai",
         ],
         allow: "/",
+        // Crawlers obey only the most specific group that names them, so the
+        // "*" disallow above does not reach these bots unless repeated here.
+        disallow: ["/api/", "/admin/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
