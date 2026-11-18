@@ -24,6 +24,7 @@ Data refreshes when:
    Optional variables: `CF_PAGES_PROJECT` (if the name differs), `CF_ANALYTICS_TOKEN` (Web Analytics, step 7).
 5. **Function variables** (Pages project → Settings → Variables and Secrets, Production):
    `NOTION_API_KEY`, `NOTION_PRODUCTS_DB_ID`, `NOTION_EVENTS_DB_ID`, `NOTION_BLOG_DB_ID`, `NOTION_WEBHOOK_SECRET`, `GH_DISPATCH_TOKEN` (fine-grained GitHub token for this repo with Actions: read and write).
+   Steps 4 and 5 in one go: `sh scripts/cloudflare-secrets.sh` copies them from `.env.local` and Vercel without printing them, then asks you to paste the Cloudflare API token. Pages secrets apply from the next deployment.
 6. **Run the workflow once**: Actions → Deploy to Cloudflare Pages → Run workflow. The first run downloads every photo (about 10 minutes); later runs only fetch new ones. Check `https://vegan-moto-club.pages.dev`.
 7. **Web Analytics** (optional): Cloudflare → Analytics & Logs → Web Analytics → add site → copy the token into the `CF_ANALYTICS_TOKEN` variable.
 8. **Domain**: Pages project → Custom domains → add `www.veganmotoclub.com`. Easiest is to move the domain's nameservers from GoDaddy to Cloudflare (free; Cloudflare then handles the apex too). Add a Redirect Rule `veganmotoclub.com/*` → `https://www.veganmotoclub.com/$1` (301). If DNS stays at GoDaddy instead: CNAME `www` → `vegan-moto-club.pages.dev`, and use GoDaddy forwarding for the apex.
