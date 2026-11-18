@@ -8,8 +8,21 @@ import { JsonLd } from "@/components/JsonLd"
 import { faqPageJsonLd } from "@/lib/seo"
 import { cn, notionImageUrl } from "@/lib/utils"
 
-/** Shown for rows that have no Featured image in Notion yet. */
-const FALLBACK_IMAGE = "/images/hero.jpg"
+/**
+ * Community photos (1200px WebP, served as-is: no image optimizer on the static
+ * host) for rows that have no Featured image in Notion yet, picked
+ * by question index so each question gets its own. `position` keeps the riders
+ * in frame when a portrait photo is cropped to the 4:3 frame.
+ */
+const COMMUNITY_PHOTOS = [
+  { src: "/images/community/community-2.webp", position: "50% 50%" },
+  { src: "/images/community/community-6.webp", position: "50% 50%" },
+  { src: "/images/community/community-4.webp", position: "50% 80%" },
+  { src: "/images/community/community-7.webp", position: "50% 50%" },
+  { src: "/images/community/community-3.webp", position: "50% 85%" },
+  { src: "/images/community/community-5.webp", position: "50% 50%" },
+  { src: "/images/community/community-1.webp", position: "50% 50%" },
+]
 
 /** React 18 only renders `inert` as a string attribute ("" turns it on), while
  *  @types/react 18.3 types it as boolean, so the cast lives here once. */
@@ -35,9 +48,10 @@ function useMediaQuery(query: string): boolean {
   return matches
 }
 
-function imageProps(item: FaqItem, width: 600 | 1200) {
-  const src = item.image || FALLBACK_IMAGE
-  return { src: notionImageUrl(src, width), unoptimized: true }
+function imageProps(item: FaqItem, index: number, width: 600 | 1200) {
+  if (item.image) return { src: notionImageUrl(item.image, width), unoptimized: true }
+  const photo = COMMUNITY_PHOTOS[index % COMMUNITY_PHOTOS.length]
+  return { src: photo.src, unoptimized: true, style: { objectPosition: photo.position } }
 }
 
 /**
@@ -109,11 +123,11 @@ export function FaqShowcase({ items, title = "Common Questions", withSchema = tr
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-16">
         {/* Photo column (lg+): every image stacked, the open question's one visible */}
         <div className="hidden lg:sticky lg:top-24 lg:block">
-          <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted">
+          <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-muted">
             {items.map((item, index) => (
               <Image
                 key={item.question}
-                {...imageProps(item, 1200)}
+                {...imageProps(item, index, 1200)}
                 alt=""
                 fill
                 sizes="(min-width: 1024px) 50vw, 100vw"
@@ -178,9 +192,9 @@ export function FaqShowcase({ items, title = "Common Questions", withSchema = tr
                   <div className="min-h-0 overflow-hidden">
                     <div className="space-y-4 pb-6">
                       <p className="max-w-prose text-base leading-relaxed text-muted-foreground text-pretty">{item.answer}</p>
-                      <div className="relative aspect-4/3 overflow-hidden rounded-xl bg-muted sm:aspect-video lg:hidden">
+                      <div className="relative aspect-4/3 overflow-hidden rounded-xl bg-muted lg:hidden">
                         <Image
-                          {...imageProps(item, 1200)}
+                          {...imageProps(item, index, 1200)}
                           alt=""
                           fill
                           sizes="100vw"
